@@ -1,0 +1,157 @@
+{
+  "schema": "GI_I66_MAKE_FUNCTION_TRAFFIC_AND_GRANTS_READONLY_V1",
+  "status": "PREIMAGES_OBSERVED_CLOSED_OR_ABSENT",
+  "projectId": "ays-orbit-360-lab",
+  "tenantId": "alianzas-soluciones",
+  "country": "GT",
+  "scopeContractBlob": "7ce546736ac8d08b8ac922d19f3e6e4c2bac0021",
+  "provenance": {
+    "repository": "paulaosoriof86/orbit360-core",
+    "sourceSha": "0f4b4ccc817b5dd539c22640b65b3b0de211b175",
+    "workflowPath": ".github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml",
+    "workflowGitBlob": "4dd760b19b3b25efc64a425294a06c8f9ca73e21",
+    "runId": 45526472429,
+    "runAttempt": 1,
+    "job": "existing_inbound_config",
+    "ownerPins": {
+      "tools/gravicentra-i66-make-lead-protected-executor.cjs": "9620fc1aefeb30e95c57aca0b87896c3e9fefc59",
+      "tools/gravicentra-i66-make-release-scope.cjs": "40c215ca67e17f9e1287ba562b0abfca1b55077d",
+      "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937"
+    }
+  },
+  "observedAtUtc": "2026-11-25T01:32:33.102Z",
+  "phases": {
+    "preview": {
+      "phase": "preview",
+      "status": "OBSERVED_CLOSED_OR_ABSENT",
+      "functionApi": {
+        "state": "EXISTING_OBSERVED",
+        "projection": {
+          "name": "orbit360MakeLeadIngressPreview",
+          "region": "us-east1",
+          "revision": "orbit360makeleadingresspreview-00004-sum",
+          "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+          "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+          "database": "(default)",
+          "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+          "retryPolicy": "RETRY_POLICY_RETRY",
+          "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-265013",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "configurationDigest": "196d5103886a681985b2ea817506a1554032961bd52aefd603b939620a49a16a"
+        }
+      },
+      "cloudRunTraffic": {
+        "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+        "phase": "preview",
+        "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+        "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+        "generation": "4",
+        "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+        "targets": [
+          {
+            "revision": "orbit360makeleadingresspreview-00001-cuy",
+            "percent": 100
+          }
+        ],
+        "observationDigest": "ee8568ce533710c81965419ab18831c2bdc48c9ca6711c7a7402e13001139665"
+      },
+      "grant": {
+        "path": "tenants/alianzas-soluciones/config/makeLeadIngressPreview",
+        "exists": true,
+        "expectedDigest": "a020555d0efc3e9cf68baf5b2b309eeb3fc004fadbf0e2539aff680a00a9aae4",
+        "state": "CLOSED",
+        "enabled": false,
+        "updateTime": {
+          "seconds": "1795547589",
+          "nanoseconds": 852062000
+        },
+        "scopeVerified": true,
+        "authoritySourceSha": "74ae28c6e6e6b40f845567c9b00738a58307b3cb",
+        "authorityReceiptBlob": "7bd5db8be25b7085d6b73dbf965d6b343a24a186"
+      },
+      "errorCode": null
+    },
+    "live": {
+      "phase": "live",
+      "status": "OBSERVED_CLOSED_OR_ABSENT",
+      "functionApi": {
+        "state": "ABSENT",
+        "projection": null
+      },
+      "cloudRunTraffic": {
+        "state": "ABSENT",
+        "exactHttp404": true
+      },
+      "grant": {
+        "path": "tenants/alianzas-soluciones/config/makeLeadIngress",
+        "exists": false,
+        "expectedDigest": "ABSENT",
+        "state": "ABSENT",
+        "enabled": false,
+        "updateTime": null,
+        "scopeVerified": true
+      },
+      "errorCode": null
+    }
+  },
+  "httpReads": [
+    {
+      "method": "GET",
+      "url": "https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360MakeLeadIngressPreview",
+      "startedAtUtc": "2026-11-25T01:32:33.513Z",
+      "httpStatus": 200,
+      "responseSha256": "e3437c832ffb60e8fe3ef3a5e4751e7e65fd816d94458842ae2e39b69f0ac7d3",
+      "completedAtUtc": "2026-11-25T01:32:34.394Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://run.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "startedAtUtc": "2026-11-25T01:32:34.405Z",
+      "httpStatus": 200,
+      "responseSha256": "97e5e883d49b1285ec1b21257803615dc3677c14ff3f2a7c95928e9919974cf8",
+      "completedAtUtc": "2026-11-25T01:32:34.984Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-east1/functions/orbit360MakeLeadIngressPreview",
+      "startedAtUtc": "2026-11-25T01:32:34.985Z",
+      "httpStatus": 200,
+      "responseSha256": "1a9883e6c6a72358a993e7d88edeb5a7ad017d78bf894ced1a9fef36dd576d07",
+      "completedAtUtc": "2026-11-25T01:32:35.651Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-central1/functions/orbit360MakeLeadIngress",
+      "startedAtUtc": "2026-11-25T01:32:35.944Z",
+      "httpStatus": 404,
+      "responseSha256": null,
+      "completedAtUtc": "2026-11-25T01:32:36.041Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://run.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-central1/services/orbit360makeleadingress",
+      "startedAtUtc": "2026-11-25T01:32:36.041Z",
+      "httpStatus": 404,
+      "responseSha256": null,
+      "completedAtUtc": "2026-11-25T01:32:36.397Z"
+    },
+    {
+      "method": "GET",
+      "url": "https://cloudfunctions.googleapis.com/v2/projects/ays-orbit-360-lab/locations/us-central1/functions/orbit360MakeLeadIngress",
+      "startedAtUtc": "2026-11-25T01:32:36.397Z",
+      "httpStatus": 404,
+      "responseSha256": null,
+      "completedAtUtc": "2026-11-25T01:32:36.644Z"
+    }
+  ],
+  "firestoreReads": 4,
+  "cloudWrites": 0,
+  "configurationWrites": 0,
+  "canonicalLeadWrites": 0,
+  "iamWrites": 0,
+  "externalMessagesSent": 0,
+  "privateBodiesPublished": false,
+  "releaseAuthority": false,
+  "completedAtUtc": "2026-11-25T01:32:36.734Z",
+  "reportDigest": "ae3baf274b7f5d248e40a606cff6aff2705a4de6ae4cd66e8e50c058457928b4"
+}

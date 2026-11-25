@@ -1,0 +1,2979 @@
+{
+  "schema": "GI_I66_PREVIEW_PACKAGE_READBACK_V1",
+  "status": "PASS",
+  "stage": "COMPLETE",
+  "sourceSha": "63bf7d9e9ba7710cab73bffee010987c784d92aa",
+  "artifactId": 14983831110,
+  "artifactDigest": "sha256:c8ecc0f82cfd61d57c628b7b506f2c73c245efec99ea1927762975e96f511801",
+  "readinessDeadlineMs": 240000,
+  "expectedFiles": 224,
+  "verifiedFiles": 224,
+  "readinessAttempts": [
+    {
+      "attempt": 1,
+      "elapsedMs": 142,
+      "status": 200,
+      "bytes": 199,
+      "sha256": "fcdef5d150b9bca781f1237050295c7d8ba39d970e6dfe1877d1b2b3b53533d0",
+      "exactBytes": true,
+      "observedMarker": {
+        "sourceSha": "63bf7d9e9ba7710cab73bffee010987c784d92aa",
+        "buildId": "gi-i66-63bf7d9e9ba7-57f234755dc1"
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "__recovery__/build.json",
+      "expectedSha256": "fcdef5d150b9bca781f1237050295c7d8ba39d970e6dfe1877d1b2b3b53533d0",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 199,
+          "sha256": "fcdef5d150b9bca781f1237050295c7d8ba39d970e6dfe1877d1b2b3b53533d0"
+        }
+      ]
+    },
+    {
+      "path": "assets/icons/gravicentra-192.png",
+      "expectedSha256": "48a916454ceb5cec8cb13324f66de8e61d84477de16ae2b5c57d8a17b1d11665",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 18752,
+          "sha256": "48a916454ceb5cec8cb13324f66de8e61d84477de16ae2b5c57d8a17b1d11665"
+        }
+      ]
+    },
+    {
+      "path": "assets/icons/gravicentra-512.png",
+      "expectedSha256": "965aed171811f52ac0a43fb496fd8961e1e58681fe0b761a28e8a590cbad4e42",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 131722,
+          "sha256": "965aed171811f52ac0a43fb496fd8961e1e58681fe0b761a28e8a590cbad4e42"
+        }
+      ]
+    },
+    {
+      "path": "assets/tenant/alianzas-soluciones/logo-bolita-192.png",
+      "expectedSha256": "7f46cadb31091877ed1692bb87504e96bd11e38f9c3324c704fdfb71efc889af",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 19606,
+          "sha256": "7f46cadb31091877ed1692bb87504e96bd11e38f9c3324c704fdfb71efc889af"
+        }
+      ]
+    },
+    {
+      "path": "assets/tenant/alianzas-soluciones/logo-bolita-512.png",
+      "expectedSha256": "34e583b2a98d6f88d97dbe73a7bffb07289089921192050ad7b46a6fecee495e",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 87892,
+          "sha256": "34e583b2a98d6f88d97dbe73a7bffb07289089921192050ad7b46a6fecee495e"
+        }
+      ]
+    },
+    {
+      "path": "assets/tenant/alianzas-soluciones/logo-bolita-96.png",
+      "expectedSha256": "2a79b7a7943459c9610ec15f98d4d726029d2b6efafb51ec9184caebdd003a4a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2921,
+          "sha256": "2a79b7a7943459c9610ec15f98d4d726029d2b6efafb51ec9184caebdd003a4a"
+        }
+      ]
+    },
+    {
+      "path": "assets/tenant/alianzas-soluciones/logo-oficial-360.png",
+      "expectedSha256": "12d7ef38ab0d6ede389653cd01d722ddeeeb0571dc9b172899aad83c0f169e61",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9338,
+          "sha256": "12d7ef38ab0d6ede389653cd01d722ddeeeb0571dc9b172899aad83c0f169e61"
+        }
+      ]
+    },
+    {
+      "path": "core/academia-product-catalog-p0.js",
+      "expectedSha256": "3eb8a8363d5333b64100363c4b84cb2e8a42e2c18ca901002786b3087051fb3d",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 7064,
+          "sha256": "3eb8a8363d5333b64100363c4b84cb2e8a42e2c18ca901002786b3087051fb3d"
+        }
+      ]
+    },
+    {
+      "path": "core/academia-static-content-write-policy-v20260729.js",
+      "expectedSha256": "5bc4b354f71b8cfcf828694657ea8e28f7d8a59e133d7f5ef2d1398272b9b1c1",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9149,
+          "sha256": "5bc4b354f71b8cfcf828694657ea8e28f7d8a59e133d7f5ef2d1398272b9b1c1"
+        }
+      ]
+    },
+    {
+      "path": "core/access-ceilings-v1199.js",
+      "expectedSha256": "301bc24b0df2af2795994a5641ca394a71f4d2bf55fd0fc3a42068fac0ad5112",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2444,
+          "sha256": "301bc24b0df2af2795994a5641ca394a71f4d2bf55fd0fc3a42068fac0ad5112"
+        }
+      ]
+    },
+    {
+      "path": "core/access-role-session-owner-v20260728.js",
+      "expectedSha256": "b8aa9f37f46ff43883b3d52f4370be0c9063e095b22093fceec0ff6da04bfcf6",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 18937,
+          "sha256": "b8aa9f37f46ff43883b3d52f4370be0c9063e095b22093fceec0ff6da04bfcf6"
+        }
+      ]
+    },
+    {
+      "path": "core/access-scope.js",
+      "expectedSha256": "e18a8ed5f89c10d4cab7b287c7fa092f89b26595757df3f8da0c4d15e451bbf8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 32671,
+          "sha256": "e18a8ed5f89c10d4cab7b287c7fa092f89b26595757df3f8da0c4d15e451bbf8"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-batch-admin-actions-p09i.js",
+      "expectedSha256": "492391fe481d424d210b17137c37c2ce57c99989d6ee7a1144734c100fb2f6ff",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15436,
+          "sha256": "492391fe481d424d210b17137c37c2ce57c99989d6ee7a1144734c100fb2f6ff"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-batch-history-p09h.js",
+      "expectedSha256": "ce396a63debdbc458df3bdd30c9520763d1e376a6c34f41e3a2aab77d269cc57",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 19777,
+          "sha256": "ce396a63debdbc458df3bdd30c9520763d1e376a6c34f41e3a2aab77d269cc57"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-batch-orchestrator-p09g.js",
+      "expectedSha256": "4213e471f6a6cd3cd4b41a461ca6a84cee1819f505efa53eb48209c25bb00a03",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 24986,
+          "sha256": "4213e471f6a6cd3cd4b41a461ca6a84cee1819f505efa53eb48209c25bb00a03"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-binding-enablement-lab-v1208.js",
+      "expectedSha256": "ee4ab3e4cd995558a877ccf474527728b8d82a69450c421eec15601bf35a83bc",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 14466,
+          "sha256": "ee4ab3e4cd995558a877ccf474527728b8d82a69450c421eec15601bf35a83bc"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-credentials-provider-lab-v20260720.js",
+      "expectedSha256": "201f1edac74974d82924a1bf22246ee5742499e337207bf57427db439885a3c2",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 14926,
+          "sha256": "201f1edac74974d82924a1bf22246ee5742499e337207bf57427db439885a3c2"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-first-source-orchestrator-p09f.js",
+      "expectedSha256": "cd380c4e618be03b15706d51bece9c3fff178db88072d8fa7e1955fa9a0715fa",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11471,
+          "sha256": "cd380c4e618be03b15706d51bece9c3fff178db88072d8fa7e1955fa9a0715fa"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-knowledge-runtime-p09.js",
+      "expectedSha256": "36e07451f27bbcb770ca4120a4b72c13b2a7c597d9954bf82b857c5cf1d53e8c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15188,
+          "sha256": "36e07451f27bbcb770ca4120a4b72c13b2a7c597d9954bf82b857c5cf1d53e8c"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-lab-collections-p09e.js",
+      "expectedSha256": "b7de31c5292a933d3677166749fa5f717ea4ea395d51df46dd29fff3195133d4",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 8397,
+          "sha256": "b7de31c5292a933d3677166749fa5f717ea4ea395d51df46dd29fff3195133d4"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-lab-persistence-p09e.js",
+      "expectedSha256": "8f47d2f1ef4aa01f3a28a9cfae91d9a2ee8cd8cbd6087420e7c2d6ca17b80f19",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9368,
+          "sha256": "8f47d2f1ef4aa01f3a28a9cfae91d9a2ee8cd8cbd6087420e7c2d6ca17b80f19"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-op2-operational-access-policy.js",
+      "expectedSha256": "894383a189294583c3e51331b21f525eba5803310a6014ea4fc7f9a246844c04",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3346,
+          "sha256": "894383a189294583c3e51331b21f525eba5803310a6014ea4fc7f9a246844c04"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-op2-secure-provider-policy-guard.js",
+      "expectedSha256": "2712438364f026026ef33fad9c7a79bee3496d177781ca38d2aa655830c74c2a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2942,
+          "sha256": "2712438364f026026ef33fad9c7a79bee3496d177781ca38d2aa655830c74c2a"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-runtime-bootstrap-p09f.js",
+      "expectedSha256": "25bb38e80ed867c753d92cb0d8ad32711fe567fdcc95d6a703b995b2fe115bce",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 12524,
+          "sha256": "25bb38e80ed867c753d92cb0d8ad32711fe567fdcc95d6a703b995b2fe115bce"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-runtime-observer-p09n.js",
+      "expectedSha256": "b47e628c81f823acfe8c6afeee552623a47d38c1f4a90969e44e2507c6d70244",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 16624,
+          "sha256": "b47e628c81f823acfe8c6afeee552623a47d38c1f4a90969e44e2507c6d70244"
+        }
+      ]
+    },
+    {
+      "path": "core/aseguradoras-source-reference-broker-p09j.js",
+      "expectedSha256": "8464c45dd6c1d43020d33117d03ed2ccc492443201eb3bbaec9b1cab19b2172b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10558,
+          "sha256": "8464c45dd6c1d43020d33117d03ed2ccc492443201eb3bbaec9b1cab19b2172b"
+        }
+      ]
+    },
+    {
+      "path": "core/assignable-advisor-roster-client.js",
+      "expectedSha256": "af1510ac92e39ab73a49b207a70ebd7ca48b09d6ecefd82bd14f2c99c3ee6419",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 7808,
+          "sha256": "af1510ac92e39ab73a49b207a70ebd7ca48b09d6ecefd82bd14f2c99c3ee6419"
+        }
+      ]
+    },
+    {
+      "path": "core/auth-password-change-v20260805.js",
+      "expectedSha256": "9ba37b1f9b83153fb663087cc6791082d84bb13f3c66fb350f74172e24322435",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 4693,
+          "sha256": "9ba37b1f9b83153fb663087cc6791082d84bb13f3c66fb350f74172e24322435"
+        }
+      ]
+    },
+    {
+      "path": "core/auth-product-runtime-p0.js",
+      "expectedSha256": "c77e25cbd6ca038410fb597b86205e56dfab8906dddd22c638f2ebab8452fdec",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10075,
+          "sha256": "c77e25cbd6ca038410fb597b86205e56dfab8906dddd22c638f2ebab8452fdec"
+        }
+      ]
+    },
+    {
+      "path": "core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "expectedSha256": "a2821a0948abff9ef5ddddf13ea36968628a14f378924246d9165b6934d356ec",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 71803,
+          "sha256": "a2821a0948abff9ef5ddddf13ea36968628a14f378924246d9165b6934d356ec"
+        }
+      ]
+    },
+    {
+      "path": "core/backend-lab-security-guard.js",
+      "expectedSha256": "9da2b42806d915e4cc5ac251dc7a1486ff1ac24166ecd314432d1890f78323b6",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6108,
+          "sha256": "9da2b42806d915e4cc5ac251dc7a1486ff1ac24166ecd314432d1890f78323b6"
+        }
+      ]
+    },
+    {
+      "path": "core/backend-product-readiness-contract-p0.js",
+      "expectedSha256": "4d1caf5ef2375422f93aec6db7d55a27c540383e2c890adfd23b2ce46037db47",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 13980,
+          "sha256": "4d1caf5ef2375422f93aec6db7d55a27c540383e2c890adfd23b2ce46037db47"
+        }
+      ]
+    },
+    {
+      "path": "core/backend-product-readonly-bootstrap-p0.js",
+      "expectedSha256": "94d2df68bc577ef543648438dbcb4276e22320ca87b30ed712b21c214e40474c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 30887,
+          "sha256": "94d2df68bc577ef543648438dbcb4276e22320ca87b30ed712b21c214e40474c"
+        }
+      ]
+    },
+    {
+      "path": "core/backend-resource-contracts.js",
+      "expectedSha256": "36a3c42ffc39372f751bb24244572c7fb7fb1305b22bad75a26c7ecf70ba742c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10855,
+          "sha256": "36a3c42ffc39372f751bb24244572c7fb7fb1305b22bad75a26c7ecf70ba742c"
+        }
+      ]
+    },
+    {
+      "path": "core/ciclo.js",
+      "expectedSha256": "b87a337d82dc6dea7252b0498bd01a2c7b3f238e294f1b570741b3ceccfe1719",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 133646,
+          "sha256": "b87a337d82dc6dea7252b0498bd01a2c7b3f238e294f1b570741b3ceccfe1719"
+        }
+      ]
+    },
+    {
+      "path": "core/client-canonical-view-projection-v20260716.js",
+      "expectedSha256": "7804236d602bf0a7e8261746c06b8efae3a34333800f7ce9d0861185b650b118",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 13673,
+          "sha256": "7804236d602bf0a7e8261746c06b8efae3a34333800f7ce9d0861185b650b118"
+        }
+      ]
+    },
+    {
+      "path": "core/client-insurer-edit-owner-v20260722.js",
+      "expectedSha256": "afe1da460cb4a591b175bbfec4e3e73c8c254c5d5ee51ab5e57a13d1b1631d0a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1825,
+          "sha256": "afe1da460cb4a591b175bbfec4e3e73c8c254c5d5ee51ab5e57a13d1b1631d0a"
+        }
+      ]
+    },
+    {
+      "path": "core/client-insurer-operational-directory-owner-v20260722.js",
+      "expectedSha256": "69baa67f06469a2e1d6c00f3dc68661fec92c919204c66889981c31c59d531c3",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 16263,
+          "sha256": "69baa67f06469a2e1d6c00f3dc68661fec92c919204c66889981c31c59d531c3"
+        }
+      ]
+    },
+    {
+      "path": "core/client-insurer-visual-contract-v20260720.js",
+      "expectedSha256": "5a95a00b8b93c79d1816ec12000c4780b92a9ea6dd45070e1138f0d18a3bb0e2",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 49918,
+          "sha256": "5a95a00b8b93c79d1816ec12000c4780b92a9ea6dd45070e1138f0d18a3bb0e2"
+        }
+      ]
+    },
+    {
+      "path": "core/client-insurer-visual-stability-barrier-v20260721.js",
+      "expectedSha256": "7183a44abc68a4bb24e34f94ede933cfc3697be37a15e9ac95e765af348872d8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10715,
+          "sha256": "7183a44abc68a4bb24e34f94ede933cfc3697be37a15e9ac95e765af348872d8"
+        }
+      ]
+    },
+    {
+      "path": "core/cobros-authorization-package-p0.js",
+      "expectedSha256": "e8a11163983efad709de4b6c5cea35e888e20fa362b947db8bd8c4a593b72e89",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 4730,
+          "sha256": "e8a11163983efad709de4b6c5cea35e888e20fa362b947db8bd8c4a593b72e89"
+        }
+      ]
+    },
+    {
+      "path": "core/cobros-private-authorization-materializer-p0.js",
+      "expectedSha256": "cf6585f0a50b54b76c4e60c3081cf302bfdd8b60f24e6cfdddeaa3fbeca175e6",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6453,
+          "sha256": "cf6585f0a50b54b76c4e60c3081cf302bfdd8b60f24e6cfdddeaa3fbeca175e6"
+        }
+      ]
+    },
+    {
+      "path": "core/cobros-proposal-queue-p0.js",
+      "expectedSha256": "c1d2cd765b4d700f495cce805e0d2276cb13da1f36eb31fb9973cedab0e01bec",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5114,
+          "sha256": "c1d2cd765b4d700f495cce805e0d2276cb13da1f36eb31fb9973cedab0e01bec"
+        }
+      ]
+    },
+    {
+      "path": "core/cobros-reconciliation-domain-client.js",
+      "expectedSha256": "dca074682bba1af538f2632b1895e51115946e4cc893d36488ca716930c17b72",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15132,
+          "sha256": "dca074682bba1af538f2632b1895e51115946e4cc893d36488ca716930c17b72"
+        }
+      ]
+    },
+    {
+      "path": "core/comisiones-eng.js",
+      "expectedSha256": "95f128f9564e99aa3ab84d42583820127fd15314cd0f501b1f75b9378fedf116",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 8094,
+          "sha256": "95f128f9564e99aa3ab84d42583820127fd15314cd0f501b1f75b9378fedf116"
+        }
+      ]
+    },
+    {
+      "path": "core/config.js",
+      "expectedSha256": "466636727a0c059c566c26b5f2a10d7b0aa16487d2db38f881bd1f0514896e61",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 34010,
+          "sha256": "466636727a0c059c566c26b5f2a10d7b0aa16487d2db38f881bd1f0514896e61"
+        }
+      ]
+    },
+    {
+      "path": "core/correo.js",
+      "expectedSha256": "8502318fd15c675ba8c39ccb528430b72b1606051379ef5d113cc5cda59c5167",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3289,
+          "sha256": "8502318fd15c675ba8c39ccb528430b72b1606051379ef5d113cc5cda59c5167"
+        }
+      ]
+    },
+    {
+      "path": "core/cotizacion-esquema-aseguradora-p0.js",
+      "expectedSha256": "8d9c1e80a5e449ebcfc14c194ffec4756de535aefb720f1cb7f8a9535ec228b1",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 19428,
+          "sha256": "8d9c1e80a5e449ebcfc14c194ffec4756de535aefb720f1cb7f8a9535ec228b1"
+        }
+      ]
+    },
+    {
+      "path": "core/credential-vault.js",
+      "expectedSha256": "7207c0d341626029902c069759c09a56e7a651f999a44466cb2905754d6eca1d",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6512,
+          "sha256": "7207c0d341626029902c069759c09a56e7a651f999a44466cb2905754d6eca1d"
+        }
+      ]
+    },
+    {
+      "path": "core/crmkit.js",
+      "expectedSha256": "76ee494fe7335ebcb4221b367b7c1ac512972fa111f41418ee7fd6f76fff00cf",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10475,
+          "sha256": "76ee494fe7335ebcb4221b367b7c1ac512972fa111f41418ee7fd6f76fff00cf"
+        }
+      ]
+    },
+    {
+      "path": "core/document-provider-bridge-p09b.js",
+      "expectedSha256": "c6fceb9a6210ef91b2f1fdb5bdadf02878c3be3203ff3c0a8b832243c298418c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 4929,
+          "sha256": "c6fceb9a6210ef91b2f1fdb5bdadf02878c3be3203ff3c0a8b832243c298418c"
+        }
+      ]
+    },
+    {
+      "path": "core/document-provider-registry-p09.js",
+      "expectedSha256": "0703a164b5f05597c4002151b66f04e35cc850d0d24765440254c212d6b2c44a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9434,
+          "sha256": "0703a164b5f05597c4002151b66f04e35cc850d0d24765440254c212d6b2c44a"
+        }
+      ]
+    },
+    {
+      "path": "core/document-source-contract-p04.js",
+      "expectedSha256": "64b2a1edcf3c178d1257868d0a5b8f722c9b5b5dbe07a1cbad10d36c106b4d6a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9177,
+          "sha256": "64b2a1edcf3c178d1257868d0a5b8f722c9b5b5dbe07a1cbad10d36c106b4d6a"
+        }
+      ]
+    },
+    {
+      "path": "core/document-viewer.js",
+      "expectedSha256": "0fbad66f9dffdc9f5463f5ff82390764091bdb771a0f103f027340da28325b73",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5731,
+          "sha256": "0fbad66f9dffdc9f5463f5ff82390764091bdb771a0f103f027340da28325b73"
+        }
+      ]
+    },
+    {
+      "path": "core/endorsement-workflow-v1201.js",
+      "expectedSha256": "2607feb7d0b04e7286f3474a4c4edd09f65bf790ba36335ae08a64711214a526",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 21421,
+          "sha256": "2607feb7d0b04e7286f3474a4c4edd09f65bf790ba36335ae08a64711214a526"
+        }
+      ]
+    },
+    {
+      "path": "core/excel-rule-proposal-adapter-p06b.js",
+      "expectedSha256": "282550411d5c5b823c67bc51c2ac4892b1b8c0560ff715861d28db0af09eb643",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 21251,
+          "sha256": "282550411d5c5b823c67bc51c2ac4892b1b8c0560ff715861d28db0af09eb643"
+        }
+      ]
+    },
+    {
+      "path": "core/ia.js",
+      "expectedSha256": "d54827bad0e30a406ec1d29c3b49bd22624ca77135ab9888ac4f0cdeba0fe297",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 16020,
+          "sha256": "d54827bad0e30a406ec1d29c3b49bd22624ca77135ab9888ac4f0cdeba0fe297"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-banco-comisiones-p0-wire.js",
+      "expectedSha256": "eaf822a569346e44ae5047780ba71d9995ecb452fcdefca0f61896d6f5472516",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1947,
+          "sha256": "eaf822a569346e44ae5047780ba71d9995ecb452fcdefca0f61896d6f5472516"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-banco-comisiones-p0.js",
+      "expectedSha256": "399bdefedb07bd578acd113e839ad3ca27ec42de652dc7c94969c674f7fe6066",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 7308,
+          "sha256": "399bdefedb07bd578acd113e839ad3ca27ec42de652dc7c94969c674f7fe6066"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-calendario-marketing-p0.js",
+      "expectedSha256": "cdfda9a41907f9b6605bd6cb206574186e78ae77b40032534b9f1354a03b319a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 12661,
+          "sha256": "cdfda9a41907f9b6605bd6cb206574186e78ae77b40032534b9f1354a03b319a"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-cartera-p0-wire.js",
+      "expectedSha256": "45bf67def3bb324607cd5a465c50fac29960218b9f42278febc627237755a953",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2633,
+          "sha256": "45bf67def3bb324607cd5a465c50fac29960218b9f42278febc627237755a953"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-cartera-p0.js",
+      "expectedSha256": "28fea8d8bc99e871930f1e541331e0ab7ef757c11f3b738082fc16006edbc8ea",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 17373,
+          "sha256": "28fea8d8bc99e871930f1e541331e0ab7ef757c11f3b738082fc16006edbc8ea"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-clientes-p0-wire.js",
+      "expectedSha256": "5dfaed055622736a602bab395d21d022942290d1bdd210956694faf564284d18",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2407,
+          "sha256": "5dfaed055622736a602bab395d21d022942290d1bdd210956694faf564284d18"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-clientes-p0.js",
+      "expectedSha256": "1013295827db095916bca35af5db0a18e9f89c9a0732bb3272306febbba40aba",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 7289,
+          "sha256": "1013295827db095916bca35af5db0a18e9f89c9a0732bb3272306febbba40aba"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-cobros-conciliacion-p0.js",
+      "expectedSha256": "13f47081d1d26e0265ee75020d26706ac43260259b19631675f99e2c06cf2ac7",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15517,
+          "sha256": "13f47081d1d26e0265ee75020d26706ac43260259b19631675f99e2c06cf2ac7"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-cobros-evidencia-temporal-p0.js",
+      "expectedSha256": "f3753a833f0a0bba14c31e620026948f674188ccb048f74700d2286da472f177",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 14202,
+          "sha256": "f3753a833f0a0bba14c31e620026948f674188ccb048f74700d2286da472f177"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-cobros-matriz-multievidencia-p0.js",
+      "expectedSha256": "475236256b9fe3c31e2d62aae1ab86e135fd6d036c1862df6c573f36ac9934ca",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 4832,
+          "sha256": "475236256b9fe3c31e2d62aae1ab86e135fd6d036c1862df6c573f36ac9934ca"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-comisiones-p0-wire.js",
+      "expectedSha256": "77ca27f47ab09606e7a637f3a1326f7a061e7a70df634bab78fcddd10178147e",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3276,
+          "sha256": "77ca27f47ab09606e7a637f3a1326f7a061e7a70df634bab78fcddd10178147e"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-comisiones-p0.js",
+      "expectedSha256": "1626922d20bcee17590b1c8de420baf3be1ed4440a9acd122ac1d02b80e35b5c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9031,
+          "sha256": "1626922d20bcee17590b1c8de420baf3be1ed4440a9acd122ac1d02b80e35b5c"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-directorio-aseguradoras-p0.js",
+      "expectedSha256": "af5d20ee41c761716d002ed5cc9afdb15651ed2ac49d36d59c811fde6baa2cc6",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9769,
+          "sha256": "af5d20ee41c761716d002ed5cc9afdb15651ed2ac49d36d59c811fde6baa2cc6"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-dryrun-p0-wire.js",
+      "expectedSha256": "7a9f1f41a50b50322f60d7ac3a1a69335f047c6a853e94513afd78dd64fcf202",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 8423,
+          "sha256": "7a9f1f41a50b50322f60d7ac3a1a69335f047c6a853e94513afd78dd64fcf202"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-dryrun-p0.js",
+      "expectedSha256": "098e7d4622dc4c8ecae26ac48cf4202dc1a319634fd4526367691ed27bcd672a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11695,
+          "sha256": "098e7d4622dc4c8ecae26ac48cf4202dc1a319634fd4526367691ed27bcd672a"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-identidad-marca-p0.js",
+      "expectedSha256": "67d97f8c8c9b94e26ec6ce61a9803d9cfd003318482daea4d063a45d9e6c5a00",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 7506,
+          "sha256": "67d97f8c8c9b94e26ec6ce61a9803d9cfd003318482daea4d063a45d9e6c5a00"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-identity-dryrun-wire-v20260731.js",
+      "expectedSha256": "f5a10ff39c35ce64747d8343957ec14852e86ca4d3f4b02b2e1586926481715f",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2868,
+          "sha256": "f5a10ff39c35ce64747d8343957ec14852e86ca4d3f4b02b2e1586926481715f"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-identity-upsert-v20260731.js",
+      "expectedSha256": "4c8512ccb6b5270b16a351e639542c22467589d2242c3956a27355c6a29db687",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 14061,
+          "sha256": "4c8512ccb6b5270b16a351e639542c22467589d2242c3956a27355c6a29db687"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-identity-writer-wire-v20260731.js",
+      "expectedSha256": "8ab2f8c614c713f307d9f437c9ee6eebd3d82bfac5c52c685ee44213c2774b85",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1979,
+          "sha256": "8ab2f8c614c713f307d9f437c9ee6eebd3d82bfac5c52c685ee44213c2774b85"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-polizas-p0-wire.js",
+      "expectedSha256": "3d6600ec06d699074c7800209b29f408bb1a8916281e1be17dd5ca72f8a3250b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6024,
+          "sha256": "3d6600ec06d699074c7800209b29f408bb1a8916281e1be17dd5ca72f8a3250b"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-polizas-p0.js",
+      "expectedSha256": "40746151d540750ef2b49557f9c70ef41c2c17b758c1a27c582759f3dcdd3c7f",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11820,
+          "sha256": "40746151d540750ef2b49557f9c70ef41c2c17b758c1a27c582759f3dcdd3c7f"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-transversal-p0-bootstrap-v20260731.js",
+      "expectedSha256": "ae51a6796a5a188cf7f3813171f05963682ad5b9a66aaf0ee859ebdb345cb725",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2993,
+          "sha256": "ae51a6796a5a188cf7f3813171f05963682ad5b9a66aaf0ee859ebdb345cb725"
+        }
+      ]
+    },
+    {
+      "path": "core/importa-write-p0.js",
+      "expectedSha256": "f263409bffc0ee764118002af055d1eafde56bdacf3ee72656fe763a1ca742c9",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15990,
+          "sha256": "f263409bffc0ee764118002af055d1eafde56bdacf3ee72656fe763a1ca742c9"
+        }
+      ]
+    },
+    {
+      "path": "core/importa.js",
+      "expectedSha256": "2bc8cbf16601688d5e4508aa801b543e701858e2f9af5df3be7f7fe5c24e4b4c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 136516,
+          "sha256": "2bc8cbf16601688d5e4508aa801b543e701858e2f9af5df3be7f7fe5c24e4b4c"
+        }
+      ]
+    },
+    {
+      "path": "core/importer-controlled-write-contract-v20260721.js",
+      "expectedSha256": "cbf6482dd2fd8978fd949ffeca215c71ab6c9796827b1f84e921beb4e4dce10a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6050,
+          "sha256": "cbf6482dd2fd8978fd949ffeca215c71ab6c9796827b1f84e921beb4e4dce10a"
+        }
+      ]
+    },
+    {
+      "path": "core/importer-execution-contract-v20260720.js",
+      "expectedSha256": "649817c66e19c752cfcfa30e5e6fccdad4324eba8e355ae40f44bfec420523dd",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11616,
+          "sha256": "649817c66e19c752cfcfa30e5e6fccdad4324eba8e355ae40f44bfec420523dd"
+        }
+      ]
+    },
+    {
+      "path": "core/insurer-directory-import-v1202-security.js",
+      "expectedSha256": "aa9f69adfd71f3cb2bd82607da84ee502414bac4cb0edd7983e5119efbc1dbbb",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 40689,
+          "sha256": "aa9f69adfd71f3cb2bd82607da84ee502414bac4cb0edd7983e5119efbc1dbbb"
+        }
+      ]
+    },
+    {
+      "path": "core/insurer-directory-import-v1202.js",
+      "expectedSha256": "2b68fa873c9d61c2ec2c6a130d92997a02748416b48a7ee7b6e10d465be8940f",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 45346,
+          "sha256": "2b68fa873c9d61c2ec2c6a130d92997a02748416b48a7ee7b6e10d465be8940f"
+        }
+      ]
+    },
+    {
+      "path": "core/insurer-secure-target-bridge-v20260720.js",
+      "expectedSha256": "f656daaf1d1927e330a090304dd1b7deb4463bf23d92fafe8b912d9348dfd462",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11921,
+          "sha256": "f656daaf1d1927e330a090304dd1b7deb4463bf23d92fafe8b912d9348dfd462"
+        }
+      ]
+    },
+    {
+      "path": "core/integraciones-lab-mock.js",
+      "expectedSha256": "d1f335f11a4ed4b7ed45ec55b13e69b65df12262e801bad98ea33097747b0641",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1910,
+          "sha256": "d1f335f11a4ed4b7ed45ec55b13e69b65df12262e801bad98ea33097747b0641"
+        }
+      ]
+    },
+    {
+      "path": "core/integraciones-panel.js",
+      "expectedSha256": "f5b1efe7c9480e36c01fbd92a7b62129bf349120a3caead07e1eca8d65a11505",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6113,
+          "sha256": "f5b1efe7c9480e36c01fbd92a7b62129bf349120a3caead07e1eca8d65a11505"
+        }
+      ]
+    },
+    {
+      "path": "core/integraciones.js",
+      "expectedSha256": "08b291f560608939bd2e6633dc3ca14f267d7859c30ffc2799a7c0b9b1cac6ff",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 16305,
+          "sha256": "08b291f560608939bd2e6633dc3ca14f267d7859c30ffc2799a7c0b9b1cac6ff"
+        }
+      ]
+    },
+    {
+      "path": "core/issuance-workflow-v1201-refinements.js",
+      "expectedSha256": "4f8e2e2dd14c73994930812fde7c9ee4221ffde5d725b3d9a3aff38d2e304547",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2707,
+          "sha256": "4f8e2e2dd14c73994930812fde7c9ee4221ffde5d725b3d9a3aff38d2e304547"
+        }
+      ]
+    },
+    {
+      "path": "core/issuance-workflow-v1201.js",
+      "expectedSha256": "230d810719fc0f0a19ae0be1984944d22be2aa55475bf11633bb7c15638e7e17",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 31274,
+          "sha256": "230d810719fc0f0a19ae0be1984944d22be2aa55475bf11633bb7c15638e7e17"
+        }
+      ]
+    },
+    {
+      "path": "core/knowledge-binding-gate-p08.js",
+      "expectedSha256": "25cea4d4bc78b55deeaee6a7037076e39166bad57609fa53f19e8c3473c9c306",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 22039,
+          "sha256": "25cea4d4bc78b55deeaee6a7037076e39166bad57609fa53f19e8c3473c9c306"
+        }
+      ]
+    },
+    {
+      "path": "core/knowledge-binding-policy-p08.js",
+      "expectedSha256": "6b5a58b77ae444448cb9ce98ab2c871f0140a7486d01786728bddbc14275e3a8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5050,
+          "sha256": "6b5a58b77ae444448cb9ce98ab2c871f0140a7486d01786728bddbc14275e3a8"
+        }
+      ]
+    },
+    {
+      "path": "core/legal.js",
+      "expectedSha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 25091,
+          "sha256": "b74a965b7be0d67862d82bcf73dacc0d5a8293dcf30cb4f5f3fdeaa6ee1c68a3"
+        }
+      ]
+    },
+    {
+      "path": "core/membership-multirol-contract-p0.js",
+      "expectedSha256": "844ab542505016716cc14c7dfba093bed496cd59d471c25a2cfb536359f11d8d",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15766,
+          "sha256": "844ab542505016716cc14c7dfba093bed496cd59d471c25a2cfb536359f11d8d"
+        }
+      ]
+    },
+    {
+      "path": "core/membership-multirol-effective-p0.js",
+      "expectedSha256": "588dd96ced70178961a1ada86b537b551d43c61247959dab3a0c2ce01deec40f",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 4017,
+          "sha256": "588dd96ced70178961a1ada86b537b551d43c61247959dab3a0c2ce01deec40f"
+        }
+      ]
+    },
+    {
+      "path": "core/notify.js",
+      "expectedSha256": "1ee20eea2a0049a03af1172a1c2d566362229762b40382aa65e33c66fe7f9c0f",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6695,
+          "sha256": "1ee20eea2a0049a03af1172a1c2d566362229762b40382aa65e33c66fe7f9c0f"
+        }
+      ]
+    },
+    {
+      "path": "core/novedades.js",
+      "expectedSha256": "29906a35cad7d52055d4d121d3a7a14df943f81ffd5b28b61ab9ddc368aee381",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10134,
+          "sha256": "29906a35cad7d52055d4d121d3a7a14df943f81ffd5b28b61ab9ddc368aee381"
+        }
+      ]
+    },
+    {
+      "path": "core/operational-directory-field-policy-v20260722.js",
+      "expectedSha256": "ae1b7cfd55e13185e435ddd78b08f63065b57eaeaf725968b026345319526df5",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9359,
+          "sha256": "ae1b7cfd55e13185e435ddd78b08f63065b57eaeaf725968b026345319526df5"
+        }
+      ]
+    },
+    {
+      "path": "core/ops-leads-domain-client.js",
+      "expectedSha256": "cadadb51a1891373a0922d4239e12216d2d6535ffbb42319f19f12510ad6718a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2499,
+          "sha256": "cadadb51a1891373a0922d4239e12216d2d6535ffbb42319f19f12510ad6718a"
+        }
+      ]
+    },
+    {
+      "path": "core/pdf-quote-adapter-p07.js",
+      "expectedSha256": "aed4d4059c2e7fc58bca545ed73c2b42bca6181aee3ea968c80ba1995668e6ee",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 29080,
+          "sha256": "aed4d4059c2e7fc58bca545ed73c2b42bca6181aee3ea968c80ba1995668e6ee"
+        }
+      ]
+    },
+    {
+      "path": "core/policy-receipts-engine.js",
+      "expectedSha256": "38dc870c56c612805e5ea32ab32d8a125118d58726af19bbdec4d63ebc02508d",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 61409,
+          "sha256": "38dc870c56c612805e5ea32ab32d8a125118d58726af19bbdec4d63ebc02508d"
+        }
+      ]
+    },
+    {
+      "path": "core/policy-receipts-v1199-refinements.js",
+      "expectedSha256": "79ab64ec77ab18ee0f7727709f4f50da602e82ad671c6596ab16dc2ce9e94bc1",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2985,
+          "sha256": "79ab64ec77ab18ee0f7727709f4f50da602e82ad671c6596ab16dc2ce9e94bc1"
+        }
+      ]
+    },
+    {
+      "path": "core/primas.js",
+      "expectedSha256": "65c4ee0c74d8564700b5389775e51c992815cbaa0e42acc4842d64efee568e22",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 19336,
+          "sha256": "65c4ee0c74d8564700b5389775e51c992815cbaa0e42acc4842d64efee568e22"
+        }
+      ]
+    },
+    {
+      "path": "core/product-app-p0.js",
+      "expectedSha256": "da0f270815c7693dc1d20867110ba8c993f489252737e0f11bf873eab1de7190",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 12615,
+          "sha256": "da0f270815c7693dc1d20867110ba8c993f489252737e0f11bf873eab1de7190"
+        }
+      ]
+    },
+    {
+      "path": "core/product-drive-document-provider-p0.js",
+      "expectedSha256": "7a785fe187a99ba842156ba70fd4acbedc1e8e63e7a569a8a41552ec8b9b0b34",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 19512,
+          "sha256": "7a785fe187a99ba842156ba70fd4acbedc1e8e63e7a569a8a41552ec8b9b0b34"
+        }
+      ]
+    },
+    {
+      "path": "core/product-hydration-required-optional-p0.js",
+      "expectedSha256": "cec2a66093570cad27f9946bb82c34dc398f8f782f38f5a9a31b56495ed27be8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15164,
+          "sha256": "cec2a66093570cad27f9946bb82c34dc398f8f782f38f5a9a31b56495ed27be8"
+        }
+      ]
+    },
+    {
+      "path": "core/product-insurer-credential-provider-p0.js",
+      "expectedSha256": "69dc8c1ebb531fdc4d4a760e0eb4052ac1681fa79794659e0c0c4ed83c87edcd",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10171,
+          "sha256": "69dc8c1ebb531fdc4d4a760e0eb4052ac1681fa79794659e0c0c4ed83c87edcd"
+        }
+      ]
+    },
+    {
+      "path": "core/product-membership-access-bridge-p0.js",
+      "expectedSha256": "2fbb4ff0d45394f2413fd05f0cd05c7035785a50dad664865ca491a6479cf49e",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3916,
+          "sha256": "2fbb4ff0d45394f2413fd05f0cd05c7035785a50dad664865ca491a6479cf49e"
+        }
+      ]
+    },
+    {
+      "path": "core/product-prebootstrap-store-p0.js",
+      "expectedSha256": "bd438bb55914d82cb8989576653266f53caa46bb0f7df46e5c9bd7270550b9cb",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2092,
+          "sha256": "bd438bb55914d82cb8989576653266f53caa46bb0f7df46e5c9bd7270550b9cb"
+        }
+      ]
+    },
+    {
+      "path": "core/product-query-planner-contract-p0.js",
+      "expectedSha256": "a38174f5f0c8cb97c3b82d639f85b4dd2d963764d1f4be9c60352f04bb07fcc5",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 7292,
+          "sha256": "a38174f5f0c8cb97c3b82d639f85b4dd2d963764d1f4be9c60352f04bb07fcc5"
+        }
+      ]
+    },
+    {
+      "path": "core/product-role-taxonomy-p0.js",
+      "expectedSha256": "00de8b226d0b0f54a6c081e5b83b45eb02488fe901f207e7bc1fa4d3dc899ca8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3535,
+          "sha256": "00de8b226d0b0f54a6c081e5b83b45eb02488fe901f207e7bc1fa4d3dc899ca8"
+        }
+      ]
+    },
+    {
+      "path": "core/product-runtime-browser-providers-p0.js",
+      "expectedSha256": "2373f71dadc79f1b9cbfdbaa660d7f5dac420f2dc82c1fd2fea4c380ee309f36",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 22639,
+          "sha256": "2373f71dadc79f1b9cbfdbaa660d7f5dac420f2dc82c1fd2fea4c380ee309f36"
+        }
+      ]
+    },
+    {
+      "path": "core/product-tenant-runtime-context-bridge-p0.js",
+      "expectedSha256": "676a7f2ba251e2508a7c6257348793bf3b3b2c9cf0fa3de71ff2a70dc8203556",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3027,
+          "sha256": "676a7f2ba251e2508a7c6257348793bf3b3b2c9cf0fa3de71ff2a70dc8203556"
+        }
+      ]
+    },
+    {
+      "path": "core/public-tenant-branding.js",
+      "expectedSha256": "a090641ebdbbbb38ff4d2dc3c3a8c909ac63219ca630bca6c9d8412435f11f2c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6663,
+          "sha256": "a090641ebdbbbb38ff4d2dc3c3a8c909ac63219ca630bca6c9d8412435f11f2c"
+        }
+      ]
+    },
+    {
+      "path": "core/pwa.js",
+      "expectedSha256": "db1a65d810bd2eea10ab208240b62824ec048f9f7e3e401d883b1fcfef4c4ee8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 12722,
+          "sha256": "db1a65d810bd2eea10ab208240b62824ec048f9f7e3e401d883b1fcfef4c4ee8"
+        }
+      ]
+    },
+    {
+      "path": "core/queries.js",
+      "expectedSha256": "d0892ba4135e4b4d4c6e9e9e0c59208eedeecf5546218b44ed0dc8050d82104e",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 52144,
+          "sha256": "d0892ba4135e4b4d4c6e9e9e0c59208eedeecf5546218b44ed0dc8050d82104e"
+        }
+      ]
+    },
+    {
+      "path": "core/quote-authority-contract-v1.js",
+      "expectedSha256": "f48dacb8e36db1913f36eb768858132b91b630c9bb5931486e2b1b3d77a7e7b1",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 14988,
+          "sha256": "f48dacb8e36db1913f36eb768858132b91b630c9bb5931486e2b1b3d77a7e7b1"
+        }
+      ]
+    },
+    {
+      "path": "core/quote-comparison-contracts-v1203-refinements.js",
+      "expectedSha256": "25e1eff545d627f49368cb43eccddb12d2c11d134b9ae64ba35947b65c6eae31",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9333,
+          "sha256": "25e1eff545d627f49368cb43eccddb12d2c11d134b9ae64ba35947b65c6eae31"
+        }
+      ]
+    },
+    {
+      "path": "core/quote-comparison-contracts-v1203.js",
+      "expectedSha256": "69b3b3a26167dbe8e14e98f364440d5d738c07b4182088c090ec6a7eed6a6e86",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 29032,
+          "sha256": "69b3b3a26167dbe8e14e98f364440d5d738c07b4182088c090ec6a7eed6a6e86"
+        }
+      ]
+    },
+    {
+      "path": "core/quote-comparison-p06-runtime-adapter-v1208.js",
+      "expectedSha256": "cd6f58302846443f2f501a0cfc7cdbbf6920c76a09a92aa922c8f10aec0a67c9",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 13039,
+          "sha256": "cd6f58302846443f2f501a0cfc7cdbbf6920c76a09a92aa922c8f10aec0a67c9"
+        }
+      ]
+    },
+    {
+      "path": "core/record-delete.js",
+      "expectedSha256": "eba523d7e62dbc49374d8d30d73500898a43e4f674852a6c946a5301cca03517",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15643,
+          "sha256": "eba523d7e62dbc49374d8d30d73500898a43e4f674852a6c946a5301cca03517"
+        }
+      ]
+    },
+    {
+      "path": "core/router-tenant-config-bootstrap.js",
+      "expectedSha256": "35033d88cec04a3f225811d11b4248be36411df120108ad1adf02a966f43eb8c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11520,
+          "sha256": "35033d88cec04a3f225811d11b4248be36411df120108ad1adf02a966f43eb8c"
+        }
+      ]
+    },
+    {
+      "path": "core/router-tenant-config-product-bootstrap-p0.js",
+      "expectedSha256": "0149c641ddff6322f3b440f42dbf4b0b2dc701669f758ef8f91fcbf9fc5d362b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5399,
+          "sha256": "0149c641ddff6322f3b440f42dbf4b0b2dc701669f758ef8f91fcbf9fc5d362b"
+        }
+      ]
+    },
+    {
+      "path": "core/router.js",
+      "expectedSha256": "b52a453acd720877df043db6c755bd241cd5e87c997a45c00cc877c6212dcdb9",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 29489,
+          "sha256": "b52a453acd720877df043db6c755bd241cd5e87c997a45c00cc877c6212dcdb9"
+        }
+      ]
+    },
+    {
+      "path": "core/secure-resource-fields-v1202.js",
+      "expectedSha256": "8e7250c49cde4eb566e84dabd8fe7746545149b72c24eb548b0532dd63e5eb4b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3455,
+          "sha256": "8e7250c49cde4eb566e84dabd8fe7746545149b72c24eb548b0532dd63e5eb4b"
+        }
+      ]
+    },
+    {
+      "path": "core/session-readiness-contract-v20260720.js",
+      "expectedSha256": "e697a8365d5cb6d426b7f8c3dcdbea5c6e76e2f64a06b2401436d2f311e956db",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 7710,
+          "sha256": "e697a8365d5cb6d426b7f8c3dcdbea5c6e76e2f64a06b2401436d2f311e956db"
+        }
+      ]
+    },
+    {
+      "path": "core/tariff-quote-reconciliation-p06c.js",
+      "expectedSha256": "4dd81200f4c71ffb77c69058ef30e90e728475b4aab1101b9b65a1e87db4f5d1",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15977,
+          "sha256": "4dd81200f4c71ffb77c69058ef30e90e728475b4aab1101b9b65a1e87db4f5d1"
+        }
+      ]
+    },
+    {
+      "path": "core/tariff-rule-proposal-p06.js",
+      "expectedSha256": "0d9a09f324737e77340716efc2985bdedec8cd02d15e240366edf89b913e7ef2",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 25218,
+          "sha256": "0d9a09f324737e77340716efc2985bdedec8cd02d15e240366edf89b913e7ef2"
+        }
+      ]
+    },
+    {
+      "path": "core/tenant-access-policy-contract-p0.js",
+      "expectedSha256": "b9edeb7c38b16dd7c583772251714e28121c3754467c97d75d8c5c73e6c136bd",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 19757,
+          "sha256": "b9edeb7c38b16dd7c583772251714e28121c3754467c97d75d8c5c73e6c136bd"
+        }
+      ]
+    },
+    {
+      "path": "core/tenant-access-policy-effective-p0.js",
+      "expectedSha256": "cece61b730091cf37a3c13a0bd6896f194c38ca9d49aaf49d1d826ec8bcddd39",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 8995,
+          "sha256": "cece61b730091cf37a3c13a0bd6896f194c38ca9d49aaf49d1d826ec8bcddd39"
+        }
+      ]
+    },
+    {
+      "path": "core/tenant-access-policy-product-p0.js",
+      "expectedSha256": "3de1cb1ded80480ff0d42d5f3f8272ebd0075da4dd673d090b164214683ab77e",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6658,
+          "sha256": "3de1cb1ded80480ff0d42d5f3f8272ebd0075da4dd673d090b164214683ab77e"
+        }
+      ]
+    },
+    {
+      "path": "core/tenant-binding-plan-p10c.js",
+      "expectedSha256": "b6f1cceb33b5ee8be2ddb4c30f849eb9f9871244d9912ce76b84549078f7edd9",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9794,
+          "sha256": "b6f1cceb33b5ee8be2ddb4c30f849eb9f9871244d9912ce76b84549078f7edd9"
+        }
+      ]
+    },
+    {
+      "path": "core/tenant-canonical-paths-contract-p0.js",
+      "expectedSha256": "2e8c72e4c530479e03f78968f95ca0909f0d4d33bcc74d979211c194c5319876",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10679,
+          "sha256": "2e8c72e4c530479e03f78968f95ca0909f0d4d33bcc74d979211c194c5319876"
+        }
+      ]
+    },
+    {
+      "path": "core/tenant-domain-config-client.js",
+      "expectedSha256": "8338f7ddb999906bcb3e6a7f13613b003525dce554ac79bf15aa76d68a0ad4d8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5934,
+          "sha256": "8338f7ddb999906bcb3e6a7f13613b003525dce554ac79bf15aa76d68a0ad4d8"
+        }
+      ]
+    },
+    {
+      "path": "core/tenant-insurer-config-p10.js",
+      "expectedSha256": "82e99f514ee08c04870d7915fa7c69f23178e4d4589e55d345395563ddd730b1",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 17787,
+          "sha256": "82e99f514ee08c04870d7915fa7c69f23178e4d4589e55d345395563ddd730b1"
+        }
+      ]
+    },
+    {
+      "path": "core/tenant-source-batch-adapter-p10.js",
+      "expectedSha256": "0a7d009648b3ab07d24e9cfa83080215794baf584be463fea501cbd0371d94a1",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5290,
+          "sha256": "0a7d009648b3ab07d24e9cfa83080215794baf584be463fea501cbd0371d94a1"
+        }
+      ]
+    },
+    {
+      "path": "core/theme.js",
+      "expectedSha256": "e437b21359eccfb744add21a530d09d61cbbe0d751db113b9c37f4ffc968a0f8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5977,
+          "sha256": "e437b21359eccfb744add21a530d09d61cbbe0d751db113b9c37f4ffc968a0f8"
+        }
+      ]
+    },
+    {
+      "path": "core/ui.js",
+      "expectedSha256": "c792483e47784b08a5ac2bddf7ec6b86b9332e3901a21f9944e9c540845e14e0",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11365,
+          "sha256": "c792483e47784b08a5ac2bddf7ec6b86b9332e3901a21f9944e9c540845e14e0"
+        }
+      ]
+    },
+    {
+      "path": "core/user-credential-selfservice-v20260805.js",
+      "expectedSha256": "7936239d0ab454f7f3ecf0475cf7ace8068a41bf0f7ee773a623e085ede53b06",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1957,
+          "sha256": "7936239d0ab454f7f3ecf0475cf7ace8068a41bf0f7ee773a623e085ede53b06"
+        }
+      ]
+    },
+    {
+      "path": "core/user-onboarding.js",
+      "expectedSha256": "33327653d20db94299b47a79f31f8be304cfd5c1e67c5651b7e0e711f98c4844",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 7831,
+          "sha256": "33327653d20db94299b47a79f31f8be304cfd5c1e67c5651b7e0e711f98c4844"
+        }
+      ]
+    },
+    {
+      "path": "data/academia-product-catalog-v1.js",
+      "expectedSha256": "7fbe38bbabc87b9e5b0f3004538461f18ab79d29623ed4685415b3f4d073d3b8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 101241,
+          "sha256": "7fbe38bbabc87b9e5b0f3004538461f18ab79d29623ed4685415b3f4d073d3b8"
+        }
+      ]
+    },
+    {
+      "path": "data/academia-v1225-importadores-e2e.js",
+      "expectedSha256": "20fb352bbdb8dc4171d4c0b4d2c9d52b70bcba2c518c7a20f671ed12bcfe4079",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 9101,
+          "sha256": "20fb352bbdb8dc4171d4c0b4d2c9d52b70bcba2c518c7a20f671ed12bcfe4079"
+        }
+      ]
+    },
+    {
+      "path": "data/academia-v1230-operational-directory-v20260722.js",
+      "expectedSha256": "612b580d53adf195d540ddc2d7f9f72754809d72b23e5a3d93cae3c7bd08c7d2",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 7350,
+          "sha256": "612b580d53adf195d540ddc2d7f9f72754809d72b23e5a3d93cae3c7bd08c7d2"
+        }
+      ]
+    },
+    {
+      "path": "data/geo-gt-co-authoritative-v20261004.js",
+      "expectedSha256": "7f486f4a233d4c1c47695fb4bbc040c0f6b9ca053da16a91d495f42c48832d2c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 20908,
+          "sha256": "7f486f4a233d4c1c47695fb4bbc040c0f6b9ca053da16a91d495f42c48832d2c"
+        }
+      ]
+    },
+    {
+      "path": "data/store-firestore-lab.local.js",
+      "expectedSha256": "bbe4aa2f6e749c085d2bf57cceccfbf6d0c6d520b991bd1c9cce3d566aba22a1",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 21507,
+          "sha256": "bbe4aa2f6e749c085d2bf57cceccfbf6d0c6d520b991bd1c9cce3d566aba22a1"
+        }
+      ]
+    },
+    {
+      "path": "data/store-firestore-product-operational-p0.js",
+      "expectedSha256": "1e235d1600ad40f97818e39fff7ab67ec92a930441c9872ff7d6d0f7795408be",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 67648,
+          "sha256": "1e235d1600ad40f97818e39fff7ab67ec92a930441c9872ff7d6d0f7795408be"
+        }
+      ]
+    },
+    {
+      "path": "data/store-firestore-product-readonly-p0.js",
+      "expectedSha256": "3789e655ae8425ef84e18730ca900e0471bf44e85ae13212c265d51e4316d886",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 38364,
+          "sha256": "3789e655ae8425ef84e18730ca900e0471bf44e85ae13212c265d51e4316d886"
+        }
+      ]
+    },
+    {
+      "path": "data/store.js",
+      "expectedSha256": "1ec42cf35458c607333a494c4fd7fa74e04101869185423d8cd71ae8098fd838",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3152,
+          "sha256": "1ec42cf35458c607333a494c4fd7fa74e04101869185423d8cd71ae8098fd838"
+        }
+      ]
+    },
+    {
+      "path": "data/tenant-alianzas-soluciones-binding-plan-p10c.js",
+      "expectedSha256": "dc69b87f23fcce881e2cb37a453391c882647bb7c58a6fe6aefcb9daacb88d71",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1829,
+          "sha256": "dc69b87f23fcce881e2cb37a453391c882647bb7c58a6fe6aefcb9daacb88d71"
+        }
+      ]
+    },
+    {
+      "path": "data/tenant-alianzas-soluciones-first-source-p09f.js",
+      "expectedSha256": "afbf7f72195032697cf9b8ac7f836c61960d2ba50de006faa376b6ce3849b654",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1382,
+          "sha256": "afbf7f72195032697cf9b8ac7f836c61960d2ba50de006faa376b6ce3849b654"
+        }
+      ]
+    },
+    {
+      "path": "data/tenant-alianzas-soluciones-insurers-p10.js",
+      "expectedSha256": "113d83d6f41b3bac7cca161748ac1d8f0709193d826e96dddc949aeafe455e80",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 4692,
+          "sha256": "113d83d6f41b3bac7cca161748ac1d8f0709193d826e96dddc949aeafe455e80"
+        }
+      ]
+    },
+    {
+      "path": "data/tenant-alianzas-soluciones-source-batch-p09g.js",
+      "expectedSha256": "15695d250e5f138e1264fdb8fcb7937fc6a69d3e545037b0a49b305113328a2e",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 8051,
+          "sha256": "15695d250e5f138e1264fdb8fcb7937fc6a69d3e545037b0a49b305113328a2e"
+        }
+      ]
+    },
+    {
+      "path": "data/tenant-config/alianzas-soluciones.aseguradoras-knowledge-summary-v20261003.js",
+      "expectedSha256": "57c786161f10f9c478deb629daa081e8c69d9952f7322efd7f73f36c1f0155b0",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 32036,
+          "sha256": "57c786161f10f9c478deb629daa081e8c69d9952f7322efd7f73f36c1f0155b0"
+        }
+      ]
+    },
+    {
+      "path": "data/tenant-public-branding-snapshot.generated.js",
+      "expectedSha256": "73d792e103d13ffde74a604e32a7f1325f9fba017d38216fae59ddff0dbc6483",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 313470,
+          "sha256": "73d792e103d13ffde74a604e32a7f1325f9fba017d38216fae59ddff0dbc6483"
+        }
+      ]
+    },
+    {
+      "path": "data/tenant-runtime-config-index.js",
+      "expectedSha256": "4d9520cffa24d6354c679aa8c0332eea73a745801094cbdd0a9c21ebf66638bd",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 656,
+          "sha256": "4d9520cffa24d6354c679aa8c0332eea73a745801094cbdd0a9c21ebf66638bd"
+        }
+      ]
+    },
+    {
+      "path": "index.html",
+      "expectedSha256": "ffb4b97827c667101983f0979a68baf577c7f8fff9db592056d631f83271e452",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 47988,
+          "sha256": "ffb4b97827c667101983f0979a68baf577c7f8fff9db592056d631f83271e452"
+        }
+      ]
+    },
+    {
+      "path": "manifest.webmanifest",
+      "expectedSha256": "77ff198f52f38de6c4022f0491fe42d9244b65da81da3ab857352175b6e3c21b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 732,
+          "sha256": "77ff198f52f38de6c4022f0491fe42d9244b65da81da3ab857352175b6e3c21b"
+        }
+      ]
+    },
+    {
+      "path": "modules/academia.js",
+      "expectedSha256": "cee0558c10d3ae01236d185a01c87a522714e8ccfaaac517dd94c112e306a1c8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 75094,
+          "sha256": "cee0558c10d3ae01236d185a01c87a522714e8ccfaaac517dd94c112e306a1c8"
+        }
+      ]
+    },
+    {
+      "path": "modules/aseguradoras-batch-admin-form-p09j.js",
+      "expectedSha256": "9f8c7d01a8a3172f00fbe2f29fdd98b06c3eaae682aaeec2b3bc73ac3edd4b0f",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 21620,
+          "sha256": "9f8c7d01a8a3172f00fbe2f29fdd98b06c3eaae682aaeec2b3bc73ac3edd4b0f"
+        }
+      ]
+    },
+    {
+      "path": "modules/aseguradoras-knowledge-p09.js",
+      "expectedSha256": "05c47a5e7f1802e99d81843ea0ede9884b4fb3af222b8a8e49461617124f3895",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10434,
+          "sha256": "05c47a5e7f1802e99d81843ea0ede9884b4fb3af222b8a8e49461617124f3895"
+        }
+      ]
+    },
+    {
+      "path": "modules/aseguradoras-knowledge-panel-p09f.js",
+      "expectedSha256": "bcf26e88565a15cb971f5980cbd168bb9b4cc0083c7690558b9c6eeec7a61125",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 16601,
+          "sha256": "bcf26e88565a15cb971f5980cbd168bb9b4cc0083c7690558b9c6eeec7a61125"
+        }
+      ]
+    },
+    {
+      "path": "modules/aseguradoras-op2-permission-guard.js",
+      "expectedSha256": "f83c82efa5f7514b153f5e47b50bb3fd92262cfe81e59f17be92de033f9d121b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1955,
+          "sha256": "f83c82efa5f7514b153f5e47b50bb3fd92262cfe81e59f17be92de033f9d121b"
+        }
+      ]
+    },
+    {
+      "path": "modules/aseguradoras-v1197-ux-bridge.js",
+      "expectedSha256": "274ed24c71f13ee416c7ec82f26b086dc66e57ecfe12557f70bcae4b9d9034bb",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 13670,
+          "sha256": "274ed24c71f13ee416c7ec82f26b086dc66e57ecfe12557f70bcae4b9d9034bb"
+        }
+      ]
+    },
+    {
+      "path": "modules/aseguradoras-v1202-import-bridge.js",
+      "expectedSha256": "675b0bd200b81c73d8b61d3e31702a7aa13e4078753edd932d4fa5d06ea14815",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 18578,
+          "sha256": "675b0bd200b81c73d8b61d3e31702a7aa13e4078753edd932d4fa5d06ea14815"
+        }
+      ]
+    },
+    {
+      "path": "modules/aseguradoras-v1202-resources-bridge.js",
+      "expectedSha256": "0f81169d2ee59372e7bebe10d4ff2d5a4e5819e93a3eaf1b98379ff6027050c6",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 13548,
+          "sha256": "0f81169d2ee59372e7bebe10d4ff2d5a4e5819e93a3eaf1b98379ff6027050c6"
+        }
+      ]
+    },
+    {
+      "path": "modules/aseguradoras.js",
+      "expectedSha256": "2d436eb5ccac4f6c6691d8c58a89d25f256857bde2c0490f7f314706e05b0de5",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 152011,
+          "sha256": "2d436eb5ccac4f6c6691d8c58a89d25f256857bde2c0490f7f314706e05b0de5"
+        }
+      ]
+    },
+    {
+      "path": "modules/automatizaciones.js",
+      "expectedSha256": "651f3d7109f3dd3fc933477f3301af827c8ebfad31ddb9d66e9cc7fab7546188",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 23426,
+          "sha256": "651f3d7109f3dd3fc933477f3301af827c8ebfad31ddb9d66e9cc7fab7546188"
+        }
+      ]
+    },
+    {
+      "path": "modules/calidad.js",
+      "expectedSha256": "7315d26ed76a74269a2a3981ae5295edf7a581aa2eae2c58ead0dddcb317f782",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 42700,
+          "sha256": "7315d26ed76a74269a2a3981ae5295edf7a581aa2eae2c58ead0dddcb317f782"
+        }
+      ]
+    },
+    {
+      "path": "modules/cancelaciones.js",
+      "expectedSha256": "53b073a98b2320d1e2329e877affb7e1a5a5d0cea37f94388da8d2dd72414f02",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 41694,
+          "sha256": "53b073a98b2320d1e2329e877affb7e1a5a5d0cea37f94388da8d2dd72414f02"
+        }
+      ]
+    },
+    {
+      "path": "modules/cliente360.js",
+      "expectedSha256": "9408c2b7e96bb848fd87a537e4be7f79bcf8ceafb311465d359e44481e9b850d",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 190845,
+          "sha256": "9408c2b7e96bb848fd87a537e4be7f79bcf8ceafb311465d359e44481e9b850d"
+        }
+      ]
+    },
+    {
+      "path": "modules/cobros-cartera-i65-closure-bridge.js",
+      "expectedSha256": "778c992d2347771227e77149faf929080cbbbaf6bc27682b7a86ed6a3bd76d94",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 5066,
+          "sha256": "778c992d2347771227e77149faf929080cbbbaf6bc27682b7a86ed6a3bd76d94"
+        }
+      ]
+    },
+    {
+      "path": "modules/cobros.js",
+      "expectedSha256": "c956d689c05ffa8972ece1b961447d70e07601c2c38b7192b92ac8b36b11643a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 121969,
+          "sha256": "c956d689c05ffa8972ece1b961447d70e07601c2c38b7192b92ac8b36b11643a"
+        }
+      ]
+    },
+    {
+      "path": "modules/comisiones.js",
+      "expectedSha256": "2ef4607bba3395323f8eb0ccfdaa48ea358750b103014e379d84b10279e56886",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 17696,
+          "sha256": "2ef4607bba3395323f8eb0ccfdaa48ea358750b103014e379d84b10279e56886"
+        }
+      ]
+    },
+    {
+      "path": "modules/comparativo-v1203-operational-bridge.js",
+      "expectedSha256": "192a29c1521dbacddf60c0f753c38d89c89c7d03a3e48ab999682b5cfc532069",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 19530,
+          "sha256": "192a29c1521dbacddf60c0f753c38d89c89c7d03a3e48ab999682b5cfc532069"
+        }
+      ]
+    },
+    {
+      "path": "modules/comparativo.js",
+      "expectedSha256": "58aa903f7231013c329ed3079449febdfd6edad98f78790567c9ea8c8a52fc1a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 38549,
+          "sha256": "58aa903f7231013c329ed3079449febdfd6edad98f78790567c9ea8c8a52fc1a"
+        }
+      ]
+    },
+    {
+      "path": "modules/conciliaciones.js",
+      "expectedSha256": "f05446e90e9db2f293a35c9170c6013fd3ee5129f0d55ffc2e54e3d9c93a9a9a",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 30439,
+          "sha256": "f05446e90e9db2f293a35c9170c6013fd3ee5129f0d55ffc2e54e3d9c93a9a9a"
+        }
+      ]
+    },
+    {
+      "path": "modules/config-domain-v20260804-bridge.js",
+      "expectedSha256": "d87ce4a2c21734f00cf66970588b3b5d4be0e8bdb40cb823e0f9b4e090ea3862",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 17164,
+          "sha256": "d87ce4a2c21734f00cf66970588b3b5d4be0e8bdb40cb823e0f9b4e090ea3862"
+        }
+      ]
+    },
+    {
+      "path": "modules/configuracion.js",
+      "expectedSha256": "7edd09f5cd681086f5f55e23415f42afb92b6570b4785c35e347fc98726a81ef",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 57280,
+          "sha256": "7edd09f5cd681086f5f55e23415f42afb92b6570b4785c35e347fc98726a81ef"
+        }
+      ]
+    },
+    {
+      "path": "modules/correo.js",
+      "expectedSha256": "c8c31afdac0b9fe198ca9c924480db36756d4c2b63f6647dfc17c96ccda7e731",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 15099,
+          "sha256": "c8c31afdac0b9fe198ca9c924480db36756d4c2b63f6647dfc17c96ccda7e731"
+        }
+      ]
+    },
+    {
+      "path": "modules/cotizador-v1203-source-gate.js",
+      "expectedSha256": "d49fca18dd1a56eaa0324b4d5c2e8877f0768c331914588fd62b4e2b9947dc09",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 28002,
+          "sha256": "d49fca18dd1a56eaa0324b4d5c2e8877f0768c331914588fd62b4e2b9947dc09"
+        }
+      ]
+    },
+    {
+      "path": "modules/cotizador.js",
+      "expectedSha256": "337659c9fd459ebb0273945ec846fb3f0a52be87454760c784a69667f8dc5d61",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 27032,
+          "sha256": "337659c9fd459ebb0273945ec846fb3f0a52be87454760c784a69667f8dc5d61"
+        }
+      ]
+    },
+    {
+      "path": "modules/crm-v1198-operational-bridge.js",
+      "expectedSha256": "163deb9c99e971f27e96359a15a61a03dac58012c8670c11f2ca332466b2c7b4",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 36119,
+          "sha256": "163deb9c99e971f27e96359a15a61a03dac58012c8670c11f2ca332466b2c7b4"
+        }
+      ]
+    },
+    {
+      "path": "modules/cronograma.js",
+      "expectedSha256": "08577de9936c2ef2efe44e6781e13773045cc2f52624b217e1cf8b6b3ba012a1",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 16088,
+          "sha256": "08577de9936c2ef2efe44e6781e13773045cc2f52624b217e1cf8b6b3ba012a1"
+        }
+      ]
+    },
+    {
+      "path": "modules/equipo-credential-admin-v20260805-bridge.js",
+      "expectedSha256": "e0d84319b1da01ff696fa7cfa7ce002af014487e651c311bb14b69a427ce5e0b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6897,
+          "sha256": "e0d84319b1da01ff696fa7cfa7ce002af014487e651c311bb14b69a427ce5e0b"
+        }
+      ]
+    },
+    {
+      "path": "modules/equipo-onboarding-v20260804-bridge.js",
+      "expectedSha256": "6fd3c29cdbae44adf30a9c91c0d03885f0818963f343b168f64646bd4b915bed",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11732,
+          "sha256": "6fd3c29cdbae44adf30a9c91c0d03885f0818963f343b168f64646bd4b915bed"
+        }
+      ]
+    },
+    {
+      "path": "modules/equipo.js",
+      "expectedSha256": "955fe70adc3c774fcd82b75550b5651cdecc87f1303af067a6355dc24a2d7dd8",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 82437,
+          "sha256": "955fe70adc3c774fcd82b75550b5651cdecc87f1303af067a6355dc24a2d7dd8"
+        }
+      ]
+    },
+    {
+      "path": "modules/finanzas.js",
+      "expectedSha256": "11df358e7e87d4364acb3096263ba509896f9393fd02c01f72b6b4e84ec5deed",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 137373,
+          "sha256": "11df358e7e87d4364acb3096263ba509896f9393fd02c01f72b6b4e84ec5deed"
+        }
+      ]
+    },
+    {
+      "path": "modules/historial.js",
+      "expectedSha256": "109e91299d78bd3444f9df7be3ca54625146531891fa5bb3f72b91141ed17324",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11005,
+          "sha256": "109e91299d78bd3444f9df7be3ca54625146531891fa5bb3f72b91141ed17324"
+        }
+      ]
+    },
+    {
+      "path": "modules/ia.js",
+      "expectedSha256": "68c8361e98f32029fd5e1b1fb32ed6b057613ba5056917e125fc127b787fa739",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 13369,
+          "sha256": "68c8361e98f32029fd5e1b1fb32ed6b057613ba5056917e125fc127b787fa739"
+        }
+      ]
+    },
+    {
+      "path": "modules/importar-p0-confirmacion.js",
+      "expectedSha256": "9210c6ec332d0a4d515d5f5769c24f7cb76e8434a0fc727200ba630e78f57e5b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 40248,
+          "sha256": "9210c6ec332d0a4d515d5f5769c24f7cb76e8434a0fc727200ba630e78f57e5b"
+        }
+      ]
+    },
+    {
+      "path": "modules/importar-p0-dashboard.js",
+      "expectedSha256": "5b76e127db7d19978396147bd8dda0a0c382a93630b6d4b20c0fd736d1c3c960",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10115,
+          "sha256": "5b76e127db7d19978396147bd8dda0a0c382a93630b6d4b20c0fd736d1c3c960"
+        }
+      ]
+    },
+    {
+      "path": "modules/importar.js",
+      "expectedSha256": "a77d1cb6dff1b6962190e7c2686f8ddf6d55302851d79a5ead026b74e6477938",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11506,
+          "sha256": "a77d1cb6dff1b6962190e7c2686f8ddf6d55302851d79a5ead026b74e6477938"
+        }
+      ]
+    },
+    {
+      "path": "modules/inicio.js",
+      "expectedSha256": "6a4608961aea4a74fd0e2f591791793d05d312123ad60942c21a608f6aa3b56f",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 53488,
+          "sha256": "6a4608961aea4a74fd0e2f591791793d05d312123ad60942c21a608f6aa3b56f"
+        }
+      ]
+    },
+    {
+      "path": "modules/insights.js",
+      "expectedSha256": "375c45c0e3a07a0c8c97e6d5a972cd869c7116ca00431d6993f54156d5bd3f91",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 70024,
+          "sha256": "375c45c0e3a07a0c8c97e6d5a972cd869c7116ca00431d6993f54156d5bd3f91"
+        }
+      ]
+    },
+    {
+      "path": "modules/issuance-endosos-v1201-bridge.js",
+      "expectedSha256": "668040348d92085d0948375ce8f72a7c0748cfa88b72aa3382b4783bbc30d89b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 80380,
+          "sha256": "668040348d92085d0948375ce8f72a7c0748cfa88b72aa3382b4783bbc30d89b"
+        }
+      ]
+    },
+    {
+      "path": "modules/issuance-endosos-v1201-refinements.js",
+      "expectedSha256": "b07697eae9250dada8059f7e2d8bb2fb9ece33363df7fc4d03bb6935ffac31d3",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 3165,
+          "sha256": "b07697eae9250dada8059f7e2d8bb2fb9ece33363df7fc4d03bb6935ffac31d3"
+        }
+      ]
+    },
+    {
+      "path": "modules/leads.js",
+      "expectedSha256": "ccae01f57ac9f5c11b1a4afe5570d7a4606e5ef6522178acf3cb49451523ebb3",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 4917,
+          "sha256": "ccae01f57ac9f5c11b1a4afe5570d7a4606e5ef6522178acf3cb49451523ebb3"
+        }
+      ]
+    },
+    {
+      "path": "modules/marketing.js",
+      "expectedSha256": "ee284e35a208e41f2d9d32b673e76606a8376775c2a3f618b6ab1407a64b6c83",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 22960,
+          "sha256": "ee284e35a208e41f2d9d32b673e76606a8376775c2a3f618b6ab1407a64b6c83"
+        }
+      ]
+    },
+    {
+      "path": "modules/notificaciones.js",
+      "expectedSha256": "29fd1a70a13aa6e1272c493689eb3838047057e0ab0256c4f434f7a36f2ee14c",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 12419,
+          "sha256": "29fd1a70a13aa6e1272c493689eb3838047057e0ab0256c4f434f7a36f2ee14c"
+        }
+      ]
+    },
+    {
+      "path": "modules/ops-workflows-v1201-bridge.js",
+      "expectedSha256": "dc08dfb41ff646463c9394c059a63961a062333b5d6ef117ba17b47226e63eed",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 11688,
+          "sha256": "dc08dfb41ff646463c9394c059a63961a062333b5d6ef117ba17b47226e63eed"
+        }
+      ]
+    },
+    {
+      "path": "modules/ops.js",
+      "expectedSha256": "4be03d1239545b221040a3cf97ef95aeb7d22e9941d22750cab6000ef6d1bd56",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 12137,
+          "sha256": "4be03d1239545b221040a3cf97ef95aeb7d22e9941d22750cab6000ef6d1bd56"
+        }
+      ]
+    },
+    {
+      "path": "modules/plantillas.js",
+      "expectedSha256": "3804549b4f70b65c8a7a819f000c493bce84ffcc66b54649885e559a016d1134",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 25982,
+          "sha256": "3804549b4f70b65c8a7a819f000c493bce84ffcc66b54649885e559a016d1134"
+        }
+      ]
+    },
+    {
+      "path": "modules/policy-receipts-v1199-bridge.js",
+      "expectedSha256": "ec9360d9b4e29a9154d589fb078d6a4a362a472d133310fdbeef790c13756c35",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 89874,
+          "sha256": "ec9360d9b4e29a9154d589fb078d6a4a362a472d133310fdbeef790c13756c35"
+        }
+      ]
+    },
+    {
+      "path": "modules/policy-receipts-v1199-detail-guard.js",
+      "expectedSha256": "5f911e48fd9f78abd6fd5c88348fbb74032467e4a9c9fbc3fe7b3f53f2e0c343",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 65253,
+          "sha256": "5f911e48fd9f78abd6fd5c88348fbb74032467e4a9c9fbc3fe7b3f53f2e0c343"
+        }
+      ]
+    },
+    {
+      "path": "modules/polizas.js",
+      "expectedSha256": "8b1a4fed14cd247df0bad117074c39b698ddf7a3b4914bf385c19c94cb95a3a2",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 34785,
+          "sha256": "8b1a4fed14cd247df0bad117074c39b698ddf7a3b4914bf385c19c94cb95a3a2"
+        }
+      ]
+    },
+    {
+      "path": "modules/portal-v1142-copyfix.js",
+      "expectedSha256": "d3ff2c470435f161dd85657e8391d2898f7a62832ab076a647250ce7e493d419",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 10091,
+          "sha256": "d3ff2c470435f161dd85657e8391d2898f7a62832ab076a647250ce7e493d419"
+        }
+      ]
+    },
+    {
+      "path": "modules/portal-v1198-scope-viewer-bridge.js",
+      "expectedSha256": "d6a4a5d7b23ce470e13e623983e07150ae15948cb74e03ce79b543109df3c858",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1604,
+          "sha256": "d6a4a5d7b23ce470e13e623983e07150ae15948cb74e03ce79b543109df3c858"
+        }
+      ]
+    },
+    {
+      "path": "modules/portal.js",
+      "expectedSha256": "8fde3256f05137b21ae5a62c46d356bdbc37f53ccbe842106bdb78bb6d0ee35b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 40732,
+          "sha256": "8fde3256f05137b21ae5a62c46d356bdbc37f53ccbe842106bdb78bb6d0ee35b"
+        }
+      ]
+    },
+    {
+      "path": "modules/renewals-v1200-operational-bridge.js",
+      "expectedSha256": "7c981939230024d2ce3d31a2d504ecb38a151f73baeb1cd036da79a56d9e7c05",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 24449,
+          "sha256": "7c981939230024d2ce3d31a2d504ecb38a151f73baeb1cd036da79a56d9e7c05"
+        }
+      ]
+    },
+    {
+      "path": "modules/renewals-v1200-permission-guard.js",
+      "expectedSha256": "ae6f0975c010169764c4395d72645f3caa51051ef2e16eacc44ab20739ca8c25",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 726,
+          "sha256": "ae6f0975c010169764c4395d72645f3caa51051ef2e16eacc44ab20739ca8c25"
+        }
+      ]
+    },
+    {
+      "path": "modules/renewals-v1201-issued-filter.js",
+      "expectedSha256": "9e72e947503a31646b0f456a1158b9733ca3e5925196dcbc0af63127255640b4",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1072,
+          "sha256": "9e72e947503a31646b0f456a1158b9733ca3e5925196dcbc0af63127255640b4"
+        }
+      ]
+    },
+    {
+      "path": "modules/renovaciones.js",
+      "expectedSha256": "03f97e2b7e082883f13e0db43a0b8db168b5c46d516b5d59efc43d852d11b005",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 35456,
+          "sha256": "03f97e2b7e082883f13e0db43a0b8db168b5c46d516b5d59efc43d852d11b005"
+        }
+      ]
+    },
+    {
+      "path": "modules/reportes.js",
+      "expectedSha256": "1c03e625265722e7b809df47ac35ba42a071a4b19b38a7797a7e70dd815e3d1d",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 38697,
+          "sha256": "1c03e625265722e7b809df47ac35ba42a071a4b19b38a7797a7e70dd815e3d1d"
+        }
+      ]
+    },
+    {
+      "path": "modules/siniestros.js",
+      "expectedSha256": "6beb41925d9f12bf2fcd00edae84f29f1c81d36d3eac205984417ef415ed0743",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 18758,
+          "sha256": "6beb41925d9f12bf2fcd00edae84f29f1c81d36d3eac205984417ef415ed0743"
+        }
+      ]
+    },
+    {
+      "path": "product-runtime-config.js",
+      "expectedSha256": "81ea1770f89b1e05e56b7399ecf3f08a6c1ee2ccee92e1209d89103375565635",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1171,
+          "sha256": "81ea1770f89b1e05e56b7399ecf3f08a6c1ee2ccee92e1209d89103375565635"
+        }
+      ]
+    },
+    {
+      "path": "styles/aseguradoras-candidate.css",
+      "expectedSha256": "2577a05cf1be5d6f4dd637eedb5407dfadff44480a291661f632b5fc687bfbff",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 1556,
+          "sha256": "2577a05cf1be5d6f4dd637eedb5407dfadff44480a291661f632b5fc687bfbff"
+        }
+      ]
+    },
+    {
+      "path": "styles/base.css",
+      "expectedSha256": "760d3f67ff013a03be73f96d04e93d626ea6206fb5ed2ea5c1160a92f7600ed2",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 34551,
+          "sha256": "760d3f67ff013a03be73f96d04e93d626ea6206fb5ed2ea5c1160a92f7600ed2"
+        }
+      ]
+    },
+    {
+      "path": "styles/client-insurer-edit-mode-v20260722.css",
+      "expectedSha256": "c63ba6262dbe86a77a40f90e119a6a578e40b5914982a96fd6ddb76479b46d3d",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2190,
+          "sha256": "c63ba6262dbe86a77a40f90e119a6a578e40b5914982a96fd6ddb76479b46d3d"
+        }
+      ]
+    },
+    {
+      "path": "styles/client-insurer-visual-contract-v20260720.css",
+      "expectedSha256": "c0302660c8a4ce79be0f28a09feb2f3c23908b6a3e9cdd5d0520a94f67e83f8b",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 12736,
+          "sha256": "c0302660c8a4ce79be0f28a09feb2f3c23908b6a3e9cdd5d0520a94f67e83f8b"
+        }
+      ]
+    },
+    {
+      "path": "styles/infra.css",
+      "expectedSha256": "117acb8f2ddc928b6a9e7b8ac7a52e1d775fff03bec6dda9ade0ae47ea01c6a2",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 150789,
+          "sha256": "117acb8f2ddc928b6a9e7b8ac7a52e1d775fff03bec6dda9ade0ae47ea01c6a2"
+        }
+      ]
+    },
+    {
+      "path": "styles/tokens.css",
+      "expectedSha256": "4c0ec96c81bd45a75e661b3371405e6fdc02b97e459b465e88214c3e0e877668",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 2003,
+          "sha256": "4c0ec96c81bd45a75e661b3371405e6fdc02b97e459b465e88214c3e0e877668"
+        }
+      ]
+    },
+    {
+      "path": "styles/v1197-empalme.css",
+      "expectedSha256": "8b5a298f9f39d3e9d018c74415dbd66b4194b5aadf11a8398440949ec75f1614",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 13088,
+          "sha256": "8b5a298f9f39d3e9d018c74415dbd66b4194b5aadf11a8398440949ec75f1614"
+        }
+      ]
+    },
+    {
+      "path": "sw.js",
+      "expectedSha256": "2c840962eed964a53ecd77195f9ce7114b891d0be5636473e4c7be25899b3567",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 6108,
+          "sha256": "2c840962eed964a53ecd77195f9ce7114b891d0be5636473e4c7be25899b3567"
+        }
+      ]
+    }
+  ],
+  "live": [
+    {
+      "label": "FIREBASE_LIVE",
+      "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 47988,
+          "sha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+        }
+      ],
+      "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+    },
+    {
+      "label": "STAFF_LIVE",
+      "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+      "status": "PASS",
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": 200,
+          "bytes": 47988,
+          "sha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+        }
+      ],
+      "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+    }
+  ],
+  "noDeploymentPerformed": true,
+  "noArtifactMutation": true,
+  "appStartupAcceptance": false,
+  "elapsedMs": 21058,
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45518809761-eiytd3a3.web.app",
+  "previewChannel": "gi-i66-rc-45518809761",
+  "buildId": "gi-i66-63bf7d9e9ba7-57f234755dc1",
+  "manifestSha256": "8d7a5c8424e7236742ca25454ad3cd10ef58aa2d088894ec865f17dccce99d93",
+  "expectedMarkerSha256": "fcdef5d150b9bca781f1237050295c7d8ba39d970e6dfe1877d1b2b3b53533d0",
+  "markerReadinessElapsedMs": 143
+}

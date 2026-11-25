@@ -1,0 +1,72 @@
+{
+  "schema": "GI_I66_V33_IMMUTABLE_BUILD_AND_EXACT_PREVIEW_READBACK_RECEIPT_V1",
+  "status": "IMMUTABLE_BUILD_AND_HOSTING_PREVIEW_READBACK_PASS_BACKEND_AND_DIRECT_FORMS_UI_PENDING",
+  "activeGate": "I6.6",
+  "sourceSha": "63bf7d9e9ba7710cab73bffee010987c784d92aa",
+  "buildId": "gi-i66-63bf7d9e9ba7-57f234755dc1",
+  "buildRunId": 45527330623,
+  "jobId": 138913995548,
+  "buildConclusion": "success",
+  "artifactId": 14983831110,
+  "artifactDigest": "sha256:c8ecc0f82cfd61d57c628b7b506f2c73c245efec99ea1927762975e96f511801",
+  "innerPackageSha256": "aef7499b9137de564f221cd6841413b61fa1102d8a4e71cdde6ec178386b90a3",
+  "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45518809761-eiytd3a3.web.app",
+  "previewChannel": "gi-i66-rc-45518809761",
+  "siteFileCount": 224,
+  "readback": {
+    "receiptPath": "artifacts/orbit360-recovery/release-control/I6_6_V33_IMMUTABLE_PACKAGE_READBACK_20261124.json",
+    "receiptGitBlobSha": "479b89ad798fd9b091fca0eca682142456e4fb90",
+    "reportSha256": "9abe9c3dc0a9874c12ab1e4dd0bb72fc2d6b6b9bc7c929d2168e02d99cb0cdd7",
+    "artifactId": 14983636887,
+    "artifactDigest": "sha256:dce4d029da6928a90efdbb5dab510aabcb2a5d882146c65404826a4bc6c426ce",
+    "matchedFiles": 224,
+    "liveFingerprints": [
+      {
+        "label": "FIREBASE_LIVE",
+        "status": "PASS",
+        "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+        "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+      },
+      {
+        "label": "STAFF_LIVE",
+        "status": "PASS",
+        "beforeSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84",
+        "afterSha256": "7a9a23d24f80cbb31858fdc5b3836b703f2f2120911e2f1dca8bfb5c2c92bb84"
+      }
+    ]
+  },
+  "sourceQa": {
+    "head": "0f4b4ccc817b5dd539c22640b65b3b0de211b175",
+    "runId": 45526472469,
+    "guardRunId": 45526472277,
+    "conclusion": "success"
+  },
+  "directFormsReceipt": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_FORMS_ASSIGNED_ROLES_AND_INSURER_EDITOR_CAUSAL_SOURCE_20261124.json",
+  "directFormsReceiptBlob": "539a1c4be0635588f5c7ec187320a78ce4b91927",
+  "causalInventoryReceipt": "artifacts/orbit360-recovery/release-control/I6_6_MAKE_EXISTING_TRIGGER_INVENTORY_CAUSAL_CORRECTION_20261124.json",
+  "causalInventoryReceiptBlob": "eaafff795b68dd86188487d3f5b126bd92da1b24",
+  "causalQuotaReceipt": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V28_ROLLOVER_V4_20261124.json",
+  "causalQuotaReceiptSha256": "dd56c0a2a9ea19e261da36f53a62b3b7a29fbf7a9a54f20ad24dfa24d505c971",
+  "technicalRollover": {
+    "status": "EXACT_PREVIEW_REPLACEMENT_READBACK_PASS_NOT_FUNCTIONAL_ACCEPTANCE",
+    "artifactId": 14982343806,
+    "artifactDigest": "sha256:c9286e21b264c2574a61b62db74c2a9ace0283a42135b456db0b578935f3a031",
+    "beforeSha256": "214d9ffe64729d7bfc8ad04056515043695f3a8ed6ee03c16b70fbf5afd9d011",
+    "afterSha256": "7ff44ecc707a392abee58c430b6d95121cc0d8ce08b155d60d3de886c2036bb8",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/639a53daf03e458b",
+    "totalChannels": 51,
+    "otherChannelsUnchanged": 50,
+    "dualLiveUnchanged": true,
+    "backupArchivesVerified": 3,
+    "receiptSha256": "1da08844f2abd98a20db07e9906b9c7ac2b83f23316edaf2aa193aa964c9843f"
+  },
+  "priorV23FullSignedPreviewPreserved": true,
+  "previousElevenProductOwnersPreserved": true,
+  "sourceGatedProductOwnerCount": 21,
+  "artifactPatched": false,
+  "backendPreviewAccepted": false,
+  "financialPreview48Accepted": false,
+  "liveAccepted": false,
+  "fullI66Accepted": false,
+  "acceptedProductionRemains": "E3"
+}
