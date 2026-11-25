@@ -11249,7 +11249,7 @@
         "mechanism": {
           "schema": "GI_I66_NATIVE_MECHANISM_REVISION_V1",
           "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
-          "commit": "2e7b6a5332f24fcc58b45ff8358b68fe48eeca4e",
+          "commit": "ad3b3c1420d286e068c13b3f8ca7dd00c8c6dec6",
           "files": {
             "tools/gravicentra-i6-6-composite-preview-admission.test.cjs": {
               "beforeBlob": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
@@ -11263,8 +11263,8 @@
             },
             "tools/gravicentra-i6-6-cloud-build-operational.test.cjs": {
               "beforeBlob": null,
-              "blob": "593ac426924765e39dd0879d13443f6d4e6ac219",
-              "sha256": "0d03e691162da81cf1201bf6c6f5df789e70a7e9e2c9ee799898d65e2ae4489b"
+              "blob": "4970ee8f80fd1f7c40f2ed38e16a4d22ae9fc8a0",
+              "sha256": "b59e60f5c08279fd56a7b2c487d3d91ec47115036d198554b90f372381380f4b"
             },
             "tools/gravicentra-i6-6-cloud-build-package.cjs": {
               "beforeBlob": null,
@@ -11358,8 +11358,8 @@
             },
             "tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs": {
               "beforeBlob": "49b5da17f6046deb52aebb2baf030d877f43b895",
-              "blob": "6d75eea2086e0e6f227e6db41bffc1332fffa05a",
-              "sha256": "b356af9ae5d6f19567b6b44b4ce29dadbffb27e66defe36a86f19b0b57de5cc7"
+              "blob": "c4c22124c556d5696b6807b334458c1e648039dc",
+              "sha256": "4460dc8a309ef4310d2fd6fe77687968fd99c9436b7d7622ca59e42d28cc8ec6"
             },
             "tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat.cjs": {
               "beforeBlob": "cdab5a1f2e12dfce569dcda3474a7b68cf3d884c",

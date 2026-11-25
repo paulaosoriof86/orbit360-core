@@ -1,0 +1,83 @@
+{
+  "recordType": "SUBORDINATE_EXECUTION_AND_READBACK_EVIDENCE",
+  "authorityHeadAtExecution": "28b2aec9b719a4d208772b6fd51321a8ae41af90",
+  "requestVersion": 35,
+  "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+  "artifactDigest": "sha256:1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+  "provider": "CLOUD_BUILD",
+  "attempts": [
+    {
+      "buildId": "e73dc3d2-788c-4a2d-a1e0-da773284f5e1",
+      "gitSource": null,
+      "status": "FAILURE",
+      "firstError": "MODULE_NOT_FOUND",
+      "log": {
+        "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/cloud-build-logs/log-e73dc3d2-788c-4a2d-a1e0-da773284f5e1.txt",
+        "generation": "1795626111776013",
+        "bytes": 7250,
+        "sha256": "dd69b60cb1b34cc1849238420deb47cf43519a2f48e828526777bb26b6fbb165",
+        "providerCrc32cVerified": true
+      },
+      "failedBeforeBackendDeploy": true
+    },
+    {
+      "buildId": "6c184d80-30f3-48f5-bff7-97e73b3ae7e2",
+      "gitSource": "28b2aec9b719a4d208772b6fd51321a8ae41af90",
+      "status": "FAILURE",
+      "firstError": "I66_DIRECT_FORMS_ROLE_CURRENT_AUTHORITY_UNAVAILABLE",
+      "log": {
+        "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/cloud-build-logs/log-6c184d80-30f3-48f5-bff7-97e73b3ae7e2.txt",
+        "generation": "1795626287944645",
+        "bytes": 6485,
+        "sha256": "7b9545dc46d19823b6e637b9560febae65fdf5c6862f5c2e41ff8378c9c63b2d",
+        "providerCrc32cVerified": true
+      },
+      "failedBeforeBackendDeploy": true
+    }
+  ],
+  "revision": {
+    "mechanismCommit": "ad3b3c1420d286e068c13b3f8ca7dd00c8c6dec6",
+    "exactChanges": [
+      "tools/gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs",
+      "tools/gravicentra-i6-6-cloud-build-operational.test.cjs"
+    ],
+    "regressionTests": {
+      "total": 182,
+      "passed": 182
+    },
+    "signedPreviewAcceptance": false,
+    "liveAcceptance": false
+  },
+  "independentFinancialReadback": {
+    "profile": "MAPFRE_DOC04_2453",
+    "policy": "3002600002453",
+    "fourOriginalBytesVerified": true,
+    "freshOwnerStatus": "MAPFRE_OBLIGATION_PREFLIGHT_HOLD",
+    "reason": "MAPFRE_DOC04_PRIOR_PAYMENT_SET_CHANGED",
+    "expectedPreviouslyRegisteredPayments": 4,
+    "actualRegisteredPayments": 6,
+    "receipts": 12,
+    "protectedPreconditionsMatched": 2,
+    "protectedPreconditionsChanged": 2,
+    "paymentAmountGTQ": 309.6,
+    "installments": [
+      {
+        "installment": 5,
+        "receiptId": "rec_213dd4c69d7c8d1a2213b565",
+        "linkedPayments": 1
+      },
+      {
+        "installment": 6,
+        "receiptId": "rec_e5bb2b7a3ecda6a26b266435",
+        "linkedPayments": 0
+      },
+      {
+        "installment": 7,
+        "receiptId": "rec_14e754d44cdac1e54abd7ca0",
+        "linkedPayments": 1
+      }
+    ],
+    "scope": "Current server records and protected batch preconditions; no financial or role acceptance claimed.",
+    "writes": 0
+  }
+}
