@@ -218,10 +218,10 @@ for(const [label,mutate] of [
  await assert.rejects(e.rollbackCreatedTrigger({...f,snapshot,postimage,restorePreviousRevision:async()=>{writes++;}}));
  assert.equal(writes,0);
 });
-test('the observed Cloud Run revision must be the new deployment at postimage capture',async()=>{
+test('a stale serving revision without a fresh provider etag cannot authorize alignment or acceptance',async()=>{
  const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);f.deploy();
  f.setTraffic(runServiceRow(f.current,{revision:'orbit360makeleadingresspreview-00001-cuy',generation:'9'}));
- await assert.rejects(e.captureTrigger({...f,snapshot}),/DEPLOYED_REVISION_NOT_SERVING/);
+  await assert.rejects(e.captureTrigger({...f,snapshot}),/TRAFFIC_CAS_ETAG_REQUIRED/);
 });
 for(const [label,mutate] of [
  ['missing traffic',r=>{delete r.trafficStatuses;}],
@@ -371,4 +371,128 @@ test('predeployment gate rejects ACTIVE or changed config before any runtime/IAM
  x.p.makeIngress.closedConfiguration.preview.expectedDigest='ABSENT';
  await assert.rejects(e.beforeDeploy({db:x.f.db,p:x.p,phase:'preview',requireFrom:()=>{calls++;throw Error();}}),/PREIMAGE_CHANGED/);
  assert.equal(calls,0);
+});
+
+async function routingCaptureFixture(){
+ const f=trafficRollbackFixture(),snapshot=await e.snapshotTrigger(f);f.deploy();
+ f.setTraffic({...runServiceRow(f.current,{revision:snapshot.traffic.targets[0].revision,generation:'9'}),etag:'"routing-before"'});
+ const x={f,p:f.p,phase:f.phase,snapshot,patches:[],diagnostics:[],postimages:[],reads:[],pauses:[],beforeRead:null,
+  patch:async()=>{f.setTraffic({...runServiceRow(f.current,{generation:'10'}),etag:'"routing-after"'});return{data:{name:'projects/ays-orbit-360-lab/locations/us-east1/operations/fixture-only',done:false}};}};
+ x.auth={request:async op=>{
+  if(op.method==='PATCH'){x.patches.push(clone(op));return x.patch(op);}
+  x.reads.push(clone(op));if(x.beforeRead)await x.beforeRead(op);return f.auth.request(op);
+ }};
+ x.args=()=>({auth:x.auth,p:x.p,phase:x.phase,snapshot:x.snapshot,
+  retainDiagnostic:r=>x.diagnostics.push(clone(r)),retainPostimage:r=>x.postimages.push(clone(r)),pause:async ms=>x.pauses.push(ms)});
+ return x;
+}
+test('capture routes only the exact postdeploy revision through one traffic-only etag CAS and real serving readback',async()=>{
+ const x=await routingCaptureFixture(),result=await e.captureTrigger(x.args());
+ assert.equal(x.patches.length,1);
+ assert.deepEqual(x.patches[0],{url:'https://run.googleapis.com/v2/'+x.snapshot.traffic.service+'?updateMask=traffic',method:'PATCH',
+  data:{name:x.snapshot.traffic.service,etag:'"routing-before"',traffic:[{type:'TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION',revision:x.f.current.serviceConfig.revision,percent:100}]}});
+ assert.equal(result.status,'DEPLOYED_REVISION_SERVING_VERIFIED');assert.equal(result.routing.trafficWrites,1);
+ assert.equal(result.traffic.targets[0].revision,result.function.revision);assert.equal(result.traffic.generation,'10');
+ assert.equal(x.diagnostics.at(-1).status,'DEPLOYED_REVISION_SERVING_VERIFIED');
+ assert.ok(x.postimages.some(p=>p.status==='OBSERVED_NOT_ACCEPTED'&&p.traffic.targets[0].revision===x.snapshot.traffic.targets[0].revision));
+ assert.equal(x.postimages.at(-1).status,result.status);assert.equal(x.pauses.length,0);
+ const again=await e.captureTrigger(x.args());assert.equal(again.routing.trafficWrites,0);assert.equal(x.patches.length,1);
+});
+test('capture retains a classified assertion and observed prior route before refusing a missing etag',async()=>{
+ const x=await routingCaptureFixture();delete x.f.traffic.etag;
+ await assert.rejects(e.captureTrigger(x.args()),/TRAFFIC_CAS_ETAG_REQUIRED/);
+ assert.equal(x.patches.length,0);assert.equal(x.diagnostics.at(-1).errorCode,'INGRESS_TRAFFIC_CAS_ETAG_REQUIRED');
+ assert.equal(x.diagnostics.at(-1).routing.trafficWrites,0);
+ assert.ok(x.diagnostics.at(-1).observations.some(o=>o.kind==='POSTDEPLOY_PAIR'));
+ assert.equal(x.postimages.at(-1).status,'OBSERVED_NOT_ACCEPTED');
+});
+for(const status of [409,412])test('a traffic etag conflict '+status+' is HOLD without a second PATCH or refreshed mutation token',async()=>{
+ const x=await routingCaptureFixture();x.patch=async()=>{throw{response:{status}};};
+ await assert.rejects(e.captureTrigger(x.args()),/INGRESS_TRAFFIC_CAS_CONFLICT/);
+ assert.equal(x.patches.length,1);assert.equal(x.diagnostics.at(-1).routing.trafficWrites,0);
+ assert.equal(x.diagnostics.at(-1).routing.httpStatus,status);assert.equal(x.pauses.length,0);
+});
+test('an ambiguous routing transport failure is retained with an unknown write count',async()=>{
+ const x=await routingCaptureFixture();x.patch=async()=>{throw Object.assign(Error('private provider message'),{code:'ETIMEDOUT'});};
+ await assert.rejects(e.captureTrigger(x.args()));assert.equal(x.patches.length,1);
+ const report=x.diagnostics.at(-1);assert.equal(report.routing.trafficWrites,null);assert.equal(report.status,'HOLD');
+ assert.equal(report.errorCode,'I66_MAKE_PROTECTED_EXECUTION_HOLD');assert.ok(!JSON.stringify(report).includes('private provider message'));
+});
+for(const [label,mutate,code]of[
+ ['different prior route',x=>{x.f.traffic.trafficStatuses[0].revision='orbit360makeleadingresspreview-00009-other';},'ALIGNMENT_PREIMAGE_CHANGED'],
+ ['recreated service',x=>{x.f.traffic.uid='87654321-4321-4321-8321-cba987654321';},'SERVICE_RECREATED'],
+ ['different trigger configuration',x=>{x.f.current.eventTrigger.trigger+='-other';},'NON_REVISION_CONFIGURATION_CHANGED'],
+ ['missing previous traffic',x=>{delete x.snapshot.traffic;},'PREVIOUS_TRAFFIC_PROOF_REQUIRED'],
+ ['absent previous state',x=>{x.snapshot.previousState='ABSENT';},'ALIGNMENT_EXISTING_PREIMAGE_REQUIRED'],
+ ['regressed generation',x=>{x.f.traffic.generation=x.f.traffic.observedGeneration='7';},'GENERATION_REGRESSED']
+])test('capture refuses '+label+' before any routing mutation',async()=>{
+ const x=await routingCaptureFixture();mutate(x);await assert.rejects(e.captureTrigger(x.args()),new RegExp(code));
+ assert.equal(x.patches.length,0);assert.equal(x.diagnostics.at(-1).status,'HOLD');
+});
+for(const change of ['etag','traffic','function'])test('capture rereads and rejects a concurrent '+change+' change before PATCH',async()=>{
+ const x=await routingCaptureFixture();let reads=0;
+ x.beforeRead=async op=>{if(op.url.startsWith('https://run.googleapis.com/')&&++reads===2){
+  if(change==='etag')x.f.traffic.etag='"changed"';
+  if(change==='traffic')x.f.traffic.trafficStatuses[0].revision='orbit360makeleadingresspreview-00009-concurrent';
+  if(change==='function')x.f.current.serviceConfig.revision='orbit360makeleadingresspreview-00009-concurrent';
+ }};
+ await assert.rejects(e.captureTrigger(x.args()),/CHANGED/);assert.equal(x.patches.length,0);
+});
+test('a pending traffic operation is observed until ready without repeating the mutation',async()=>{
+ const x=await routingCaptureFixture();let afterReads=0;
+ x.patch=async()=>{x.f.setTraffic({...runServiceRow(x.f.current,{generation:'10'}),etag:'"pending"',reconciling:true,observedGeneration:'9'});return{data:{done:false}};};
+ x.beforeRead=async op=>{if(x.patches.length&&op.url.startsWith('https://run.googleapis.com/')&&++afterReads===2)
+  x.f.setTraffic({...runServiceRow(x.f.current,{generation:'10'}),etag:'"ready"'});};
+ const result=await e.captureTrigger(x.args());assert.equal(result.routing.trafficWrites,1);assert.equal(x.patches.length,1);assert.equal(x.pauses.length,1);
+ assert.ok(x.diagnostics.at(-1).observations.some(o=>o.kind==='CLOUD_RUN_RESPONSE'&&o.reconciling===true));
+});
+test('a successful PATCH response with no serving change remains HOLD and never claims acceptance',async()=>{
+ const x=await routingCaptureFixture();x.patch=async()=>({data:{done:true}});
+ await assert.rejects(e.captureTrigger(x.args()),/DEPLOYED_REVISION_NOT_SERVING/);
+ assert.equal(x.patches.length,1);assert.equal(x.pauses.length,29);assert.equal(x.diagnostics.at(-1).routing.trafficWrites,null);
+ assert.ok(x.postimages.every(p=>p.status==='OBSERVED_NOT_ACCEPTED'));
+});
+for(const [label,change,code]of[
+ ['third-party route',x=>{x.f.traffic.trafficStatuses[0].revision='orbit360makeleadingresspreview-00009-other';},'ROUTING_TARGET_CHANGED'],
+ ['recreated service',x=>{x.f.traffic.uid='87654321-4321-4321-8321-cba987654321';},'SERVICE_RECREATED'],
+ ['extra generation',x=>{x.f.traffic.generation=x.f.traffic.observedGeneration='11';},'ROUTING_GENERATION_CHANGED'],
+ ['concurrent function',x=>{x.f.current.serviceConfig.revision='orbit360makeleadingresspreview-00009-other';},'FUNCTION_CHANGED_DURING_TRAFFIC_READ']
+])test('post-PATCH '+label+' is retained diagnostically but never becomes rollback write authority',async()=>{
+ const x=await routingCaptureFixture(),normal=x.patch;x.patch=async op=>{const r=await normal(op);change(x);return r;};
+ await assert.rejects(e.captureTrigger(x.args()),new RegExp(code));assert.equal(x.patches.length,1);
+ assert.equal(x.postimages.at(-1).traffic.targets[0].revision,x.snapshot.traffic.targets[0].revision);
+ assert.equal(x.diagnostics.at(-1).status,'HOLD');assert.equal(x.diagnostics.at(-1).routing.trafficWrites,null);
+});
+test('rollback proves previous traffic intact after failed capture with no postimage and no Cloud write',async()=>{
+ const x=await routingCaptureFixture();let writes=0;
+ const result=await e.rollbackCreatedTrigger({...x.args(),restorePreviousRevision:async()=>{writes++;},deleteFunction:async()=>{writes++;}});
+ assert.equal(result.status,'EXACT_PREVIOUS_PREVIEW_REVISION_ALREADY_RESTORED');assert.equal(result.trafficWrites,0);assert.equal(writes,0);
+ assert.equal(result.functionMetadataRestored,false);assert.equal(result.observedFunctionRevision,x.f.current.serviceConfig.revision);
+ assert.equal(result.restoredRevision,x.snapshot.traffic.targets[0].revision);
+});
+for(const [label,change]of[
+ ['unknown serving revision',x=>{x.f.traffic.trafficStatuses[0].revision='orbit360makeleadingresspreview-00009-unknown';}],
+ ['wrong service UID',x=>{x.f.traffic.uid='87654321-4321-4321-8321-cba987654321';}],
+ ['changed trigger',x=>{x.f.current.eventTrigger.trigger+='-other';}],
+ ['missing prior proof',x=>{delete x.snapshot.traffic;}]
+])test('rollback without postimage rejects '+label+' without mutation',async()=>{
+ const x=await routingCaptureFixture();change(x);let writes=0;
+ await assert.rejects(e.rollbackCreatedTrigger({...x.args(),restorePreviousRevision:async()=>{writes++;}}));assert.equal(writes,0);
+});
+test('capture file retention survives HOLD inside the existing diagnostic artifact paths without raw private provider data',async()=>{
+ const x=await routingCaptureFixture(),dir=fs.mkdtempSync(path.join(os.tmpdir(),'gi-capture-retention-'));
+ delete x.f.traffic.etag;x.f.traffic.template={environmentVariables:{privateValue:'never-publish-this'}};
+ try{
+  await assert.rejects(e.captureTrigger({...x.args(),...e.captureRecorders(dir,'preview')}),/CAS_ETAG_REQUIRED/);
+  const files=fs.readdirSync(dir).sort();assert.deepEqual(files,['gi-make-preview-capture-trigger-observation.json','gi-make-preview-capture-trigger.json']);
+  const raw=files.map(file=>fs.readFileSync(path.join(dir,file),'utf8')).join('\n');assert.ok(!raw.includes('never-publish-this'));
+  const diagnostic=JSON.parse(fs.readFileSync(path.join(dir,files[0])));assert.equal(diagnostic.status,'HOLD');assert.equal(diagnostic.errorCode,'INGRESS_TRAFFIC_CAS_ETAG_REQUIRED');
+  assert.match(fs.readFileSync(path.join(__dirname,'../.github/workflows/gravicentra-i66-privileged-role-three-function-preview-uat.yml'),'utf8'),/gi-make-preview-\*\.json/);
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+test('failure classification retains only a safe guard token and never an assertion value or provider message',()=>{
+ let error;try{assert.equal('private actual','private expected','INGRESS_DEPLOYED_REVISION_NOT_SERVING');}catch(caught){error=caught;}
+ assert.equal(e.safeFailureCode(error),'INGRESS_DEPLOYED_REVISION_NOT_SERVING');
+ assert.equal(e.safeFailureCode({code:'INGRESS_ROLLBACK_UNVERIFIED',message:'private'}),'INGRESS_ROLLBACK_UNVERIFIED');
+ assert.equal(e.safeFailureCode(Error('private provider value')),'I66_MAKE_PROTECTED_EXECUTION_HOLD');
 });

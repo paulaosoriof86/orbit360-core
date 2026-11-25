@@ -1,0 +1,111 @@
+{
+  "schema": "GI_I66_MAKE_POSTDEPLOY_TRAFFIC_CAS_CAUSAL_SOURCE_V1",
+  "status": "SOURCE_PREPARED_NOT_APPLIED_NO_RUNTIME_ACCEPTANCE",
+  "preparedAtUtc": "2026-11-25T01:04:44.702Z",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "immutableSourceBaseline": "12db222244dd2b02f3d8148470b28a798cacaca0",
+  "integrationBase": "9a699defebab9c122343fd1318db2e80bd06f5d7",
+  "patch": {
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v32-preview-trigger-capture-causal-fix/exact-trigger-traffic-cas-and-retention.patch",
+    "sha256": "dac7d56b69f1e6fa9bc0a29bd214df492fe7c8a8bab027951677dea125cd88ad"
+  },
+  "paths": [
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.cjs",
+      "beforeBlob": "85070cdd546198d964d76cb3643cece9d8b73311",
+      "blob": "9620fc1aefeb30e95c57aca0b87896c3e9fefc59",
+      "sha256": "f5dd042a3cf346f4653306a0d2870147032ca4f348800382964e17d5f56fdc3c"
+    },
+    {
+      "path": "tools/gravicentra-i66-make-lead-protected-executor.test.cjs",
+      "beforeBlob": "f9a7797349373c84f2a1d359d9c922c6ec747677",
+      "blob": "ffb8449bb9a0964950c35c49739178b181a33c9f",
+      "sha256": "fb842bc0c623f91288ff70a8b9dd4df3b7dbcc774363b8e0b9af549b2e7ba02d"
+    }
+  ],
+  "actualFailure": {
+    "previewRunId": 45519726701,
+    "attempt": 1,
+    "jobId": 138888314175,
+    "authorityHead": "0a1ae764d000f2562e736b68a762527d5046cd0e",
+    "status": "FAILED_NOT_ACCEPTED",
+    "failedSteps": [
+      10,
+      18
+    ],
+    "signedUiNotExecuted": true,
+    "logPath": "/workspace/scratch/166055cd45dc/continuity-evidence/v32-preview-verification/job138888314175.log",
+    "logSha256": "c5e97f014483c170e801fe1f30d7993bdbf925aa0c5ae5e469e88ae08724722f",
+    "observedBoundary": "Five Preview targets deployed and inventory readback passed. The next capture-trigger command emitted only I66_MAKE_PROTECTED_EXECUTION_HOLD; no accepted capture postimage or initialize-closed report was retained. Compensation emitted INGRESS_ROLLBACK_UNVERIFIED.",
+    "originalInnerAssertionRetained": false,
+    "build32RemainsWholeSuccess": true,
+    "buildRunId": 45518809761,
+    "artifactId": 14979094222,
+    "artifactDigest": "sha256:0426b4e4d008bc5f2c145b2ee34928c1fc93f733a28e93ff94babc1edd32ea53"
+  },
+  "discriminatingLaterObservation": {
+    "runId": 45505420941,
+    "attempt": 2,
+    "jobId": 138891123287,
+    "status": "READONLY_PROVIDER_SUCCESS",
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v32-preview-failure-make/readonly-attempt2/i66-make-preimages-sanitized.json",
+    "sha256": "286c0954eacc0b5666ccc7e24c5ff12fe83f6cad51ee746383558d9501957fb4",
+    "functionRevision": "orbit360makeleadingresspreview-00004-sum",
+    "servingRevision": "orbit360makeleadingresspreview-00001-cuy",
+    "servingPercent": 100,
+    "previousGrantUnchangedAndClosed": true,
+    "limitation": "This later provider observation is not relabeled as the missing raw capture32 observation."
+  },
+  "reproduction": {
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v32-preview-trigger-capture-causal-fix/observed-capture-causal-replay.json",
+    "sha256": "74501763f7383f5136187d22b85a9dda6a333bea7eb7f14814ec56c73e6d29f8",
+    "baselineCapture": "INGRESS_DEPLOYED_REVISION_NOT_SERVING",
+    "baselineRollback": "INGRESS_TRIGGER_POSTIMAGE_REQUIRED_FOR_RESTORE",
+    "candidateMissingEtag": "INGRESS_TRAFFIC_CAS_ETAG_REQUIRED",
+    "candidateRollback": "EXACT_PREVIOUS_PREVIEW_REVISION_ALREADY_RESTORED",
+    "normalizedProviderReplay": true,
+    "rawProviderReplay": false,
+    "syntheticCasOnly": true,
+    "cloudWrites": 0
+  },
+  "behavior": [
+    "The existing capture owner keeps the new-revision-serving requirement and records safe provider observations and classified assertion codes before rejection.",
+    "Alignment is allowed only after the scoped deployment, an exact existing trigger preimage, an unchanged service UID and non-revision configuration, and the exact previously approved single 100-percent route.",
+    "One Cloud Run v2 PATCH updates only traffic to the literal deployed Functions revision, using the freshly reread etag. It changes no template, IAM, grant, latest selector, function or business record.",
+    "An etag conflict is HOLD without a second mutation. A successful request alone is not acceptance: fresh Functions and Cloud Run reads must show the same revision, ready state, observed generation and exact 100-percent target.",
+    "Unknown or concurrent routing is retained diagnostically without becoming rollback write authority.",
+    "Rollback may confirm that previous routing is already intact without a postimage, only from fresh validated routing and matching service/configuration identity. It performs zero writes and explicitly does not claim Functions metadata was restored."
+  ],
+  "verification": {
+    "targetedChecks": 90,
+    "targetedFailures": 0,
+    "sourceQaExistingGroupCommand": "node --test --test-reporter=tap tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs",
+    "sourceQaExistingGroupChecks": 212,
+    "sourceQaExistingGroupFailures": 0,
+    "tapPath": "/workspace/scratch/166055cd45dc/continuity-evidence/v32-preview-trigger-capture-causal-fix/source-qa-make-group.tap",
+    "tapSha256": "4c6dd5a88e3aa1e7b0889b1567f908dab0663254887517999ca644d92a141ef0",
+    "applyCheckAgainstIntegrationBase": "PASS",
+    "diffCheck": "PASS",
+    "sourceQaWorkflowChanged": false,
+    "sharedRepositoryModified": false,
+    "cloudWrites": 0
+  },
+  "referenceContract": [
+    "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services/patch",
+    "https://docs.cloud.google.com/run/docs/reference/rest/v2/projects.locations.services",
+    "https://docs.cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions"
+  ],
+  "boundary": {
+    "productFilesChanged": 0,
+    "existingOwnerOnly": true,
+    "newExecutor": false,
+    "scopeExpansion": false,
+    "iamChanges": false,
+    "immutableArtifact32Modified": false,
+    "sourceChangeRequiresNewImmutableArtifact": true,
+    "sourceQaOnPublishedSuccessorRequired": true,
+    "previewSignedAcceptancePending": true,
+    "liveAcceptancePending": true
+  }
+}

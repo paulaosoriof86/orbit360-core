@@ -141,12 +141,24 @@ const PHYSICAL_V4_SOURCE = '74ae28c6e6e6b40f845567c9b00738a58307b3cb';
 const PHYSICAL_V4_BUILD = 45464287026;
 const PHYSICAL_V4_ARTIFACT = 14953553588;
 const PHYSICAL_V4_DIGEST = 'sha256:8dae2c413cc774be504e3aa224b4333e2968c176fc74116c6c5f42c0a6a46290';
+// V5 preserves successful build32 and its separately failed signed Preview.
+// The receipt is pinned here because this owner is itself source/artifact-pinned.
+const PHYSICAL_V5_RECEIPT_PATH = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V32_ROLLOVER_V5_20261125.json';
+const PHYSICAL_V5_RECEIPT_SHA256 = '1da08844f2abd98a20db07e9906b9c7ac2b83f23316edaf2aa193aa964c9843f';
+const PHYSICAL_V5_RECEIPT_BLOB = 'c1987329882a5c9f6ec06c3073e9f0edd0065cce';
+const PHYSICAL_V5_PROFILE = 'I66_CURRENT_PHYSICAL_E3_PREVIEW_V32_SUCCESSOR_V5';
+const PHYSICAL_V5_SOURCE = '12db222244dd2b02f3d8148470b28a798cacaca0';
+const PHYSICAL_V5_BUILD = 45518809761;
+const PHYSICAL_V5_ARTIFACT = 14979094222;
+const PHYSICAL_V5_DIGEST = 'sha256:0426b4e4d008bc5f2c145b2ee34928c1fc93f733a28e93ff94babc1edd32ea53';
+const PHYSICAL_V5_CHANNEL = 'gi-i66-rc-45518809761';
+const PHYSICAL_V5_ORIGIN = 'https://ays-orbit-360-lab--gi-i66-rc-45518809761-eiytd3a3.web.app';
 // One independently observed settlement of V28's output-only statistics. This
 // source pin is not a generic exclusion of fileCount/versionBytes from identity.
 const PHYSICAL_V4_STATISTICS_RECEIPT = 'artifacts/orbit360-recovery/release-control/I6_6_V4_OBSERVED_PREVIEW_STATISTICS_CAUSAL_SOURCE_20261125.json';
 const PHYSICAL_V4_STATISTICS_SHA256 = '596a1b80bbf82b7e56dcfd4809942e25cc6bbedce2fecfa477833e92a2b636c2';
 const PHYSICAL_V4_STATISTICS_BLOB = '2057d981ce6c71650ebae491d6b85a179e5baea3';
-const isPhysicalProfile = a => [PHYSICAL_PROFILE, PHYSICAL_V4_PROFILE].includes(a?.profile);
+const isPhysicalProfile = a => [PHYSICAL_PROFILE, PHYSICAL_V4_PROFILE, PHYSICAL_V5_PROFILE].includes(a?.profile);
 const PHYSICAL_LIVE_SOURCE = '65c825b2808a615ca4195bdde6689dbdbe3193b2';
 const PHYSICAL_LIVE_WORKFLOW = '.github/workflows/gravicentra-i66-privileged-role-exact-live-promotion.yml';
 const technicalSha = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
@@ -171,6 +183,19 @@ function readV4StatisticsEvidence(readText = relative => fs.readFileSync(path.jo
   return receipt;
 }
 
+function readV5Evidence(readText = relative => fs.readFileSync(path.join(__dirname, '..', relative), 'utf8')) {
+  const exact = (relative, sha256, blob) => {
+    const text = readText(relative), bytes = Buffer.from(text);
+    assert.equal(technicalSha(bytes), sha256, 'I66_TECHNICAL_ROLLOVER_V5_RECEIPT_SHA_DRIFT');
+    assert.equal(crypto.createHash('sha1').update('blob ' + bytes.length + '\0').update(bytes).digest('hex'),
+      blob, 'I66_TECHNICAL_ROLLOVER_V5_RECEIPT_BLOB_DRIFT');
+    return JSON.parse(text);
+  };
+  const receipt = exact(PHYSICAL_V5_RECEIPT_PATH, PHYSICAL_V5_RECEIPT_SHA256, PHYSICAL_V5_RECEIPT_BLOB);
+  const b = receipt.build32Verification, f = receipt.signedPreviewFailurePreserved.receipt;
+  return { receipt, build: exact(b.path, b.sha256, b.gitBlobSha), failure: exact(f.path, f.sha256, f.gitBlobSha) };
+}
+
 function technicalRolloverCandidatePin() {
   return {
     receiptPath: TECHNICAL_RECEIPT_PATH, receiptSha256: TECHNICAL_RECEIPT_SHA256,
@@ -189,7 +214,19 @@ function residualPhysicalRolloverCandidatePin() {
   };
 }
 
-function currentPhysicalRolloverCandidatePin() {
+function currentPhysicalRolloverCandidatePin(selector) {
+  if (selector !== undefined) {
+    if (selector?.receiptPath === PHYSICAL_V5_RECEIPT_PATH) {
+      assert.deepEqual(selector, { receiptPath: PHYSICAL_V5_RECEIPT_PATH, receiptSha256: PHYSICAL_V5_RECEIPT_SHA256 },
+        'I66_TECHNICAL_ROLLOVER_V5_SELECTOR_DRIFT');
+      readV5Evidence();
+      return { receiptPath: PHYSICAL_V5_RECEIPT_PATH, receiptSha256: PHYSICAL_V5_RECEIPT_SHA256,
+        channel: PHYSICAL_V5_CHANNEL, origin: PHYSICAL_V5_ORIGIN, previousSourceSha: PHYSICAL_V5_SOURCE,
+        previousArtifactId: PHYSICAL_V5_ARTIFACT, previousArtifactDigest: PHYSICAL_V5_DIGEST };
+    }
+    assert.deepEqual(selector, { receiptPath: PHYSICAL_V4_RECEIPT_PATH, receiptSha256: PHYSICAL_V4_RECEIPT_SHA256 },
+      'I66_TECHNICAL_ROLLOVER_PHYSICAL_SELECTOR_DRIFT');
+  }
   return {
     receiptPath: PHYSICAL_V4_RECEIPT_PATH, receiptSha256: PHYSICAL_V4_RECEIPT_SHA256,
     channel: PHYSICAL_CHANNEL, origin: PHYSICAL_ORIGIN,
@@ -199,6 +236,13 @@ function currentPhysicalRolloverCandidatePin() {
 }
 
 function physicalReleaseProfile(pin) {
+  if (pin?.receiptPath === PHYSICAL_V5_RECEIPT_PATH) {
+    const candidatePin = currentPhysicalRolloverCandidatePin({ receiptPath: pin.receiptPath, receiptSha256: pin.receiptSha256 });
+    return { ...candidatePin, candidatePin, sourceBaseHead: PHYSICAL_V5_SOURCE, profileName: PHYSICAL_V5_PROFILE,
+      requestVersion: 33, previousBuildRunId: PHYSICAL_V5_BUILD, residualPreviousBuild: false, expectedSiteFileCount: 224,
+      deniedSources: [PHYSICAL_V5_SOURCE, ...physicalReleaseProfile(currentPhysicalRolloverCandidatePin()).deniedSources],
+      deniedBuilds: [PHYSICAL_V5_BUILD, ...physicalReleaseProfile(currentPhysicalRolloverCandidatePin()).deniedBuilds] };
+  }
   const current = pin?.receiptPath === PHYSICAL_V4_RECEIPT_PATH;
   if (!current && pin?.receiptPath !== PHYSICAL_RECEIPT_PATH) return null;
   const candidatePin = current ? currentPhysicalRolloverCandidatePin() : residualPhysicalRolloverCandidatePin();
@@ -240,7 +284,7 @@ function validateTechnicalRolloverCandidate(p) {
 
 function validateTechnicalAuthorization(control, receiptText, retryIo) {
   if (physicalReleaseProfile(control?.currentTechnicalPreviewRollover) ||
-      (typeof receiptText === 'string' && [PHYSICAL_RECEIPT_SHA256, PHYSICAL_V4_RECEIPT_SHA256].includes(technicalSha(receiptText))))
+      (typeof receiptText === 'string' && [PHYSICAL_RECEIPT_SHA256, PHYSICAL_V4_RECEIPT_SHA256, PHYSICAL_V5_RECEIPT_SHA256].includes(technicalSha(receiptText))))
     return validatePhysicalAuthorization(control, receiptText, retryIo);
   technicalFail(typeof receiptText === 'string' && technicalSha(receiptText) === TECHNICAL_RECEIPT_SHA256, 'EXACT_RECEIPT_BYTES_REQUIRED');
   const a = JSON.parse(receiptText), c = control || {};
@@ -267,7 +311,86 @@ function validateTechnicalAuthorization(control, receiptText, retryIo) {
   return a;
 }
 
-// V4's first request is 29. A failed build may advance that same request only
+const physicalProductRoots = ['orbit360-platform', 'functions', 'firebase.json', 'storage.rules', 'firestore.rules',
+  'database.rules.json', 'tools/gravicentra-i6-1-preview-package.mjs',
+  ':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json'];
+function physicalRequestScope(original) {
+  const result = structuredClone(original);
+  // These fields are recertified by the existing source/build admission gate.
+  for (const key of ['version', 'sourceQaHead', 'manifestBlob', 'sourceQaRunId', 'guardRunId',
+    'releaseMechanismSourceSha', 'reason']) delete result[key];
+  for (const key of ['financialRecovery', 'financialRecoveryQa', 'cancellationRecovery', 'cancellationRecoveryQa'])
+    if (result[key]) delete result[key].receiptBlob;
+  return result;
+}
+
+// V5 starts after a successful immutable build and a closed failed signed run.
+// This is not a failed-build exception and confers no backend or LIVE authority.
+function validateV5ClosedPreview(control, suppliedIo = {}) {
+  const repo = path.resolve(__dirname, '..');
+  const git = suppliedIo.git || ((...args) => execFileSync('git', args,
+    { cwd: repo, encoding: 'utf8', stdio: 'pipe', maxBuffer: 5 * 1024 * 1024 }).trim());
+  const { receipt, build, failure } = readV5Evidence(suppliedIo.readText);
+  const c = control, request = c.frontendPreviewRequest, pin = receipt.signedPreviewFailurePreserved.receipt;
+  const expectedTarget = { sourceSha: PHYSICAL_V5_SOURCE, buildRunId: PHYSICAL_V5_BUILD,
+    artifactId: PHYSICAL_V5_ARTIFACT, artifactDigest: PHYSICAL_V5_DIGEST };
+  assert.equal(build.buildConclusion, 'success'); assert.equal(build.siteFileCount, 224);
+  assert.equal(build.readback.matchedFiles, 224); assert.equal(build.technicalRollover, null);
+  assert.equal(failure.signedPreview.conclusion, 'failure'); assert.equal(failure.signedPreview.wholeRunAccepted, false);
+  assert.equal(failure.observedDeployment.previewFunctionsDeployed, 5);
+  assert.equal(failure.compensation.status, 'HOLD');
+  assert.equal(failure.artifactPatched, false); assert.equal(failure.newLiveAcceptance, false);
+  for (const [key, value] of Object.entries(expectedTarget)) {
+    assert.equal(build[key], value); assert.equal(failure.target[key], value);
+  }
+  technicalFail(!(c.failedImmutableBuildAttempts || []).some(row => row.version === 32 ||
+    row.sourceSha === PHYSICAL_V5_SOURCE || row.runId === PHYSICAL_V5_BUILD), 'SUCCESSFUL_BUILD32_RECLASSIFIED');
+  const closed = (c.closedFailedPreviewAttempts || []).filter(row => row.receipt?.path === pin.path);
+  technicalFail(closed.length === 1, 'CLOSED_PREVIEW32_REQUIRED');
+  const prior = closed[0];
+  assert.deepEqual(prior.receipt, pin, 'I66_TECHNICAL_ROLLOVER_CLOSED_PREVIEW_RECEIPT_DRIFT');
+  for (const [key, value] of Object.entries({ ...expectedTarget,
+    schema: 'GI_I66_CLOSED_FAILED_PREVIEW_ATTEMPT_V1', status: failure.status,
+    buildStatus: 'SUCCESS_IMMUTABLE_BYTES_PRESERVED', previewStatus: 'FAILURE',
+    previewRunId: failure.signedPreview.runId, activeAuthorizationWithdrawn: true,
+    artifactPatched: false, buildRerun: false, newLiveAcceptance: false,
+    compensationVerified: false, overallPackageAccepted: false, realFinancialPayments: 0 }))
+    assert.equal(prior[key], value, 'I66_TECHNICAL_ROLLOVER_CLOSED_PREVIEW_FACT_DRIFT_' + key);
+  const disposition = request.version === 33 ? c.failedFrontendPreviewRequestDisposition
+    : c.priorFailedFrontendPreviewRequestDispositionBeforeV33;
+  assert.equal(disposition?.version, 32, 'I66_TECHNICAL_ROLLOVER_CLOSED_PREVIEW_DISPOSITION_REQUIRED');
+  assert.equal(disposition.status, 'BUILD_SUCCEEDED_SIGNED_PREVIEW_FAILED_SCOPED_AUTHORIZATION_WITHDRAWN');
+  assert.equal(disposition.requestRetainedExactly, true); assert.deepEqual(disposition.receipt, pin);
+  technicalFail(typeof disposition.successorRequestCreated === 'boolean', 'CLOSED_PREVIEW_DISPOSITION_INVALID');
+  if (request.version > 33) {
+    assert.deepEqual(disposition, { version: 32,
+      status: 'BUILD_SUCCEEDED_SIGNED_PREVIEW_FAILED_SCOPED_AUTHORIZATION_WITHDRAWN',
+      requestRetainedExactly: true, receipt: pin, successorRequestCreated: false },
+    'I66_TECHNICAL_ROLLOVER_ARCHIVED_PREVIEW32_DISPOSITION_DRIFT');
+  } else if (disposition.successorRequestCreated) {
+    assert.equal(disposition.successorRequestVersion, 33);
+    assert.equal(disposition.successorSourceQaHead, request.sourceQaHead);
+  }
+  assert.equal(c.makeIngressProtectedOperation, undefined, 'I66_TECHNICAL_ROLLOVER_PENDING_MAKE_AUTHORITY');
+  const keys = Object.keys(c).filter(key => /^priorFrontendPreviewRequestBeforeV33_[0-9]{8}$/.test(key));
+  technicalFail(keys.length === 1 && c[keys[0]]?.version === 32, 'CLOSED_PREVIEW_REQUEST_ARCHIVE_REQUIRED');
+  const original = JSON.parse(git('show', PHYSICAL_V5_SOURCE +
+    ':artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json'));
+  assert.deepEqual(c[keys[0]], original.frontendPreviewRequest, 'I66_TECHNICAL_ROLLOVER_CLOSED_PREVIEW_ARCHIVED_REQUEST_DRIFT');
+  assert.deepEqual(c.priorTechnicalPreviewRolloverBeforeV33, original.currentTechnicalPreviewRollover,
+    'I66_TECHNICAL_ROLLOVER_PRIOR_ROLLOVER_PIN_DRIFT');
+  assert.deepEqual(c.currentPhysicalHostingRelease, original.currentPhysicalHostingRelease,
+    'I66_TECHNICAL_ROLLOVER_CLOSED_PREVIEW_LIVE_POINTER_DRIFT');
+  assert.deepEqual(physicalRequestScope(request), physicalRequestScope(original.frontendPreviewRequest),
+    'I66_TECHNICAL_ROLLOVER_CLOSED_PREVIEW_REQUEST_SCOPE_DRIFT');
+  technicalFail(/^[a-f0-9]{40}$/.test(request.sourceQaHead || ''), 'RETRY_SOURCE_QA_REQUIRED');
+  git('merge-base', '--is-ancestor', PHYSICAL_V5_SOURCE, request.sourceQaHead);
+  git('merge-base', '--is-ancestor', request.sourceQaHead, 'HEAD');
+  git('diff', '--quiet', PHYSICAL_V5_SOURCE, request.sourceQaHead, '--', ...physicalProductRoots);
+  git('diff', '--quiet', request.sourceQaHead, 'HEAD', '--', ...physicalProductRoots);
+}
+
+// V4 starts at29; V5 starts at33. A failed build may advance that same request only
 // through the already recorded, contiguous history; it does not grant a new
 // channel, product delta, backend scope or acceptance to a failed artifact.
 function validatePhysicalRetryChain(control, profile, suppliedIo = {}) {
@@ -284,19 +407,7 @@ function validatePhysicalRetryChain(control, profile, suppliedIo = {}) {
     { cwd: repo, encoding: 'utf8', stdio: 'pipe', maxBuffer: 5 * 1024 * 1024 }).trim());
   const readText = suppliedIo.readText || (relative => fs.readFileSync(path.join(repo, relative), 'utf8'));
   const transportPath = 'artifacts/orbit360-recovery/release-control/I6_6_RELEASE_TRANSPORT_CONTROL_20261110.json';
-  const roots = ['orbit360-platform', 'functions', 'firebase.json', 'storage.rules', 'firestore.rules',
-    'database.rules.json', 'tools/gravicentra-i6-1-preview-package.mjs',
-    ':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json'];
-  const scope = original => {
-    const result = structuredClone(original);
-    // These fields are recertified by the existing source/build admission gate.
-    // Financial/cancellation QA receipts may be resealed without product edits.
-    for (const key of ['version', 'sourceQaHead', 'manifestBlob', 'sourceQaRunId', 'guardRunId',
-      'releaseMechanismSourceSha', 'reason']) delete result[key];
-    for (const key of ['financialRecovery', 'financialRecoveryQa', 'cancellationRecovery', 'cancellationRecoveryQa'])
-      if (result[key]) delete result[key].receiptBlob;
-    return result;
-  };
+  const roots = physicalProductRoots, scope = physicalRequestScope;
   technicalFail(/^[a-f0-9]{40}$/.test(request.sourceQaHead || ''), 'RETRY_SOURCE_QA_REQUIRED');
   git('merge-base', '--is-ancestor', request.sourceQaHead, 'HEAD');
   git('diff', '--quiet', request.sourceQaHead, 'HEAD', '--', ...roots);
@@ -378,7 +489,8 @@ function validatePhysicalAuthorization(control, receiptText, retryIo) {
   assert.equal(c.gate, 'I6.6'); assert.equal(c.historicalClosedGate, 'B4-007');
   assert.equal(c.status, 'OPERATIONAL_EXACT_LIVE_ACCEPTED_LOCKED', 'I66_TECHNICAL_ROLLOVER_PHYSICAL_GATE_REQUIRED');
   const request = c.frontendPreviewRequest;
-  if (profile.profileName === PHYSICAL_V4_PROFILE) validatePhysicalRetryChain(c, profile, retryIo);
+  if (profile.profileName === PHYSICAL_V5_PROFILE) validateV5ClosedPreview(c, retryIo);
+  if ([PHYSICAL_V4_PROFILE, PHYSICAL_V5_PROFILE].includes(profile.profileName)) validatePhysicalRetryChain(c, profile, retryIo);
   else assert.equal(request?.version, profile.requestVersion, 'I66_TECHNICAL_ROLLOVER_SUCCESSOR_REQUEST_REQUIRED');
   assert.equal(request.mode, 'A13_A14_BALANCE_COMPOSITE_ARTIFACT_HOSTING_PREVIEW_ONLY');
   assert.equal(request.previousReceiptBlob, '11fdb3bee494541513482666d6215f45cbad0567');
@@ -394,7 +506,7 @@ function validatePhysicalAuthorization(control, receiptText, retryIo) {
   assert.equal(a.schema, 'GI_I66_CURRENT_TECHNICAL_PREVIEW_ROLLOVER_V1');
   assert.equal(a.profile, profile.profileName); assert.equal(a.phase, 'PREVIEW');
   assert.equal(a.sourceBaseHead, profile.sourceBaseHead);
-  assert.equal(a.channel.id, PHYSICAL_CHANNEL); assert.equal(a.channel.origin, PHYSICAL_ORIGIN);
+  assert.equal(a.channel.id, profile.channel); assert.equal(a.channel.origin, profile.origin);
   assert.equal(a.executionAuthority.newLegalConsentGrantUsedForHosting, false);
   for (const value of Object.values(a.constraints)) assert.equal(value, true, 'I66_TECHNICAL_ROLLOVER_CONSTRAINT_REQUIRED');
   const current = c.currentPhysicalHostingRelease || {}, live = a.protectedLive;
@@ -538,6 +650,8 @@ function technicalMetadataDifferences(first, final) {
 function validateTechnicalAfterInventories(initial, first, final, authorization) {
   const a = authorization;
   technicalFail(isPhysicalProfile(a), 'AFTER_PROFILE_DENIED');
+  if (a.profile === PHYSICAL_V5_PROFILE) assert.deepEqual(a, readV5Evidence().receipt,
+    'I66_TECHNICAL_ROLLOVER_V5_AFTER_AUTHORITY_DRIFT');
   const inventories = [initial, first, final], selections = [];
   for (const inventory of inventories) {
     const rows = technicalRows(inventory), ids = rows.map(technicalChannelIdentity);

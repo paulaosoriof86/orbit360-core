@@ -1661,3 +1661,186 @@ test('finish retains final returned inventory and checksum before concurrent met
   const b=fs.readFileSync(path.join(h.root,'inventory-after-final.json'));assert.equal(digest(b),r.finalInventorySha256);assert.deepEqual(JSON.parse(b),final);assert.equal(r.status,'HOLD');
  }finally{h.clean();}
 });
+
+// The successful immutable build32 and its failed signed Preview have distinct
+// immutable evidence. Keep this fixture anchored to R74, never to mutable HEAD.
+const v5ReceiptPath = 'artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V32_ROLLOVER_V5_20261125.json';
+const v5Text = fs.readFileSync(path.join(retryRepo, v5ReceiptPath), 'utf8');
+const v5Receipt = JSON.parse(v5Text);
+const v5Selector = { receiptPath: v5ReceiptPath,
+  receiptSha256: '1da08844f2abd98a20db07e9906b9c7ac2b83f23316edaf2aa193aa964c9843f' };
+const v5Original = JSON.parse(retryGitRead('show', v5Receipt.sourceBaseHead + ':' + retryTransportPath));
+const v5Closed = JSON.parse(retryGitRead('show', '5e4a348fa0cf22012b2bfd8950bd5ba410381bc9:' + retryTransportPath));
+function v5Fixture() {
+  const control = clone(v5Closed), calls = [];
+  control.priorFrontendPreviewRequestBeforeV33_20261125 = clone(v5Original.frontendPreviewRequest);
+  control.priorTechnicalPreviewRolloverBeforeV33 = clone(v5Original.currentTechnicalPreviewRollover);
+  control.currentTechnicalPreviewRollover = clone(v5Selector);
+  control.frontendPreviewRequest = { ...clone(v5Original.frontendPreviewRequest), version: 33,
+    sourceQaHead: '5e4a348fa0cf22012b2bfd8950bd5ba410381bc9', reason: 'Synthetic source-owner correction; no new product.' };
+  const io = { git(...args) { calls.push(args); return retryGitRead(...args); },
+    readText: p => fs.readFileSync(path.join(retryRepo, p), 'utf8') };
+  return { control, calls, io };
+}
+const checkV5 = f => api.validateAuthorization(f.control, v5Text, f.io);
+test('V5 explicit selector is source-pinned and preserves the historical default V4', () => {
+  assert.equal(digest(v5Text), v5Selector.receiptSha256);
+  assert.equal(retryBlob(v5Text), 'c1987329882a5c9f6ec06c3073e9f0edd0065cce');
+  assert.deepEqual(guard.currentPhysicalRolloverCandidatePin(), successfulPhysicalPin);
+  const selected = guard.currentPhysicalRolloverCandidatePin(v5Selector);
+  assert.equal(selected.channel, 'gi-i66-rc-45518809761');
+  assert.equal(selected.origin, v5Receipt.channel.origin);
+  assert.equal(selected.previousArtifactId, 14979094222);
+  assert.equal(selected.previousSourceSha, v5Receipt.sourceBaseHead);
+  selected.channel = 'live';
+  assert.equal(guard.currentPhysicalRolloverCandidatePin(v5Selector).channel, v5Receipt.channel.id);
+});
+for (const [label, change] of [
+  ['hash', s => { s.receiptSha256 = 'a'.repeat(64); }],
+  ['path', s => { s.receiptPath += '.other'; }],
+  ['additional field', s => { s.allowDrift = true; }]
+]) test('V5 selector rejects ' + label + ' drift', () => {
+  const s = clone(v5Selector); change(s); assert.throws(() => guard.currentPhysicalRolloverCandidatePin(s));
+});
+test('V5 admits33 from exact successful32 and closed failed signed Preview with unchanged21 products', () => {
+  const f = v5Fixture(), before = clone(f.control);
+  assert.deepEqual(checkV5(f), v5Receipt); assert.deepEqual(f.control, before);
+  assert.equal(f.control.frontendPreviewRequest.productPaths.length, 21);
+  assert.equal(f.control.frontendPreviewRequest.fiveFunctionExactPreviewRequired, true);
+  assert.ok(f.calls.some(x => x[0] === 'show' && x[1].startsWith(v5Receipt.sourceBaseHead + ':')));
+  assert.equal(f.calls.filter(x => x[0] === 'diff').length, 2);
+  assert.equal(v5Receipt.previousCandidate.wholeBuildConclusionRequired, 'success');
+  assert.equal(v5Receipt.signedPreviewFailurePreserved.wholeRun, 'FAILURE');
+});
+test('V5 accepts the emitted33 disposition without requiring the old false flag', () => {
+  const f = v5Fixture(); Object.assign(f.control.failedFrontendPreviewRequestDisposition, {
+    successorRequestCreated: true, successorRequestVersion: 33,
+    successorSourceQaHead: f.control.frontendPreviewRequest.sourceQaHead });
+  assert.deepEqual(checkV5(f), v5Receipt);
+});
+const v5Prior = f => f.control.closedFailedPreviewAttempts.find(x => x.sourceSha === v5Receipt.sourceBaseHead);
+for (const [label, change] of [
+  ['successful32 classified as failed', f => { f.control.failedImmutableBuildAttempts.push({ version: 32 }); }],
+  ['successful32 run reused in another failed row', f => { f.control.failedImmutableBuildAttempts.push({ version: 9, runId: 45518809761 }); }],
+  ['missing closed Preview', f => { f.control.closedFailedPreviewAttempts = []; }],
+  ['duplicate closed Preview', f => { f.control.closedFailedPreviewAttempts.push(clone(v5Prior(f))); }],
+  ['closed build relabelled failure', f => { v5Prior(f).buildStatus = 'FAILURE'; }],
+  ['failed Preview relabelled PASS', f => { v5Prior(f).previewStatus = 'PASS'; }],
+  ['unverified compensation relabelled', f => { v5Prior(f).compensationVerified = true; }],
+  ['unwithdrawn authority', f => { v5Prior(f).activeAuthorizationWithdrawn = false; }],
+  ['changed closed artifact', f => { v5Prior(f).artifactId++; }],
+  ['changed closed receipt', f => { v5Prior(f).receipt.gitBlobSha = 'a'.repeat(40); }],
+  ['missing archived request32', f => { delete f.control.priorFrontendPreviewRequestBeforeV33_20261125; }],
+  ['duplicate archived request32', f => { f.control.priorFrontendPreviewRequestBeforeV33_20261124 = clone(f.control.priorFrontendPreviewRequestBeforeV33_20261125); }],
+  ['edited archived request32', f => { f.control.priorFrontendPreviewRequestBeforeV33_20261125.reason += ' edited'; }],
+  ['lost previous V4 pin', f => { delete f.control.priorTechnicalPreviewRolloverBeforeV33; }],
+  ['removed product', f => { f.control.frontendPreviewRequest.productPaths.pop(); }],
+  ['removed financial UI', f => { delete f.control.frontendPreviewRequest.financialRecoveryQa; }],
+  ['removed cancellation UI', f => { delete f.control.frontendPreviewRequest.cancellationRecoveryQa; }],
+  ['changed assigned-role profile', f => { f.control.frontendPreviewRequest.directFormsQaProfile = 'OTHER'; }],
+  ['widened write scope', f => { f.control.frontendPreviewRequest.realCustomerWritesAllowed = true; }],
+  ['pending Make operation', f => { f.control.makeIngressProtectedOperation = {}; }],
+  ['changed physical LIVE pointer', f => { f.control.currentPhysicalHostingRelease.artifactId++; }],
+  ['no failed33 to advance34', f => { f.control.frontendPreviewRequest.version = 34; }]
+]) test('V5 closed successor rejects ' + label, () => {
+  const f = v5Fixture(); change(f); assert.throws(() => checkV5(f));
+});
+for (const target of [v5ReceiptPath, v5Receipt.build32Verification.path,
+  v5Receipt.signedPreviewFailurePreserved.receipt.path]) {
+  test('V5 authorization reads and rejects changed exact bytes: ' + path.basename(target), () => {
+    const f = v5Fixture(), read = f.io.readText;
+    f.io.readText = p => read(p) + (p === target ? ' ' : '');
+    assert.throws(() => checkV5(f), /V5_RECEIPT_SHA_DRIFT/);
+  });
+}
+for (const operation of ['merge-base', 'diff']) test('V5 refuses ' + operation + ' source continuity failure', () => {
+  const f = v5Fixture(), run = f.io.git;
+  f.io.git = (...args) => { if (args[0] === operation) throw new Error('synthetic Git continuity failure'); return run(...args); };
+  assert.throws(() => checkV5(f), /synthetic Git continuity failure/);
+});
+test('V5 candidate verifies its exact new channel and forbids backup32 as the new artifact source', () => {
+  const p = { sourceSha: 'a'.repeat(40), buildRunId: 45530000001, previewChannelId: v5Receipt.channel.id,
+    previewUrl: v5Receipt.channel.origin, previewRollover: guard.currentPhysicalRolloverCandidatePin(v5Selector) };
+  assert.deepEqual(api.validateCandidateReuse(p), p.previewRollover);
+  for (const change of [c => { c.sourceSha = v5Receipt.sourceBaseHead; }, c => { c.buildRunId = 45518809761; },
+    c => { c.previewChannelId = successfulPhysicalPin.channel; }, c => { c.previewUrl = successfulPhysicalPin.origin; }]) {
+    const c = clone(p); change(c); assert.throws(() => api.validateCandidateReuse(c));
+  }
+});
+test('V5 uses unchanged whole-success metadata validation for backup32 and E3', () => {
+  for (const expected of [v5Receipt.previousCandidate, v5Receipt.protectedLive]) {
+    const run = { id: expected.buildRunId, run_attempt: expected.buildRunAttempt, head_sha: expected.sourceSha,
+      head_branch: v5Receipt.branch, path: '.github/workflows/gravicentra-release-delta-66-package.yml',
+      status: 'completed', conclusion: 'success' };
+    const artifact = { id: expected.artifactId, name: 'gi-i66-immutable-' + expected.sourceSha,
+      digest: expected.artifactDigest, expired: false, size_in_bytes: 1024,
+      workflow_run: { id: expected.buildRunId, head_sha: expected.sourceSha, head_branch: v5Receipt.branch } };
+    assert.doesNotThrow(() => api.validateArtifact(run, artifact, expected));
+    assert.throws(() => api.validateArtifact({ ...run, conclusion: 'failure' }, artifact, expected));
+    assert.throws(() => api.validateArtifact({ ...run, run_attempt: run.run_attempt + 1 }, artifact, expected));
+  }
+});
+function v5AfterFixture() {
+  const f = afterInventoriesFixture(); f.authorization = clone(v5Receipt);
+  for (const inventory of [f.initial, f.first, f.final]) {
+    const target = inventory.result[0];
+    target.name = 'sites/ays-orbit-360-lab/channels/' + v5Receipt.channel.id;
+    target.createTime = v5Receipt.channel.createdAt;
+  }
+  f.initial.result[0].release.version.name = v5Receipt.channel.expectedVersion;
+  return f;
+}
+test('V5 post-readback keeps50 other channels exact and verifies the complete pinned authorization', () => {
+  const f = v5AfterFixture(), before = clone(f);
+  assert.equal(validateAfter(f).otherChannelsUnchanged, 50); assert.deepEqual(f, before);
+  f.authorization.constraints.noLiveChanges = false; assert.throws(() => validateAfter(f), /V5_AFTER_AUTHORITY_DRIFT/);
+});
+for (const [label, change] of [
+  ['target version', f => { f.final.result[0].release.version.name += '-other'; }],
+  ['target config', f => { f.final.result[0].release.version.config.rewrites[0].path = '/other.html'; }],
+  ['unknown target field', f => { f.final.result[0].unapproved = true; }],
+  ['another channel', f => { f.final.result[2].release.version.name += '-other'; }]
+]) test('V5 post-readback rejects ' + label + ' drift', () => {
+  const f = v5AfterFixture(); change(f); assert.throws(() => validateAfter(f));
+});
+function v5Retry34Fixture() {
+  const f = v5Fixture(), control33 = clone(f.control), failedSource = 'e'.repeat(40), nextQa = 'f'.repeat(40);
+  f.control.priorFrontendPreviewRequestBeforeV34_20261125 = clone(control33.frontendPreviewRequest);
+  f.control.frontendPreviewRequest.version = 34; f.control.frontendPreviewRequest.sourceQaHead = nextQa;
+  f.control.priorFailedFrontendPreviewRequestDispositionBeforeV33 = clone(control33.failedFrontendPreviewRequestDisposition);
+  f.control.failedFrontendPreviewRequestDisposition = { version: 33, status: 'FAILED_BEFORE_ARTIFACT_OR_DEPLOY' };
+  const failed = { schema: 'GI_I66_PREPACKAGE_QA_FAILURE_V1', status: 'FAILED_BEFORE_ARTIFACT_OR_DEPLOY',
+    gate: 'I6.6', requestVersion: 33, sourceSha: failedSource, buildRunId: 45530000001,
+    attempt: 1, conclusion: 'failure', hostingDeployments: 0, backendDeployments: 0, realDataWrites: 0,
+    acceptedPhysicalLiveUnchanged: true, acceptedGeneration: 'E3', fullI66ProductionAccepted: false,
+    logEvidence: { sha256: 'a'.repeat(64) }, artifacts: 0, build29Artifact: null };
+  const text = JSON.stringify(failed), failurePath = 'artifacts/orbit360-recovery/release-control/I6_6_SYNTHETIC_V33_FAILURE.json';
+  f.control.failedImmutableBuildAttempts.push({ version: 33, sourceSha: failedSource, runId: failed.buildRunId,
+    attempt: 1, status: 'FAILED_BEFORE_PACKAGE', artifactCreated: false,
+    receipt: { path: failurePath, gitBlobSha: retryBlob(text), sha256: digest(text) } });
+  const read = f.io.readText; f.io.readText = p => p === failurePath ? text : read(p);
+  f.io.git = (...args) => {
+    f.calls.push(args);
+    if (args[0] === 'show') {
+      const source = args[1].split(':')[0];
+      assert.ok([failedSource, v5Receipt.sourceBaseHead].includes(source));
+      return JSON.stringify(source === failedSource ? control33 : v5Original);
+    }
+    assert.ok(['merge-base', 'diff'].includes(args[0])); return '';
+  };
+  return f;
+}
+test('V5 monotonic continuation starts at33 and can admit34 without treating successful32 as a failed build', () => {
+  const f = v5Retry34Fixture(); assert.deepEqual(checkV5(f), v5Receipt);
+  assert.equal(f.control.failedFrontendPreviewRequestDisposition.version, 33);
+  assert.equal(f.control.priorFailedFrontendPreviewRequestDispositionBeforeV33.version, 32);
+  assert.equal(f.control.failedImmutableBuildAttempts.some(x => x.version === 32), false);
+  f.control.failedImmutableBuildAttempts.push(clone(f.control.failedImmutableBuildAttempts.at(-1)));
+  assert.throws(() => checkV5(f), /SUCCESSOR_REQUEST_REQUIRED/);
+});
+test('V5 continuation34 rejects missing or altered archived32 disposition', () => {
+  for (const change of [c => { delete c.priorFailedFrontendPreviewRequestDispositionBeforeV33; },
+    c => { c.priorFailedFrontendPreviewRequestDispositionBeforeV33.successorRequestCreated = true; }]) {
+    const f = v5Retry34Fixture(); change(f.control); assert.throws(() => checkV5(f));
+  }
+});

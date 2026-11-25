@@ -15,6 +15,33 @@ const sha64=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
 const sha256=b=>require('node:crypto').createHash('sha256').update(b).digest('hex');
 const gitBlob=b=>require('node:crypto').createHash('sha1').update('blob '+b.length+'\0').update(b).digest('hex');
 const resource=(phase)=>`projects/${PROJECT}/locations/${scope.ADDED[phase].region}/functions/${scope.ADDED[phase].name}`;
+function safeFailureCode(error){
+  const explicit=String(error?.code||'');if(/^INGRESS_[A-Z0-9_]+$/.test(explicit))return explicit;
+  const message=String(error?.message||'').match(/^(INGRESS_[A-Z0-9_]+)(?:\s|$)/);
+  return message?message[1]:'I66_MAKE_PROTECTED_EXECUTION_HOLD';
+}
+function safeRoutingObservation(row,phase){
+  const prefix=scope.ADDED[phase].name.toLowerCase()+'-';
+  const revision=value=>typeof value==='string'&&new RegExp('^'+prefix+'[a-z0-9-]+$').test(value)?value:null;
+  return{responseSha256:c.digest(row),serviceNameMatchesExpected:
+    row?.name==='projects/'+PROJECT+'/locations/'+scope.ADDED[phase].region+'/services/'+scope.ADDED[phase].name.toLowerCase(),
+    serviceUid:/^[a-f0-9-]{36}$/i.test(String(row?.uid||''))?row.uid:null,
+    generation:/^[0-9]+$/.test(String(row?.generation||''))?String(row.generation):null,
+    observedGeneration:/^[0-9]+$/.test(String(row?.observedGeneration||''))?String(row.observedGeneration):null,
+    reconciling:typeof row?.reconciling==='boolean'?row.reconciling:null,
+    condition:['CONDITION_SUCCEEDED','CONDITION_PENDING','CONDITION_FAILED','CONDITION_RECONCILING'].includes(row?.terminalCondition?.state)?row.terminalCondition.state:null,
+    etagSha256:typeof row?.etag==='string'?sha256(row.etag):null,
+    trafficCount:Array.isArray(row?.trafficStatuses)?row.trafficStatuses.length:null,
+    targets:Array.isArray(row?.trafficStatuses)?row.trafficStatuses.slice(0,8).map(value=>{const t=value&&typeof value==='object'?value:{};return{revision:revision(t.revision),
+      percent:Number.isSafeInteger(t.percent)?t.percent:null,tagPresent:t.tag!==undefined&&t.tag!=='',
+      allocation:['TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST','TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION'].includes(t.type)?t.type:null};}):null};
+}
+function captureRecorders(directory,phase){
+  assert.ok(path.isAbsolute(directory),'INGRESS_CAPTURE_DIRECTORY_REQUIRED');
+  assert.ok(['preview','live'].includes(phase),'INGRESS_CAPTURE_PHASE_REQUIRED');
+  const write=(suffix,value)=>fs.writeFileSync(path.join(directory,`gi-make-${phase}-${suffix}.json`),JSON.stringify(value,null,2)+'\n');
+  return{retainDiagnostic:value=>write('capture-trigger-observation',value),retainPostimage:value=>write('capture-trigger',value)};
+}
 function fnProjection(fn,p,phase){
   assert.equal(fn?.name,resource(phase),'INGRESS_DEPLOYED_FUNCTION_IDENTITY');
   assert.equal(fn.state,'ACTIVE','INGRESS_DEPLOYED_FUNCTION_NOT_ACTIVE');
@@ -83,9 +110,12 @@ async function deployedRules(auth,p){
   const actual=Buffer.from(files[0].content||'');assert.equal(gitBlob(actual),pin.sourceBlob,'INGRESS_DEPLOYED_RULES_BYTES_CHANGED');
   return{queueRulesDenyClient:true,rulesetName:name,rulesSourceBlob:pin.sourceBlob,rulesSourceSha256:sha256(actual)};
 }
-async function deployedFunction(auth,p,phase){
+async function deployedFunction(auth,p,phase,observe){
   const response=await auth.request({url:'https://cloudfunctions.googleapis.com/v2/'+resource(phase),method:'GET'});
-  return fnProjection(response.data,p,phase);
+  if(observe)observe({kind:'FUNCTION_RESPONSE',responseSha256:c.digest(response.data),
+    nameMatchesExpected:response.data?.name===resource(phase),active:response.data?.state==='ACTIVE'});
+  const projection=fnProjection(response.data,p,phase);
+  if(observe)observe({kind:'FUNCTION_PROJECTION',function:projection});return projection;
 }
 async function optionalFunction(auth,p,phase){
   try{return await deployedFunction(auth,p,phase);}catch(error){if(Number(error?.response?.status)===404)return null;throw error;}
@@ -145,14 +175,23 @@ function validateTrafficProof(proof,fn,phase){
   assert.equal(c.digest(observed),observationDigest,'INGRESS_TRAFFIC_PROOF_DIGEST_CHANGED');
   return{service:proof.service,serviceUid:proof.serviceUid,targets:proof.targets};
 }
-async function deployedTraffic(auth,p,phase,fn){
+async function routingObservation(auth,p,phase,fn,observe){
   const service=trafficServiceResource(fn.service,phase);
   const response=await auth.request({url:'https://run.googleapis.com/v2/'+service,method:'GET'});
+  if(observe)observe({kind:'CLOUD_RUN_RESPONSE',...safeRoutingObservation(response.data,phase)});
   const traffic=trafficProjection(response.data,fn,phase);
+  if(observe)observe({kind:'TRAFFIC_PROJECTION',traffic});
   // A Functions deploy during the independent routing read invalidates this
   // observation. Its API revision is never used as a substitute for traffic.
-  assert.deepEqual(await deployedFunction(auth,p,phase),fn,'INGRESS_FUNCTION_CHANGED_DURING_TRAFFIC_READ');
-  return traffic;
+  assert.deepEqual(await deployedFunction(auth,p,phase,observe),fn,'INGRESS_FUNCTION_CHANGED_DURING_TRAFFIC_READ');
+  return{traffic,etag:response.data.etag};
+}
+async function deployedTraffic(auth,p,phase,fn,observe){
+  return(await routingObservation(auth,p,phase,fn,observe)).traffic;
+}
+function sameTriggerConfiguration(before,after){
+  const view=fn=>Object.fromEntries(Object.entries(fn||{}).filter(([key])=>!['revision','configurationDigest'].includes(key)));
+  assert.deepEqual(view(after),view(before),'INGRESS_TRIGGER_NON_REVISION_CONFIGURATION_CHANGED');
 }
 async function snapshotTrigger({auth,p,phase}){
   const actual=await optionalFunction(auth,p,phase),before=p.makeIngress.targetBefore[phase];
@@ -162,18 +201,87 @@ async function snapshotTrigger({auth,p,phase}){
   return{schema:'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
     previousState:before.state,function:actual,traffic:actual?await deployedTraffic(auth,p,phase,actual):null};
 }
-async function captureTrigger({auth,p,phase,snapshot}){
-  assert.equal(snapshot?.schema,'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1');assert.equal(snapshot.phase,phase);
-  assert.equal(snapshot.sourceSha,p.sourceSha);assert.equal(snapshot.artifactDigest,p.artifactDigest);
-  const fn=await deployedFunction(auth,p,phase);
-  if(snapshot.function)assert.notEqual(fn.revision,snapshot.function.revision,'INGRESS_TRIGGER_REVISION_NOT_CHANGED');
-  const traffic=await deployedTraffic(auth,p,phase,fn);
-  assert.equal(traffic.targets[0].revision,fn.revision,'INGRESS_DEPLOYED_REVISION_NOT_SERVING');
-  if(snapshot.traffic)assert.equal(traffic.serviceUid,snapshot.traffic.serviceUid,'INGRESS_TRAFFIC_SERVICE_RECREATED');
-  return{schema:'GI_I66_MAKE_TRIGGER_POSTIMAGE_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
-    previousState:snapshot.previousState,previousRevision:snapshot.function?.revision||null,function:fn,traffic};
+async function captureTrigger({auth,p,phase,snapshot,retainDiagnostic=()=>{},retainPostimage=()=>{},
+  pause=ms=>new Promise(resolve=>setTimeout(resolve,ms))}){
+  const diagnostic={schema:'GI_I66_MAKE_TRIGGER_CAPTURE_DIAGNOSTIC_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
+    status:'OBSERVED_NOT_ACCEPTED',stage:'START',observations:[],routing:{attempted:false,trafficWrites:0},
+    iamWrites:0,configurationWrites:0,canonicalLeadWrites:0,externalMessagesSent:0};
+  const retain=()=>retainDiagnostic(structuredClone(diagnostic));
+  const observe=row=>{diagnostic.observations.push(row);retain();};
+  const postimage=(fn,traffic,status)=>({schema:'GI_I66_MAKE_TRIGGER_POSTIMAGE_V1',phase,sourceSha:p.sourceSha,
+    artifactDigest:p.artifactDigest,previousState:snapshot.previousState,previousRevision:snapshot.function?.revision||null,
+    status,function:fn,traffic,routing:structuredClone(diagnostic.routing)});
+  retain();
+  try{
+    assert.equal(snapshot?.schema,'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1');assert.equal(snapshot.phase,phase);
+    assert.equal(snapshot.sourceSha,p.sourceSha);assert.equal(snapshot.artifactDigest,p.artifactDigest);
+    diagnostic.stage='POSTDEPLOY_OBSERVATION';
+    const fn=await deployedFunction(auth,p,phase,observe);
+    if(snapshot.function)assert.notEqual(fn.revision,snapshot.function.revision,'INGRESS_TRIGGER_REVISION_NOT_CHANGED');
+    let observed=await routingObservation(auth,p,phase,fn,observe),traffic=observed.traffic;
+    // Keep every observed pair as diagnostics before asserting its meaning.
+    // Only exact prior routing or the exact deployed revision may become a
+    // rollback postimage; an unknown concurrent route never grants a write.
+    observe({kind:'POSTDEPLOY_PAIR',function:fn,traffic});
+    if(snapshot.traffic)assert.equal(traffic.serviceUid,snapshot.traffic.serviceUid,'INGRESS_TRAFFIC_SERVICE_RECREATED');
+    if(traffic.targets[0].revision!==fn.revision){
+      diagnostic.stage='EXACT_PREVIOUS_TRAFFIC_CAS';retain();
+      const before=p.makeIngress.targetBefore[phase];
+      assert.equal(snapshot.previousState,'EXISTING_APPROVED','INGRESS_TRAFFIC_ALIGNMENT_EXISTING_PREIMAGE_REQUIRED');
+      assert.equal(before.state,snapshot.previousState);assert.equal(snapshot.function?.revision,before.revision);
+      assert.equal(snapshot.function?.configurationDigest,before.configurationDigest);
+      sameTriggerConfiguration(snapshot.function,fn);
+      assert.deepEqual(validateTrafficProof(traffic,fn,phase),validateTrafficProof(snapshot.traffic,snapshot.function,phase),
+        'INGRESS_TRAFFIC_ALIGNMENT_PREIMAGE_CHANGED');
+      assert.ok(BigInt(traffic.generation)>=BigInt(snapshot.traffic.generation),'INGRESS_TRAFFIC_GENERATION_REGRESSED');
+      retainPostimage(postimage(fn,traffic,'OBSERVED_NOT_ACCEPTED'));
+      assert.ok(typeof observed.etag==='string'&&observed.etag.length>0&&observed.etag.length<=512&&
+        !/[\x00-\x1f\x7f]/.test(observed.etag),'INGRESS_TRAFFIC_CAS_ETAG_REQUIRED');
+      const fresh=await routingObservation(auth,p,phase,fn,observe);
+      assert.deepEqual(fresh,observed,'INGRESS_TRAFFIC_CAS_PREIMAGE_CHANGED');
+      const data={name:traffic.service,etag:observed.etag,
+        traffic:[{type:'TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION',revision:fn.revision,percent:100}]};
+      diagnostic.routing={attempted:true,trafficWrites:null,beforeDigest:traffic.observationDigest,
+        etagSha256:sha256(observed.etag),targetRevision:fn.revision,percent:100,requestSha256:c.digest(data)};
+      diagnostic.stage='TRAFFIC_PATCH_ATTEMPTED';retain();
+      try{
+        const response=await auth.request({url:'https://run.googleapis.com/v2/'+traffic.service+'?updateMask=traffic',method:'PATCH',data});
+        observe({kind:'TRAFFIC_PATCH_RESPONSE',responseSha256:c.digest(response.data)});
+        assert.ok(!response.data?.error,'INGRESS_TRAFFIC_PATCH_PROVIDER_FAILED');
+      }catch(error){
+        const http=Number(error?.response?.status);
+        if([400,401,403,404,409,412].includes(http))diagnostic.routing.trafficWrites=0;
+        if(Number.isInteger(http))diagnostic.routing.httpStatus=http;
+        if([409,412].includes(http))throw Object.assign(Error('INGRESS_TRAFFIC_CAS_CONFLICT'),{code:'INGRESS_TRAFFIC_CAS_CONFLICT'});
+        throw error;
+      }
+      diagnostic.stage='TRAFFIC_PATCH_READBACK';retain();
+      let serving=false;
+      for(let attempt=0;attempt<30;attempt++){
+        try{
+          const read=await routingObservation(auth,p,phase,fn,observe),current=read.traffic;
+          assert.equal(current.serviceUid,traffic.serviceUid,'INGRESS_TRAFFIC_SERVICE_RECREATED');
+          if(current.targets[0].revision===fn.revision){
+            assert.equal(BigInt(current.generation),BigInt(traffic.generation)+1n,'INGRESS_TRAFFIC_ROUTING_GENERATION_CHANGED');
+            retainPostimage(postimage(fn,current,'OBSERVED_NOT_ACCEPTED'));
+            traffic=current;observed=read;serving=true;break;
+          }
+          assert.deepEqual(validateTrafficProof(current,fn,phase),validateTrafficProof(traffic,fn,phase),
+            'INGRESS_TRAFFIC_ROUTING_TARGET_CHANGED');
+        }catch(error){
+          if(!['INGRESS_TRAFFIC_RECONCILING','INGRESS_TRAFFIC_GENERATION_UNOBSERVED','INGRESS_TRAFFIC_NOT_READY'].includes(safeFailureCode(error)))throw error;
+        }
+        if(attempt<29)await pause(2000);
+      }
+      assert.ok(serving,'INGRESS_DEPLOYED_REVISION_NOT_SERVING');
+      diagnostic.routing.trafficWrites=1;diagnostic.routing.afterDigest=traffic.observationDigest;
+    }
+    assert.equal(traffic.targets[0].revision,fn.revision,'INGRESS_DEPLOYED_REVISION_NOT_SERVING');
+    diagnostic.stage='COMPLETE';diagnostic.status='DEPLOYED_REVISION_SERVING_VERIFIED';retain();
+    const report=postimage(fn,traffic,diagnostic.status);retainPostimage(report);return report;
+  }catch(error){diagnostic.status='HOLD';diagnostic.errorCode=safeFailureCode(error);retain();throw error;}
 }
-async function rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,deleteFunction,restorePreviousRevision}){
+async function rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,deleteFunction,restorePreviousRevision,observe}){
   assert.equal(snapshot?.schema,'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1');assert.equal(snapshot.phase,phase);
   assert.equal(snapshot.sourceSha,p.sourceSha);assert.equal(snapshot.artifactDigest,p.artifactDigest);
   if(snapshot.previousState!=='ABSENT'){
@@ -182,26 +290,40 @@ async function rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,deleteFun
     // V1 snapshots remain readable. An old EXISTING_APPROVED snapshot without
     // observed traffic cannot authorize either a restore or an unchanged claim.
     const previousTraffic=validateTrafficProof(snapshot.traffic,snapshot.function,phase);
-    const current=await deployedFunction(auth,p,phase);
+    const current=await deployedFunction(auth,p,phase,observe);
     assert.equal(current.service,snapshot.function.service,'INGRESS_PREVIEW_ROLLBACK_SERVICE_CHANGED');
-    const currentTraffic=await deployedTraffic(auth,p,phase,current);
+    const currentTraffic=await deployedTraffic(auth,p,phase,current,observe);
+    assert.equal(currentTraffic.serviceUid,previousTraffic.serviceUid,'INGRESS_TRAFFIC_SERVICE_RECREATED');
     if(c.digest(current)===c.digest(snapshot.function)){
       assert.deepEqual(currentTraffic,snapshot.traffic,'INGRESS_PREVIEW_TRAFFIC_PREIMAGE_CHANGED');
       return{status:'PREVIOUS_TRIGGER_UNCHANGED_NO_RESTORE_REQUIRED',functionDeletes:0,trafficWrites:0};
+    }
+    // A failed capture may have observed a new Functions revision while the
+    // previously approved revision kept all traffic. Prove that routing from
+    // fresh reads before requiring the postimage that the failed capture could
+    // not finish. This claims no restoration of Functions metadata.
+    if(c.digest(validateTrafficProof(currentTraffic,current,phase))===c.digest(previousTraffic)){
+      sameTriggerConfiguration(snapshot.function,current);
+      assert.ok(BigInt(currentTraffic.generation)>=BigInt(snapshot.traffic.generation),'INGRESS_TRAFFIC_GENERATION_REGRESSED');
+      if(postimage){
+        assert.equal(postimage.schema,'GI_I66_MAKE_TRIGGER_POSTIMAGE_V1');
+        assert.equal(postimage.phase,phase);assert.equal(postimage.sourceSha,p.sourceSha);assert.equal(postimage.artifactDigest,p.artifactDigest);
+        assert.deepEqual(current,postimage.function,'INGRESS_TRIGGER_ROLLBACK_POSTIMAGE_CHANGED');
+      }
+      return{status:'EXACT_PREVIOUS_PREVIEW_REVISION_ALREADY_RESTORED',functionDeletes:0,trafficWrites:0,
+        restoredRevision:previousTraffic.targets[0].revision,observedFunctionRevision:current.revision,
+        functionMetadataRestored:false,trafficReadbackDigest:currentTraffic.observationDigest};
     }
     assert.equal(postimage?.schema,'GI_I66_MAKE_TRIGGER_POSTIMAGE_V1','INGRESS_TRIGGER_POSTIMAGE_REQUIRED_FOR_RESTORE');
     assert.equal(postimage.phase,phase);assert.equal(postimage.sourceSha,p.sourceSha);assert.equal(postimage.artifactDigest,p.artifactDigest);
     assert.deepEqual(current,postimage.function,'INGRESS_TRIGGER_ROLLBACK_POSTIMAGE_CHANGED');
     validateTrafficProof(postimage.traffic,postimage.function,phase);
     assert.equal(currentTraffic.serviceUid,previousTraffic.serviceUid,'INGRESS_TRAFFIC_SERVICE_RECREATED');
-    if(c.digest(validateTrafficProof(currentTraffic,current,phase))===c.digest(previousTraffic))
-      return{status:'EXACT_PREVIOUS_PREVIEW_REVISION_ALREADY_RESTORED',functionDeletes:0,trafficWrites:0,
-        restoredRevision:previousTraffic.targets[0].revision};
     assert.deepEqual(currentTraffic,postimage.traffic,'INGRESS_PREVIEW_TRAFFIC_POSTIMAGE_CHANGED');
     const target={service:previousTraffic.service,region:scope.ADDED[phase].region,
       revision:previousTraffic.targets[0].revision,percent:100};
     assert.equal(typeof restorePreviousRevision,'function');await restorePreviousRevision(target);
-    const restored=await deployedTraffic(auth,p,phase,current);
+    const restored=await deployedTraffic(auth,p,phase,current,observe);
     assert.deepEqual(validateTrafficProof(restored,current,phase),previousTraffic,'INGRESS_PREVIEW_TRAFFIC_RESTORE_UNVERIFIED');
     return{status:'EXACT_PREVIOUS_PREVIEW_REVISION_RESTORED',functionDeletes:0,trafficWrites:1,
       restoredRevision:target.revision,trafficReadbackDigest:restored.observationDigest};
@@ -523,15 +645,19 @@ async function rollback({db,auth,p,phase,requireFrom,authorityBlob,directory=pro
   const deployment=readOptional(`gi-make-${phase}-initialize-closed.json`),progress=readOptional(`gi-make-${phase}-last-operation.json`);
   const report={schema:'GI_I66_MAKE_RELEASE_COMPENSATION_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
     status:'HOLD',configuration:null,trigger:null,secretIam:null,canonicalLeadWrites:0,externalMessagesSent:0,failures:[]};
+  const retain=()=>fs.writeFileSync(path.join(directory,`gi-make-${phase}-rollback.json`),JSON.stringify(report,null,2)+'\n');
+  const observe=entry=>{(report.triggerObservations||=([])).push(entry);retain();};
+  const failed=(label,error)=>{report.failures.push(label);(report.failureCodes||={})[label]=safeFailureCode(error);retain();};
+  retain();
   try{report.configuration=await closeForRollback({db,p,phase,deployment,
     expectedDigest:progress?.afterDigest||deployment?.config?.afterDigest,authorityBlob});}
-  catch{report.failures.push('CONFIGURATION_CLOSE_UNVERIFIED');}
+  catch(error){failed('CONFIGURATION_CLOSE_UNVERIFIED',error);}
   // Do not remove the endpoint or its permission while a known active grant
   // could be left behind. Both LIVE and Preview begin with CLOSED/absent grants.
   if(!report.failures.length){
     const snapshot=readOptional(`gi-make-${phase}-snapshot-trigger.json`),postimage=readOptional(`gi-make-${phase}-capture-trigger.json`);
-    try{report.trigger=snapshot?await rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,deleteFunction,restorePreviousRevision}):
-      {status:'NO_TRIGGER_MUTATION_STARTED',functionDeletes:0};}catch{report.failures.push('TRIGGER_ROLLBACK_UNVERIFIED');}
+    try{report.trigger=snapshot?await rollbackCreatedTrigger({auth,p,phase,snapshot,postimage,deleteFunction,restorePreviousRevision,observe}):
+      {status:'NO_TRIGGER_MUTATION_STARTED',functionDeletes:0};}catch(error){failed('TRIGGER_ROLLBACK_UNVERIFIED',error);}
     if(phase==='live'){
       const saved=readOptional('gi-make-secret-iam-private.json');
       try{
@@ -545,7 +671,7 @@ async function rollback({db,auth,p,phase,requireFrom,authorityBlob,directory=pro
           const {SecretManagerServiceClient}=requireFrom('@google-cloud/secret-manager'),client=new SecretManagerServiceClient();
           try{report.secretIam=await access.rollbackExact({client,plan:saved.plan,receipt:saved.receipt});}finally{await client.close();}
         }
-      }catch{report.failures.push('EXACT_SECRET_IAM_ROLLBACK_UNVERIFIED');}
+      }catch(error){failed('EXACT_SECRET_IAM_ROLLBACK_UNVERIFIED',error);}
     }
   }
   report.status=report.failures.length?'HOLD':'COMPENSATION_READBACK_VERIFIED';
@@ -570,7 +696,8 @@ async function main(){
     privateFile:path.join(process.env.RUNNER_TEMP,'gi-make-secret-iam-private.json')});
   else if(action==='snapshot-trigger')report=await snapshotTrigger({auth,p,phase});
   else if(action==='capture-trigger')report=await captureTrigger({auth,p,phase,
-    snapshot:JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP,`gi-make-${phase}-snapshot-trigger.json`)))});
+    snapshot:JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP,`gi-make-${phase}-snapshot-trigger.json`))),
+    ...captureRecorders(process.env.RUNNER_TEMP,phase)});
   else if(action==='rollback')report=await rollback({db,auth,p,phase,requireFrom,authorityBlob,deleteFunction:async target=>{
     execFileSync('gcloud',['functions','delete',target.name,'--gen2','--region',target.region,'--project',PROJECT,'--quiet'],{stdio:'pipe',timeout:180000});},
     restorePreviousRevision:async target=>{const service=trafficServiceResource(target.service,phase).split('/').at(-1);
@@ -596,12 +723,13 @@ async function main(){
   const file=path.join(process.env.RUNNER_TEMP,`gi-make-${phase}-${action}.json`);fs.writeFileSync(file,JSON.stringify(report,null,2)+'\n');
   console.log('I66_MAKE_PROTECTED_OPERATION_RESULT='+JSON.stringify({action,phase,status:report.status||report.state,
     sourceSha:p.sourceSha,iamWrites:report.iamWrites||0,configurationWrites:report.configurationWrites||report.config?.configurationWrites||0,
+    trafficWrites:report.routing?report.routing.trafficWrites:(report.trigger?.trafficWrites??0),
     configDigest:report.afterDigest||report.config?.afterDigest||null,canonicalLeadWrites:report.canonicalLeadWrites||0,
     externalMessagesSent:0,reportBlobSha:gitBlob(fs.readFileSync(file)),reportSha256:sha256(fs.readFileSync(file))}));
 }
-if(require.main===module)main().catch(error=>{console.error(/^INGRESS_[A-Z0-9_]+$/.test(error?.code||'')?error.code:'I66_MAKE_PROTECTED_EXECUTION_HOLD');process.exitCode=1;});
+if(require.main===module)main().catch(error=>{console.error(safeFailureCode(error));process.exitCode=1;});
 module.exports={fnProjection,requireOperation,resolveCandidate,readBoundJson,verifyMakeExecution,deployedRules,deployedFunction,
-  trafficServiceResource,trafficRevision,trafficProjection,validateTrafficProof,deployedTraffic,
+  trafficServiceResource,trafficRevision,trafficProjection,validateTrafficProof,deployedTraffic,safeFailureCode,safeRoutingObservation,captureRecorders,
   optionalFunction,snapshotTrigger,captureTrigger,rollbackCreatedTrigger,closeForRollback,rollback,
   proveCurrentDeployment,configAuthority,verifyProbeReadback,runtimeServices,beforeDeploy,initializeClosed,operate,
   verifyProjectIamUnchanged,validateProjectIamReadback,

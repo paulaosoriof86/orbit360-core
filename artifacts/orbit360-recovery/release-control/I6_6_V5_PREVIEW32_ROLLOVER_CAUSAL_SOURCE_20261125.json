@@ -1,0 +1,107 @@
+{
+  "schema": "GI_I66_V5_ROLLOVER_CAUSAL_SOURCE_PREPARATION_V1",
+  "status": "PREPARED_FOR_ROOT_INTEGRATION_NOT_DEPLOYED",
+  "baseHead": "5e4a348fa0cf22012b2bfd8950bd5ba410381bc9",
+  "files": [
+    {
+      "path": "tools/gravicentra-i6-6-preview-channel-reuse-guard.cjs",
+      "beforeBlob": "c85f321370c1e00628e93a21c3c9ec21d813354b",
+      "afterBlob": "e819fb19ad5207effb1a3b0a769b211417b653bc",
+      "sha256": "50f6d9b8f708b943ff17b18f56ba7a4c672612bf72e90caeaf3824af6d91cf07"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-technical-preview-rollover.test.cjs",
+      "beforeBlob": "d7ca82b30d7f311c653a7413c3aa3987a85bf98c",
+      "afterBlob": "81dff4cf18410cc1c33f51907facec05ddc790ee",
+      "sha256": "4146b29d12a875b6a062b22fa2230807cdeebf2661d69b7b9267a21ed0f8074b"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_PHYSICAL_PREVIEW_V32_ROLLOVER_V5_20261125.json",
+      "beforeBlob": null,
+      "afterBlob": "c1987329882a5c9f6ec06c3073e9f0edd0065cce",
+      "sha256": "1da08844f2abd98a20db07e9906b9c7ac2b83f23316edaf2aa193aa964c9843f"
+    }
+  ],
+  "patch": {
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v33-v5-preview-rollover/v5-guard-and-tests.patch",
+    "sha256": "c501d9f7250600169df470c180d24b1f715aa0f5ea0b6a8757e6a31ac2652f90"
+  },
+  "localTests": {
+    "command": "node --test --test-reporter=tap tools/gravicentra-i6-6-technical-preview-rollover.test.cjs",
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v33-v5-preview-rollover/v5-targeted-tests.tap",
+    "sha256": "30c1ef5c31a4a84122d80a35bb9ce96db0984767c1503b194d845196cf714717",
+    "tests": 546,
+    "suites": 0,
+    "pass": 546,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "causalReplay": {
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v33-v5-preview-rollover/observed-inventory-causal-replay.json",
+    "sha256": "7c50438ad8c1fec1edfb2e5d4b205dc5d03632950bd6d7bd2352e14ac4c903fd",
+    "inventoryRows": 51,
+    "driftRejections": 6,
+    "baselineRejected": true,
+    "candidateAcceptedLocally": true,
+    "usesRealRetainedInventory": true,
+    "request33IsSyntheticOfflineInput": true
+  },
+  "productOwnersUnchanged": {
+    "functions/b4-003-scoped-related-reader.js": "439bea6d90ef9a6a03ca2539096cb626cc43695d",
+    "functions/bootstrap.js": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+    "functions/cobros-reconciliation-domain.js": "3d84423fd985841c6f9b230dcf729b41f2512556",
+    "functions/make-lead-ingress-bridge.js": "8b519ad21da032ffeeee7f9f9cc3e9c3fe6c1317",
+    "functions/payment-inference-engine.js": "a3d6bf99288c0c309759dce954d48c1ecc4db9dc",
+    "functions/product-lead-ingress-contract.js": "ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937",
+    "functions/product-lead-ingress-owner-support.js": "0f07f1620e3968cacf684a88c895faa64eb8a1a1",
+    "functions/product-ops-leads-domain.js": "affde2677b4c997b89abdabf3af2cb920128935d",
+    "orbit360-platform/core/policy-receipts-engine.js": "698fbaa0d15989f1393f0c6ec1eefb9da8153d87",
+    "orbit360-platform/core/primas.js": "0d5d343ef11760312092314b719fc82da0eaa147",
+    "orbit360-platform/core/product-hydration-required-optional-p0.js": "f2f42ef536b00b89c7198710a20aadb633a7eb29",
+    "orbit360-platform/core/queries.js": "b77b65f86ef6ac2ab6dc157fdbc9ad5e34dbcdcc",
+    "orbit360-platform/data/store-firestore-product-operational-p0.js": "d9b6806958da950f7a3aff28ca8b164220f827d6",
+    "orbit360-platform/data/store-firestore-product-readonly-p0.js": "fa8e507c03aba7bc7e99214c3b4e695f2c5fe222",
+    "orbit360-platform/modules/aseguradoras.js": "0ce40050387f68b2e3efaddc7717ace7cf3ae3ff",
+    "orbit360-platform/modules/cobros.js": "e86ea782c6aacf97fe4ab4900ed40dec07537a22",
+    "orbit360-platform/modules/config-domain-v20260804-bridge.js": "b0c3d6e2399ab9a13a60ea473fc8cc1e9edd00f9",
+    "orbit360-platform/modules/issuance-endosos-v1201-bridge.js": "6dabc32d0a012566eb7840ef8774aee3beb17817",
+    "orbit360-platform/modules/policy-receipts-v1199-bridge.js": "583b87763fe7931d211e8c67a4f08ef0265b0dfb",
+    "orbit360-platform/modules/policy-receipts-v1199-detail-guard.js": "74298d8565902895e5b2d2a5de030ed08847243c",
+    "orbit360-platform/modules/renewals-v1200-operational-bridge.js": "8395b86246cf9bd77523da0059a6e5318e0cfc80"
+  },
+  "productOwnersCount": 21,
+  "workflowChanged": false,
+  "collectorChanged": false,
+  "functionalReceiptsChanged": false,
+  "selectorContract": {
+    "default": "V4_HISTORICAL_UNCHANGED",
+    "explicitV5": [
+      "receiptPath",
+      "receiptSha256"
+    ],
+    "receiptCheckedBy": "SOURCE_PINNED_LITERAL_PATH_SHA256_GIT_BLOB",
+    "candidatePinShapeUnchanged": true
+  },
+  "constraints": {
+    "build32WholeSuccessPreserved": true,
+    "signedPreview32FailurePreserved": true,
+    "compensation32HoldPreserved": true,
+    "firstRequest": 33,
+    "laterRetryRequiresContiguousFailedBuildEvidenceStartingAt33": true,
+    "successful32NeverClassifiedAsFailedBuild": true,
+    "backup32AndE3RuntimeHashesRequired": true,
+    "other50ChannelsExact": true
+  },
+  "cloudReads": 0,
+  "cloudWrites": 0,
+  "deployments": 0,
+  "runtimeAcceptance": false,
+  "artifact32Patched": false,
+  "completeBundle": {
+    "path": "/workspace/scratch/166055cd45dc/continuity-evidence/v33-v5-preview-rollover/v5-closed-preview32-rollover.patch",
+    "sha256": "9072cba47e5581888d45757a2dd4dddfa60c0b31c3a87d335f8b66ab050f35f1"
+  },
+  "integrationNote": "Root already has the exact V5 receipt c1987329882a5c9f6ec06c3073e9f0edd0065cce; apply the two-owner contextual patch."
+}
