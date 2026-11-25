@@ -1,0 +1,460 @@
+{
+  "schema": "GI_I66_V33_POSTDEPLOY_TRAFFIC_PATCH_FAILURE_AND_CONTINUITY_V1",
+  "status": "BUILD_AND_224_HOSTING_PASS_SIGNED_PREVIEW_FAILED_HTTP409_TRAFFIC_COMPENSATION_VERIFIED_FUNCTION_METADATA_NOT_RESTORED",
+  "activeGate": "I6.6",
+  "recordedAtUtc": "2026-11-25T02:02:36.551Z",
+  "target": {
+    "sourceSha": "63bf7d9e9ba7710cab73bffee010987c784d92aa",
+    "artifactId": 14983831110,
+    "artifactDigest": "sha256:c8ecc0f82cfd61d57c628b7b506f2c73c245efec99ea1927762975e96f511801",
+    "buildId": "gi-i66-63bf7d9e9ba7-57f234755dc1",
+    "buildRunId": 45527330623,
+    "previewUrl": "https://ays-orbit-360-lab--gi-i66-rc-45518809761-eiytd3a3.web.app",
+    "previewChannel": "gi-i66-rc-45518809761"
+  },
+  "immutableBuild": {
+    "conclusion": "success",
+    "receipt": {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_V33_IMMUTABLE_BUILD_RECEIPT_20261124.json",
+      "gitBlobSha": "f8e2660fadef26f3fc6df9d1fe3dbb657500319f",
+      "sha256": "8dec993b2caf90c9681bf242885def24e093bd41c3b7406c9e4fcbd1e690ca9c"
+    },
+    "siteFiles": 224,
+    "readbackFiles": 224,
+    "artifactPatched": false
+  },
+  "signedPreview": {
+    "runId": 45528595084,
+    "runAttempt": 1,
+    "headSha": "504829b30e1a3e0fde97bdef54fe3d0636e1344e",
+    "jobId": 138918077657,
+    "conclusion": "failure",
+    "failedSteps": [
+      10
+    ],
+    "compensationStep": 18,
+    "compensationStepConclusion": "success",
+    "skippedSteps": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "signedUiExecuted": false,
+    "wholeRunAccepted": false
+  },
+  "observedDeployment": {
+    "previewFunctionsDeployed": 5,
+    "inventoryReadback": "PASS_COUNT_5",
+    "liveHostingFingerprintsUnchangedDuringRun": true,
+    "livePromotionExecuted": false,
+    "makeClosedDeploymentReceiptPresent": false,
+    "makeTriggerPostimagePresent": true,
+    "makeTriggerPostimageStatus": "OBSERVED_NOT_ACCEPTED",
+    "makeTriggerCaptureAccepted": false,
+    "makeProbeExecuted": false,
+    "canonicalLeadWrites": 0,
+    "externalMessagesSent": 0
+  },
+  "failure": {
+    "safeCode": "INGRESS_TRAFFIC_CAS_CONFLICT",
+    "boundary": "After the five exact Preview function deployments and inventory readback, capture-trigger attempted the exact new revision traffic PATCH and the provider rejected it with HTTP409; initialize-closed did not execute.",
+    "stage": "TRAFFIC_PATCH_ATTEMPTED",
+    "httpStatus": 409,
+    "trafficPatchAttempted": true,
+    "trafficWrites": 0,
+    "requestedRevision": "orbit360makeleadingresspreview-00005-juw",
+    "retainedTrafficRevision": "orbit360makeleadingresspreview-00001-cuy",
+    "providerResponseBodyRetained": false,
+    "underlying409Cause": "NOT_ESTABLISHED_BY_RETAINED_EVIDENCE",
+    "concurrentModificationProven": false,
+    "staleEtagProven": false,
+    "prePatchCloudRunResponsesIdentical": true,
+    "noBlindDeployBuildOrSignedPreviewRetry": true
+  },
+  "captureDiagnostic": {
+    "schema": "GI_I66_MAKE_TRIGGER_CAPTURE_DIAGNOSTIC_V1",
+    "phase": "preview",
+    "sourceSha": "63bf7d9e9ba7710cab73bffee010987c784d92aa",
+    "artifactDigest": "sha256:c8ecc0f82cfd61d57c628b7b506f2c73c245efec99ea1927762975e96f511801",
+    "status": "HOLD",
+    "stage": "TRAFFIC_PATCH_ATTEMPTED",
+    "observations": [
+      {
+        "kind": "FUNCTION_RESPONSE",
+        "responseSha256": "b2b5ec9f60c89754d60ab94e33cbb69f322475fea2411b5370f072002657aa73",
+        "nameMatchesExpected": true,
+        "active": true
+      },
+      {
+        "kind": "FUNCTION_PROJECTION",
+        "function": {
+          "name": "orbit360MakeLeadIngressPreview",
+          "region": "us-east1",
+          "revision": "orbit360makeleadingresspreview-00005-juw",
+          "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+          "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+          "database": "(default)",
+          "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+          "retryPolicy": "RETRY_POLICY_RETRY",
+          "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-265013",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "configurationDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3"
+        }
+      },
+      {
+        "kind": "CLOUD_RUN_RESPONSE",
+        "responseSha256": "73118820e2163413cc2e4001e644706715b7f682ec24ea9874ffe1c89605aca7",
+        "serviceNameMatchesExpected": true,
+        "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+        "generation": "5",
+        "observedGeneration": "5",
+        "reconciling": null,
+        "condition": "CONDITION_SUCCEEDED",
+        "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc",
+        "trafficCount": 1,
+        "targets": [
+          {
+            "revision": "orbit360makeleadingresspreview-00001-cuy",
+            "percent": 100,
+            "tagPresent": false,
+            "allocation": "TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION"
+          }
+        ]
+      },
+      {
+        "kind": "TRAFFIC_PROJECTION",
+        "traffic": {
+          "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+          "phase": "preview",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+          "generation": "5",
+          "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+          "targets": [
+            {
+              "revision": "orbit360makeleadingresspreview-00001-cuy",
+              "percent": 100
+            }
+          ],
+          "observationDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50"
+        }
+      },
+      {
+        "kind": "FUNCTION_RESPONSE",
+        "responseSha256": "24d4d35205c17519cff7799680309d4853ae98a3b3906b51b7206e7b0310eded",
+        "nameMatchesExpected": true,
+        "active": true
+      },
+      {
+        "kind": "FUNCTION_PROJECTION",
+        "function": {
+          "name": "orbit360MakeLeadIngressPreview",
+          "region": "us-east1",
+          "revision": "orbit360makeleadingresspreview-00005-juw",
+          "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+          "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+          "database": "(default)",
+          "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+          "retryPolicy": "RETRY_POLICY_RETRY",
+          "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-265013",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "configurationDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3"
+        }
+      },
+      {
+        "kind": "POSTDEPLOY_PAIR",
+        "function": {
+          "name": "orbit360MakeLeadIngressPreview",
+          "region": "us-east1",
+          "revision": "orbit360makeleadingresspreview-00005-juw",
+          "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+          "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+          "database": "(default)",
+          "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+          "retryPolicy": "RETRY_POLICY_RETRY",
+          "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-265013",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "configurationDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3"
+        },
+        "traffic": {
+          "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+          "phase": "preview",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+          "generation": "5",
+          "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+          "targets": [
+            {
+              "revision": "orbit360makeleadingresspreview-00001-cuy",
+              "percent": 100
+            }
+          ],
+          "observationDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50"
+        }
+      },
+      {
+        "kind": "CLOUD_RUN_RESPONSE",
+        "responseSha256": "73118820e2163413cc2e4001e644706715b7f682ec24ea9874ffe1c89605aca7",
+        "serviceNameMatchesExpected": true,
+        "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+        "generation": "5",
+        "observedGeneration": "5",
+        "reconciling": null,
+        "condition": "CONDITION_SUCCEEDED",
+        "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc",
+        "trafficCount": 1,
+        "targets": [
+          {
+            "revision": "orbit360makeleadingresspreview-00001-cuy",
+            "percent": 100,
+            "tagPresent": false,
+            "allocation": "TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION"
+          }
+        ]
+      },
+      {
+        "kind": "TRAFFIC_PROJECTION",
+        "traffic": {
+          "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+          "phase": "preview",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+          "generation": "5",
+          "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+          "targets": [
+            {
+              "revision": "orbit360makeleadingresspreview-00001-cuy",
+              "percent": 100
+            }
+          ],
+          "observationDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50"
+        }
+      },
+      {
+        "kind": "FUNCTION_RESPONSE",
+        "responseSha256": "24d4d35205c17519cff7799680309d4853ae98a3b3906b51b7206e7b0310eded",
+        "nameMatchesExpected": true,
+        "active": true
+      },
+      {
+        "kind": "FUNCTION_PROJECTION",
+        "function": {
+          "name": "orbit360MakeLeadIngressPreview",
+          "region": "us-east1",
+          "revision": "orbit360makeleadingresspreview-00005-juw",
+          "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+          "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+          "database": "(default)",
+          "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+          "retryPolicy": "RETRY_POLICY_RETRY",
+          "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-265013",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "configurationDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3"
+        }
+      }
+    ],
+    "routing": {
+      "attempted": true,
+      "trafficWrites": 0,
+      "beforeDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50",
+      "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc",
+      "targetRevision": "orbit360makeleadingresspreview-00005-juw",
+      "percent": 100,
+      "requestSha256": "1f11a18159772c99443f383beaca5586ee9d508d2c39accbb18c6c5293421735",
+      "httpStatus": 409
+    },
+    "iamWrites": 0,
+    "configurationWrites": 0,
+    "canonicalLeadWrites": 0,
+    "externalMessagesSent": 0,
+    "errorCode": "INGRESS_TRAFFIC_CAS_CONFLICT"
+  },
+  "compensation": {
+    "schema": "GI_I66_MAKE_RELEASE_COMPENSATION_V1",
+    "phase": "preview",
+    "sourceSha": "63bf7d9e9ba7710cab73bffee010987c784d92aa",
+    "artifactDigest": "sha256:c8ecc0f82cfd61d57c628b7b506f2c73c245efec99ea1927762975e96f511801",
+    "status": "COMPENSATION_READBACK_VERIFIED",
+    "configuration": {
+      "status": "NO_CONFIGURATION_TRANSITION_RECORDED",
+      "configurationWrites": 0
+    },
+    "trigger": {
+      "status": "EXACT_PREVIOUS_PREVIEW_REVISION_ALREADY_RESTORED",
+      "functionDeletes": 0,
+      "trafficWrites": 0,
+      "restoredRevision": "orbit360makeleadingresspreview-00001-cuy",
+      "observedFunctionRevision": "orbit360makeleadingresspreview-00005-juw",
+      "functionMetadataRestored": false,
+      "trafficReadbackDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50"
+    },
+    "secretIam": null,
+    "canonicalLeadWrites": 0,
+    "externalMessagesSent": 0,
+    "failures": [],
+    "triggerObservations": [
+      {
+        "kind": "FUNCTION_RESPONSE",
+        "responseSha256": "cc3516223b7d5e7bce37afd8e13339a96f20b79fa4e71ea9ea9ac8f2a386f1a7",
+        "nameMatchesExpected": true,
+        "active": true
+      },
+      {
+        "kind": "FUNCTION_PROJECTION",
+        "function": {
+          "name": "orbit360MakeLeadIngressPreview",
+          "region": "us-east1",
+          "revision": "orbit360makeleadingresspreview-00005-juw",
+          "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+          "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+          "database": "(default)",
+          "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+          "retryPolicy": "RETRY_POLICY_RETRY",
+          "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-265013",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "configurationDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3"
+        }
+      },
+      {
+        "kind": "CLOUD_RUN_RESPONSE",
+        "responseSha256": "73118820e2163413cc2e4001e644706715b7f682ec24ea9874ffe1c89605aca7",
+        "serviceNameMatchesExpected": true,
+        "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+        "generation": "5",
+        "observedGeneration": "5",
+        "reconciling": null,
+        "condition": "CONDITION_SUCCEEDED",
+        "etagSha256": "91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc",
+        "trafficCount": 1,
+        "targets": [
+          {
+            "revision": "orbit360makeleadingresspreview-00001-cuy",
+            "percent": 100,
+            "tagPresent": false,
+            "allocation": "TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION"
+          }
+        ]
+      },
+      {
+        "kind": "TRAFFIC_PROJECTION",
+        "traffic": {
+          "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+          "phase": "preview",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+          "generation": "5",
+          "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+          "targets": [
+            {
+              "revision": "orbit360makeleadingresspreview-00001-cuy",
+              "percent": 100
+            }
+          ],
+          "observationDigest": "1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50"
+        }
+      },
+      {
+        "kind": "FUNCTION_RESPONSE",
+        "responseSha256": "b2b5ec9f60c89754d60ab94e33cbb69f322475fea2411b5370f072002657aa73",
+        "nameMatchesExpected": true,
+        "active": true
+      },
+      {
+        "kind": "FUNCTION_PROJECTION",
+        "function": {
+          "name": "orbit360MakeLeadIngressPreview",
+          "region": "us-east1",
+          "revision": "orbit360makeleadingresspreview-00005-juw",
+          "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+          "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+          "database": "(default)",
+          "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+          "retryPolicy": "RETRY_POLICY_RETRY",
+          "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-265013",
+          "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+          "configurationDigest": "e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3"
+        }
+      }
+    ]
+  },
+  "preDeploymentTrigger": {
+    "schema": "GI_I66_MAKE_TRIGGER_SNAPSHOT_V1",
+    "phase": "preview",
+    "sourceSha": "63bf7d9e9ba7710cab73bffee010987c784d92aa",
+    "artifactDigest": "sha256:c8ecc0f82cfd61d57c628b7b506f2c73c245efec99ea1927762975e96f511801",
+    "previousState": "EXISTING_APPROVED",
+    "function": {
+      "name": "orbit360MakeLeadIngressPreview",
+      "region": "us-east1",
+      "revision": "orbit360makeleadingresspreview-00004-sum",
+      "runtimePrincipal": "646761409743-compute@developer.gserviceaccount.com",
+      "eventType": "google.cloud.firestore.document.v1.created.withAuthContext",
+      "database": "(default)",
+      "document": "tenants/alianzas-soluciones/previewLeadIngressRequests/{requestId}",
+      "retryPolicy": "RETRY_POLICY_RETRY",
+      "trigger": "projects/ays-orbit-360-lab/locations/nam5/triggers/orbit360makeleadingresspreview-265013",
+      "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "configurationDigest": "196d5103886a681985b2ea817506a1554032961bd52aefd603b939620a49a16a"
+    },
+    "traffic": {
+      "schema": "GI_I66_MAKE_CLOUD_RUN_TRAFFIC_V1",
+      "phase": "preview",
+      "service": "projects/ays-orbit-360-lab/locations/us-east1/services/orbit360makeleadingresspreview",
+      "serviceUid": "2cb4dc4b-ad08-442e-bf39-4fc0803bd111",
+      "generation": "4",
+      "observedFrom": "CLOUD_RUN_V2_TRAFFIC_STATUSES",
+      "targets": [
+        {
+          "revision": "orbit360makeleadingresspreview-00001-cuy",
+          "percent": 100
+        }
+      ],
+      "observationDigest": "ee8568ce533710c81965419ab18831c2bdc48c9ca6711c7a7402e13001139665"
+    }
+  },
+  "evidence": {
+    "logSha256": "6fc08d33cb8dda8b2fc73618e399b3b600b8d74da0cdb1cea47b9e2a74b81177",
+    "makeArtifact": {
+      "id": 14982534576,
+      "digest": "sha256:6cd65439f2c6ed9fcb0b574c611010d1e626ad48f9b0f55d2914cc3785c5087c"
+    },
+    "generalArtifact": {
+      "id": 14984235004,
+      "digest": "sha256:751119f0aa1044f5f8e9375ec871280a1f19fb5535f58da8682e7c943074c6f5"
+    },
+    "preservedMakeReports": {
+      "gi-make-preview-before-deploy.json": {
+        "sha256": "2ee16ef2d2950e9761cc8b51e645bf7ecde3afecb3e853e538d4fbb1089531d9",
+        "gitBlobSha": "d013ee85dda68147188fd599150a9ded2fd90f56"
+      },
+      "gi-make-preview-snapshot-trigger.json": {
+        "sha256": "acbb467d9beae99aa56830b7b43492c6ec1ec0e135147b85b8ba74d48a1ae19c",
+        "gitBlobSha": "25b9b4df7248d4118424b22e9ca68f27a5ef54d6"
+      },
+      "gi-make-preview-capture-trigger-observation.json": {
+        "sha256": "56a2a9219aa3f28f05e6a7c9f6abb34bb518a764719bb9d47caa4610ece088e9",
+        "gitBlobSha": "673f21f9d63495883dc2168de63df210cd3f9225"
+      },
+      "gi-make-preview-capture-trigger.json": {
+        "sha256": "4a3fb3cb2a226068b4c486baa654c7e9666a3d25cfeab3b0d6c3e23248af20ed",
+        "gitBlobSha": "17cdddf022205c5d2d634b819a2537b7c69e3b11"
+      },
+      "gi-make-preview-rollback.json": {
+        "sha256": "79cb3e8aaf6cb76d4ff326d7d6cb44cba648be0248e39a669c20f9b014b82bdd",
+        "gitBlobSha": "77f661207ea0c858514a9b3d4a6e3dbd25fc25a0"
+      }
+    }
+  },
+  "acceptedProductionRemains": "E3",
+  "artifactPatched": false,
+  "artifactRebuilt": false,
+  "newBuildRequested": false,
+  "newSourceCreated": false,
+  "newLiveAcceptance": false,
+  "financialPaymentsCreated": 0,
+  "fullI66ProductionAccepted": false
+}
