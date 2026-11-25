@@ -1,0 +1,118 @@
+{
+  "schema": "GRAVICENTRA_I66_FINANCIAL_CURRENT_PRIVATE_READBACK_RECEIPT_V1",
+  "status": "ENCRYPTED_CURRENT_FINANCIAL_BASELINE_NOT_MATCHED_NOT_APPLIED",
+  "profile": "I66_CURRENT_FINANCIAL_BASELINE_V1",
+  "sourceHeadSha": "bdcf12e9eb24f9fb95ebd244802139e13d2a7802",
+  "authorityBaseHead": "e97698401802ac04d8f61ff11a63b75d21d3b6ef",
+  "currentProgressPath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R77.json",
+  "currentProgressBlobSha": "1a746160f56a71604c5f53210859769b50412a74",
+  "formalDataCutoff": "2026-07-31",
+  "documentaryPeriod": "2026-11",
+  "sourceEvidenceDate": "2026-11-24",
+  "privateReferenceQuerySha256": "46013562cc92dd4c8aa735745f91643ce3b4bd36f2c8280732ef657f43d684ee",
+  "counts": {
+    "polizas": 1444,
+    "clientes": 450,
+    "aseguradoras": 33,
+    "recibosEsperados": 2271,
+    "carteraPrimas": 2043,
+    "cobros": 521,
+    "asesores": 10
+  },
+  "collections": {
+    "polizas": {
+      "count": 1444,
+      "complete": true,
+      "readTime": "2026-11-25T02:49:20.317Z",
+      "readTimeExact": {
+        "seconds": "1795574960",
+        "nanoseconds": 316578000
+      },
+      "idMismatches": 0
+    },
+    "clientes": {
+      "count": 450,
+      "complete": true,
+      "readTime": "2026-11-25T02:49:21.120Z",
+      "readTimeExact": {
+        "seconds": "1795574961",
+        "nanoseconds": 120028000
+      },
+      "idMismatches": 0
+    },
+    "aseguradoras": {
+      "count": 33,
+      "complete": true,
+      "readTime": "2026-11-25T02:49:21.610Z",
+      "readTimeExact": {
+        "seconds": "1795574961",
+        "nanoseconds": 610292000
+      },
+      "idMismatches": 0
+    },
+    "recibosEsperados": {
+      "count": 2271,
+      "complete": true,
+      "readTime": "2026-11-25T02:49:21.799Z",
+      "readTimeExact": {
+        "seconds": "1795574961",
+        "nanoseconds": 798823000
+      },
+      "idMismatches": 0
+    },
+    "carteraPrimas": {
+      "count": 2043,
+      "complete": true,
+      "readTime": "2026-11-25T02:49:22.659Z",
+      "readTimeExact": {
+        "seconds": "1795574962",
+        "nanoseconds": 659462000
+      },
+      "idMismatches": 0
+    },
+    "cobros": {
+      "count": 521,
+      "complete": true,
+      "readTime": "2026-11-25T02:49:23.319Z",
+      "readTimeExact": {
+        "seconds": "1795574963",
+        "nanoseconds": 319073000
+      },
+      "idMismatches": 0
+    },
+    "asesores": {
+      "count": 10,
+      "complete": true,
+      "readTime": "2026-11-25T02:49:23.622Z",
+      "readTimeExact": {
+        "seconds": "1795574963",
+        "nanoseconds": 622080000
+      },
+      "idMismatches": 0
+    }
+  },
+  "readWindow": {
+    "startedAt": "2026-11-25T02:49:20.093Z",
+    "completedAt": "2026-11-25T02:49:23.648Z",
+    "atomicAcrossCollections": false,
+    "newDocumentsAfterCollectionReadNotRuledOut": true
+  },
+  "encryptedPayloadSha256": "ad44084767a9ae55edaf85e662a979f6560ce29ac43b94c9d17906fa8481bdfe",
+  "plaintextSha256": "e01893dd9307be434d56b7c8b442237eea39945c7f9882bd5bec5353e28123d8",
+  "publicKeySha256": "51c54db8e9e76ac3fec99bad9556f49f6c8c7b263f42426a6bef07ec16860cfd",
+  "requestPath": "artifacts/orbit360-recovery/release-control/I6_6_FINANCIAL_CURRENT_PRIVATE_READBACK_REQUEST_20261125.json",
+  "requestBlobSha": "0ada66eefb9b2dcfd9bd16e706aa111898689121",
+  "requestSha256": "f164763a39bc03ee7843a8063191e0e58ff4a1c8f19ed4d7d73c32c9e6649562",
+  "encryptedOnly": true,
+  "containsPlaintextPII": false,
+  "exactDocumentUpdateTimes": true,
+  "matchingPerformed": false,
+  "eligibleForWrite": false,
+  "absenceInferenceAllowed": false,
+  "writes": 0,
+  "operationalWrites": 0,
+  "paymentsApplied": 0,
+  "receiptsCreated": 0,
+  "deploy": false,
+  "acceptanceGranted": false
+}

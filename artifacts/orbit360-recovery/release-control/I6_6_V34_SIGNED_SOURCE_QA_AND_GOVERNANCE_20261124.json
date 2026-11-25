@@ -1,0 +1,51 @@
+{
+  "schema": "GI_I66_SIGNED_SOURCE_QA_AND_GOVERNANCE_V1",
+  "status": "SIGNED_SOURCE_QA_AND_GOVERNANCE_PASS",
+  "sourceHead": "22a4d5f2240107c58e0ef96a6c6ca71d80afff7c",
+  "branch": "recovery/fase-a-clean-20260831",
+  "sourceQa": {
+    "runId": 45538613640,
+    "workflow": ".github/workflows/gravicentra-i66-privileged-role-parity-source-qa.yml",
+    "headSha": "22a4d5f2240107c58e0ef96a6c6ca71d80afff7c",
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "completedAt": "2026-11-25T03:17:01Z",
+    "jobId": 138951312680,
+    "requiredSteps": [
+      {
+        "name": "Source test with 5 roles, 12 domain writers and explicit negative boundaries",
+        "conclusion": "success"
+      },
+      {
+        "name": "Canonical source blob and historic release guard without re-opening B4",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "governance": {
+    "runId": 45538613691,
+    "workflow": ".github/workflows/gravicentra-release-lock-sync.yml",
+    "headSha": "22a4d5f2240107c58e0ef96a6c6ca71d80afff7c",
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "completedAt": "2026-11-25T03:16:52Z",
+    "jobs": [
+      {
+        "id": 138951312443,
+        "name": "verify-control-plane",
+        "conclusion": "success"
+      },
+      {
+        "id": 138951312916,
+        "name": "live-hosting-availability-readonly",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "productDeployment": false,
+  "previewFunctionalAccepted": false,
+  "liveAccepted": false,
+  "physicalProduction": "E3"
+}
