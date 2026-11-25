@@ -27,6 +27,8 @@ on:
       - tools/gravicentra-i66-source-bulk-plan.test.cjs
       - tools/gravicentra-i66-source-bulk-apply.test.cjs
       - tools/gravicentra-i66-mapfre-obligation-cas.test.cjs
+      - artifacts/orbit360-recovery/release-control/I6_6_MAPFRE_DOC04_DOCUMENTARY_PREFLIGHT_SOURCE_20261125.json
+      - artifacts/orbit360-recovery/release-control/I6_6_MAPFRE2453_HOLDER_WITNESS_SOURCE_READONLY_20261125.json
       - tools/gravicentra-i66-source-bulk-readback.test.cjs
       - tools/gravicentra-i66-universales-25-source-crosswalk.test.cjs
       - artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_25_PENDING_2_PAID_9_INFERRED_20261122.json
@@ -41,6 +43,9 @@ concurrency:
 env:
   GCLOUD_PROJECT: ays-orbit-360-lab
   GI_I66_BULK_SOURCE_MANIFEST: ${{ inputs.source_manifest || 'artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261120_MULTI_302.json' }}
+  # Closed scope selection only. Existing mode marker and protected environment
+  # remain mandatory; this selector cannot make the generic batch eligible.
+  GI_I66_MAPFRE_PROFILE: ${{ contains(github.event.head_commit.message || '', 'I66_MAPFRE_DOC04_2453') && 'MAPFRE_DOC04_2453' || 'MAPFRE_R46' }}
   SA_LAB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT360_LAB }}
   SA_LAB_ALT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ORBIT_360_LAB }}
   SA_DEFAULT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

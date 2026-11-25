@@ -41,29 +41,34 @@ class Db{
     return result;
   }
 }
-function fixture(){
-  const binding=reader.mapfreBinding(),s=binding.preflight.scope,db=new Db();
+function fixture(profileId='MAPFRE_R46'){
+  const binding=reader.mapfreBinding(profileId),profile=reader.mapfreProfile(binding),s=binding.preflight.scope,db=new Db();
   const name='PRIVATE SYNTHETIC MAPFRE HOLDER',witness=hash(name.replace(/ /g,''));
   binding.holder.sources.forEach(w=>w.issuedPdfNormalizedHolderSha256=witness);
   db.put(at('polizas',s.policyId),{numero:s.policyNumber,clienteId:s.clientId,aseguradoraId:s.insurerId,
-    pais:'GT',moneda:'GTQ',estado:'Vigente',vigenciaInicio:s.issuedTerm[0],vigenciaFin:s.issuedTerm[1]});
+    pais:'GT',moneda:'GTQ',estado:'Vigente',vigenciaInicio:s.issuedTerm[0],vigenciaFin:s.issuedTerm[1],
+    ...(profileId==='MAPFRE_DOC04_2453'?{primaTotal:3715.24}: {})});
   db.put(at('clientes',s.clientId),{nombre:name,pais:'GT'});
   db.put(at('aseguradoras',s.insurerId),{nombre:'MAPFRE Seguros'});
   for(const t of binding.preflight.twoCases){
     const common={polizaId:s.policyId,clienteId:s.clientId,aseguradoraId:s.insurerId,moneda:'GTQ',
-      primaTotal:127.76,monto:'127.76',serie:t.installment+'/12',numeroReciboFuente:t.receiptId,
+      primaTotal:profile.beforeGrossCents/100,monto:(profile.beforeGrossCents/100).toFixed(2),serie:t.installment+'/12',numeroReciboFuente:t.receiptId,
       fechaLimite:t.historicalOnlyBaseline.dates.fechaLimite,estadoOperativo:'futuro_pendiente',
       primaNeta:79.62,impuestosIVA:13.69,metadata:{keep:'exactly'}};
     db.put(at('recibosEsperados',t.receiptId),common);
     db.put(at('carteraPrimas',t.portfolioId),{...common,reciboId:t.receiptId,carteraActiva:true});
   }
-  for(const t of binding.preflight.preservedPayments){
-    db.put(at('recibosEsperados',t.receiptId),{polizaId:s.policyId,primaTotal:t.amountCents/100,estado:'Pagado'});
+  for(const [i,t] of binding.preflight.preservedPayments.entries()){
+    db.put(at('recibosEsperados',t.receiptId),{polizaId:s.policyId,primaTotal:t.amountCents/100,estado:'Pagado',
+      ...(profileId==='MAPFRE_DOC04_2453'?{serie:(i+1)+'/12'}:{})});
     db.put(at('carteraPrimas',t.receiptId),{polizaId:s.policyId,reciboId:t.receiptId,primaTotal:t.amountCents/100,estado:'Pagado'});
     db.put(at('cobros',t.cobroId),{polizaId:s.policyId,reciboId:t.receiptId,monto:t.amountCents/100,estado:'Pagado'});
   }
   for(const c of ['recibosEsperados','carteraPrimas'])db.put(at(c,'synthetic_installment_12'),
-    {polizaId:s.policyId,primaTotal:127.76,serie:'12/12',reciboId:'synthetic_installment_12',estado:'Pendiente'});
+    {polizaId:s.policyId,primaTotal:profile.beforeGrossCents/100,serie:'12/12',reciboId:'synthetic_installment_12',estado:'Pendiente'});
+  if(profileId==='MAPFRE_DOC04_2453')for(const n of [5,8,9,10,11])for(const c of ['recibosEsperados','carteraPrimas'])
+    db.put(at(c,'synthetic_installment_'+n),{polizaId:s.policyId,primaTotal:309.60,serie:n+'/12',
+      reciboId:'synthetic_installment_'+n,estado:'Pendiente',privateSyntheticMetadata:{preserve:true}});
   const originals=binding.preflight.originalDocumentPins.map(p=>({fileId:p.driveFileId,sha256:p.sha256,status:'ORIGINAL_BYTES_VERIFIED'}));
   return {binding,db,originals};
 }
@@ -175,8 +180,8 @@ test('MAPFRE observer digest equals the real backend normalizer for documentary 
     }
   }
 });
-async function canonicalPaymentFixture(){
-  const f=fixture(),p=await plan(f),corrected=await apply(f,p),s=f.binding.preflight.scope;
+async function canonicalPaymentFixture(profileId='MAPFRE_R46'){
+  const f=fixture(profileId),p=await plan(f),corrected=await apply(f,p),s=f.binding.preflight.scope;
   for(const t of f.binding.preflight.twoCases){
     const request=t.pendingConditionalCanonicalCall,body=request.payload;
     const shared={paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT',directOrInferred:'DIRECT',
@@ -188,7 +193,7 @@ async function canonicalPaymentFixture(){
     f.db.put(at('carteraPrimas',t.portfolioId),{...f.db.docs.get(at('carteraPrimas',t.portfolioId)),
       estado:'Pagado',estadoCartera:'Pagado',fechaPago:body.paidDate,paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT'});
     f.db.put(at('cobros',request.expectedNewCobroIdIfAbsent),{polizaId:s.policyId,clienteId:s.clientId,
-      reciboId:t.receiptId,moneda:'GTQ',monto:127.77,...shared});
+      reciboId:t.receiptId,moneda:'GTQ',monto:body.amount,...shared});
     const result={ok:true,receiptId:t.receiptId,cobroId:request.expectedNewCobroIdIfAbsent,
       policyId:s.policyId,clientId:s.clientId,paymentState:'PAID_DIRECT',applicationState:'APPLIED_DIRECT',
       paidDate:body.paidDate,invoiceNumber:body.invoiceNumber,portfolioUpdated:true,serverOwned:true,idempotent:true};
@@ -235,4 +240,84 @@ test('MAPFRE observer rejects the legacy digest missing currency and actual date
   const r=await paymentReview(f);
   assert.equal(r.status,'MAPFRE_PAYMENT_READBACK_HOLD');assert.equal(r.verifiedPayments,0);
   assert.equal(f.db.writes,writes);assert.equal(f.db.docs.size,before.length);
+});
+
+test('DOC04 binding admits only its two original requirements and preserves truthful source states',()=>{
+  const binding=reader.mapfreBinding('MAPFRE_DOC04_2453'),p=binding.preflight;
+  assert.equal(p.scope.policyNumber,'3002600002453');assert.equal(p.scope.knownPreviousPaymentsToPreserve,4);
+  assert.deepEqual(p.twoCases.map(t=>[t.installment,t.requirement]),[[6,'3041843'],[7,'3041844']]);
+  assert.deepEqual(p.twoCases.map(t=>binding.source.facts.find(f=>f.sourceFactId===t.sourceFactId).state),['COMMISSION_ANCHOR','PAID']);
+  assert.equal(binding.source.facts.find(f=>f.sourceFactId===p.twoCases[0].sourceFactId).installment,null);
+  assert.equal(p.originalDocumentPins.length,4);assert.equal(p.documentedSchedule.length,12);
+  assert.deepEqual(p.documentedSchedule.map(t=>Math.round(Number(t.gross)*100)),[...Array(11).fill(30961),30953]);
+  assert.equal(p.annualDocumentaryBoundary.documentedSumScheduleCents,371524);
+  assert.equal(p.effects.paymentWrites,0);assert.equal(binding.holder.rawHolderNameIncluded,false);assert.equal(binding.holder.rawTaxIdIncluded,false);
+  assert.throws(()=>reader.mapfreBinding('MAPFRE_ARBITRARY_POLICY'),/MAPFRE_CLOSED_PROFILE_REQUIRED/);
+});
+test('DOC04 uses the same protected CAS for four existing records and one audit, preserving actual payments and operational dates',async()=>{
+  const f=fixture('MAPFRE_DOC04_2453'),p=await plan(f),before=clone([...f.db.docs]),r=await apply(f,p);
+  assert.equal(p.profileId,'MAPFRE_DOC04_2453');assert.equal(p.priorPayments,4);
+  assert.equal(p.calendarDiagnostic.contractMinusCurrentReceiptsCents,4);assert.equal(p.annualVariancePreserved,false);
+  assert.equal(r.status,'MAPFRE_OBLIGATION_APPLIED_READBACK_PASS');assert.equal(r.technicalWrites,5);
+  assert.equal(r.receiptWrites,2);assert.equal(r.portfolioWrites,2);assert.equal(r.auditWrites,1);
+  assert.equal(r.paymentWrites,0);assert.equal(r.cobroWrites,0);assert.equal(r.newPayments,0);
+  assert.equal(r.privateAfter.calendarDiagnostic.contractMinusCurrentReceiptsCents,2);
+  assert.equal(r.privateAfter.calendarDiagnostic.wholeCalendarAccepted,false);
+  for(const [key,data] of before){
+    const patch=p.patches.find(e=>at(e.collection,e.id)===key);
+    assert.deepEqual(f.db.docs.get(key),patch?{...data,...patch.patch}:data);
+  }
+  for(const target of f.binding.preflight.twoCases){
+    const receipt=f.db.docs.get(at('recibosEsperados',target.receiptId));
+    assert.equal(receipt.primaTotal,309.61);assert.equal(receipt.monto,'309.61');
+    assert.equal(receipt.fechaLimite,target.historicalOnlyBaseline.dates.fechaLimite);
+    assert.equal(receipt.fechaVencimientoContractual,target.documentedTarget.contractualDue);
+  }
+  const audit=f.db.docs.get(root+'/operationalRequests/'+r.auditId);
+  assert.equal(audit.previousPaymentsPreserved,4);assert.equal(audit.rollback.records.length,4);
+  assert.equal(audit.rollback.onlyIfWholeCurrentAfterDataHashMatches,true);
+  const replay=await apply(f,p);assert.equal(replay.status,'MAPFRE_OBLIGATION_ALREADY_APPLIED_READBACK_PASS');
+  assert.equal(replay.technicalWrites,0);assert.equal(f.db.writes,5);
+});
+test('DOC04 refuses unknown holder, contradictory NIT, missing calendar and competing payment with zero writes',async()=>{
+  for(const mutate of [
+    f=>f.db.docs.get(at('clientes',f.binding.preflight.scope.clientId)).nombre='DIFFERENT SYNTHETIC HOLDER',
+    f=>f.db.docs.get(at('clientes',f.binding.preflight.scope.clientId)).nit='SYNTHETIC-CONTRADICTORY-NIT',
+    f=>f.db.docs.delete(at('recibosEsperados','synthetic_installment_8')),
+    f=>f.db.docs.get(at('recibosEsperados','synthetic_installment_8')).serie='7/12',
+    f=>f.db.docs.get(at('polizas',f.binding.preflight.scope.policyId)).vigenciaFin='2027-05-21',
+    f=>f.db.put(at('cobros','synthetic-extra-paid-record'),{polizaId:f.binding.preflight.scope.policyId,reciboId:'synthetic_installment_5',monto:309.6,estado:'Pagado'}),
+    f=>f.db.docs.get(at('recibosEsperados',f.binding.preflight.twoCases[0].receiptId)).partialPayment=true
+  ]){
+    const f=fixture('MAPFRE_DOC04_2453');mutate(f);await assert.rejects(plan(f));assert.equal(f.db.writes,0);
+  }
+});
+test('DOC04 holds original drift and cannot use the historical R46 plan or overwrite an unrelated postimage',async()=>{
+  const f=fixture('MAPFRE_DOC04_2453'),p=await plan(f);
+  const badOriginals=clone(f.originals);badOriginals[0].sha256='0'.repeat(64);
+  await assert.rejects(writer.applyMapfreObligations(f.db,p,gate(p),f.binding,badOriginals),/MAPFRE_ORIGINAL_BYTES_CHANGED/);
+  const legacy=fixture(),legacyPlan=await plan(legacy);
+  await assert.rejects(apply(f,legacyPlan,gate(legacyPlan)),/MAPFRE_PLAN_PROFILE_CHANGED/);
+  const receipt=f.binding.preflight.twoCases[0].receiptId;
+  f.db.docs.get(at('recibosEsperados',receipt)).metadata.keep='new concurrent value';
+  const held=await apply(f,p);assert.equal(held.status,'MAPFRE_OBLIGATION_CAS_HOLD');assert.equal(f.db.writes,0);
+});
+test('DOC04 canonical payment observer verifies two exact real-owner-shaped requests, four preserved payments and gross61922 without writes',async()=>{
+  const f=await canonicalPaymentFixture('MAPFRE_DOC04_2453'),before=clone([...f.db.docs]),writes=f.db.writes,r=await paymentReview(f);
+  assert.equal(r.status,'MAPFRE_TWO_CANONICAL_PAYMENTS_READBACK_PASS');assert.equal(r.verifiedPayments,2);
+  assert.equal(r.verifiedGrossCents,61922);assert.equal(r.previousPaymentsPreserved,4);assert.equal(r.writes,0);
+  assert.deepEqual([...f.db.docs],before);assert.equal(f.db.writes,writes);
+  f.db.docs.get(at('cobros',f.binding.preflight.preservedPayments[0].cobroId)).monto+=0.01;
+  const held=await paymentReview(f);assert.equal(held.status,'MAPFRE_PAYMENT_READBACK_HOLD');assert.equal(held.verifiedPayments,0);
+  assert.equal(f.db.writes,writes);
+});
+test('DOC04 workflow selects only a closed profile in existing modes and retains protected financial approval',()=>{
+  const fs=require('node:fs'),path=require('node:path'),base=path.resolve(__dirname,'..');
+  const wf=fs.readFileSync(path.join(base,'.github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml'),'utf8');
+  assert.match(wf,/GI_I66_MAPFRE_PROFILE:.*'I66_MAPFRE_DOC04_2453'.*'MAPFRE_DOC04_2453'.*'MAPFRE_R46'/);
+  assert.match(wf,/environment: gravicentra-live-data-writes/);
+  assert.match(wf,/GI_I66_BULK_MODE:.*'mapfre-cas-preflight'/);assert.match(wf,/GI_I66_BULK_MODE:.*'mapfre-cas-apply'/);
+  const live=fs.readFileSync(path.join(base,'tools/gravicentra-i66-source-bulk-live.cjs'),'utf8');
+  assert.ok(live.indexOf('MAPFRE_PROFILE_CANNOT_ENTER_OTHER_WRITERS')<live.indexOf("const admin=require('firebase-admin')"));
+  assert.match(live,/MAPFRE_LOADED_PLAN_PROFILE_MISMATCH/);
 });

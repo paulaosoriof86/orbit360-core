@@ -296,16 +296,44 @@ const mapfrePins={
  source:[newStatementSource.path,newStatementSource.sha256],
  authority:['artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_URGENT_COMPLETION_TOLERANCE_AND_DIRECT_RENEWAL_20261124.json','cda5d408666e6e959248ea0a08ffa13f9e05a695fe41b3dedee20ba3d93f7c3d']
 };
-function mapfreBinding(){
+// Exactly two documentary scopes in the same reader and CAS owner. No caller
+// may supply arbitrary policy IDs, source hashes, amounts or target counts.
+const mapfreDoc04Pins={
+ ...mapfrePins,
+ preflight:['artifacts/orbit360-recovery/release-control/I6_6_MAPFRE_DOC04_DOCUMENTARY_PREFLIGHT_SOURCE_20261125.json','cf3973b7eda170446a0e95b955f6ff51ef1e2234edfb5c758457c947dfcccc5b'],
+ holder:['artifacts/orbit360-recovery/release-control/I6_6_MAPFRE2453_HOLDER_WITNESS_SOURCE_READONLY_20261125.json','d0bcedb375a0e853cb8b4d2b444cdf6827f8d9d016a3653dda352f624d16ab5b']
+};
+const mapfreProfiles={
+ MAPFRE_R46:Object.freeze({id:'MAPFRE_R46',policyNumber:'3002400057714',originals:3,previousPayments:9,
+  beforeGrossCents:12776,grossCents:12777,installments:[10,11],annualVariancePreserved:true,pins:mapfrePins}),
+ MAPFRE_DOC04_2453:Object.freeze({id:'MAPFRE_DOC04_2453',policyNumber:'3002600002453',originals:4,previousPayments:4,
+  beforeGrossCents:30960,grossCents:30961,installments:[6,7],annualVariancePreserved:false,pins:mapfreDoc04Pins})
+};
+function mapfreProfile(value){
+ const id=typeof value==='string'?value:(value?.profileId||'MAPFRE_R46');
+ assert.ok(Object.hasOwn(mapfreProfiles,id),'MAPFRE_CLOSED_PROFILE_REQUIRED');
+ const profile=mapfreProfiles[id];
+ if(value&&typeof value==='object'){
+  assert.equal(value.preflight.scope.policyNumber,profile.policyNumber,'MAPFRE_PROFILE_POLICY_CHANGED');
+  assert.deepEqual(value.preflight.twoCases.map(t=>t.installment),profile.installments,'MAPFRE_PROFILE_INSTALLMENTS_CHANGED');
+ }
+ return profile;
+}
+function mapfreBinding(profileId='MAPFRE_R46'){
+ const profile=mapfreProfile(profileId);
  const fs=require('node:fs'),path=require('node:path'),value={};
- for(const [key,[name,digest]] of Object.entries(mapfrePins)){
+ for(const [key,[name,digest]] of Object.entries(profile.pins)){
   const bytes=fs.readFileSync(path.join(__dirname,'..',name));
   assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),digest,'MAPFRE_PIN_CHANGED_'+key);
   value[key]=JSON.parse(bytes);
  }
  assert.equal(value.authority.decisions.extendPreviouslyApprovedToleranceToAllInsurersAndCases,true);
- assert.equal(value.preflight.scope.policyNumber,'3002400057714');
+ if(profile.id!=='MAPFRE_R46')value.profileId=profile.id;
+ assert.equal(value.preflight.scope.policyNumber,profile.policyNumber);
  assert.equal(value.preflight.twoCases.length,2);
+ mapfreProfile(value);
+ assert.equal(value.preflight.preservedPayments.length,profile.previousPayments);
+ assert.equal(value.preflight.originalDocumentPins.length,profile.originals);
  for(const target of value.preflight.twoCases){
   const fact=value.source.facts.find(f=>f.sourceFactId===target.sourceFactId);
   assert.ok(fact&&fact.paymentConfirmed===true&&fact.actualPaidDateEvidence===true);
@@ -315,6 +343,15 @@ function mapfreBinding(){
   assert.equal(fact.requirement,target.requirement);
   assert.equal(fact.sourceRowSha256,target.source.sourceRowSha256);
   assert.equal(fact.sourceSha256,target.source.sha256);
+  assert.equal(fact.grossCents,profile.grossCents);
+  if(profile.id==='MAPFRE_DOC04_2453'){
+   const original=value.preflight.documentedSchedule.find(r=>r.requirement===fact.requirement);
+   assert.ok(original&&original.installment===target.installment&&original.due===fact.due&&
+    Math.round(Number(original.gross)*100)===fact.grossCents,'MAPFRE_ISSUED_REQUIREMENT_SEQUENCE_REQUIRED');
+   assert.equal(fact.policy,profile.policyNumber);
+   assert.equal(fact.invoiceNumber,target.pendingConditionalCanonicalCall.payload.invoiceNumber);
+   assert.equal(target.pendingConditionalCanonicalCall.payload.actualPaidDateEvidence,true);
+  }
  }
  return value;
 }
@@ -349,6 +386,7 @@ async function mapfreSnapshot(db,binding,transaction){
  return {collections,client,requests:requests.map(raw),complete:true,observedAtUtc:new Date().toISOString()};
 }
 function mapfreReview(binding,snapshot,originals){
+ const profile=mapfreProfile(binding);
  const s=binding.preflight.scope,{moneyCents,paid}=require('./gravicentra-i66-source-bulk-plan.cjs');
  const all=snapshot.collections,holds=[],entries=[],find=(col,id)=>all[col].find(e=>e.id===id);
  const p=find('polizas',s.policyId),insurer=find('aseguradoras',s.insurerId),client=snapshot.client;
@@ -357,13 +395,19 @@ function mapfreReview(binding,snapshot,originals){
  const witnesses=binding.holder.sources,knownHolderHashes=new Set(witnesses.flatMap(w=>[w.sourceNormalizedHolderSha256,w.issuedPdfNormalizedHolderSha256]));
  const holderEvidence=Object.fromEntries(['nombre','nombreCompleto','razonSocial'].map(k=>[k,{present:!!str(client.data?.[k]),
   matchesPinnedOriginal:!!str(client.data?.[k])&&knownHolderHashes.has(sha(norm(client.data[k])))}]));
- if(!snapshot.complete||originals.length!==3||originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED'))holds.push('MAPFRE_ORIGINAL_ACCESS_UNVERIFIED');
+ if(!snapshot.complete||originals.length!==profile.originals||originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED'))holds.push('MAPFRE_ORIGINAL_ACCESS_UNVERIFIED');
  if(!policy||/ANULADA|CANCELADA|SUSPENDIDA|DELETED/.test(str(policy.estado).toUpperCase())||policy.clienteId!==s.clientId||policy.aseguradoraId!==s.insurerId||policy.pais!=='GT'||policy.moneda!=='GTQ'||
   policy.vigenciaInicio!==s.issuedTerm[0]||policy.vigenciaFin!==s.issuedTerm[1]||
   !fields.some(k=>norm(policy[k])===norm(s.policyNumber))||fields.some(k=>str(policy[k])&&norm(policy[k])!==norm(s.policyNumber))||
   (policy.tenantId&&policy.tenantId!==s.tenantId)||!insurer?.exists||!/mapfre/i.test(str(insurer.data.nombre||insurer.data.razonSocial)))holds.push('MAPFRE_POLICY_IDENTITY_HOLD');
  if(!client.exists||client.id!==s.clientId||!Object.values(holderEvidence).some(v=>v.matchesPinnedOriginal)||
   (client.data.tenantId&&client.data.tenantId!==s.tenantId)||(client.data.pais&&!['GT','GUATEMALA'].includes(str(client.data.pais).toUpperCase())))holds.push('MAPFRE_HOLDER_IDENTITY_HOLD');
+ if(profile.id==='MAPFRE_DOC04_2453'){
+  const aliases=['nit','NIT'];
+  if(['NIT','NUMERODEIDENTIFICACIONTRIBUTARIA'].includes(norm(client.data?.tipoIdentificacion)))aliases.push('identificacion');
+  if(aliases.some(k=>str(client.data?.[k])&&sha(norm(client.data[k]))!==binding.holder.issuedPdfNormalizedTaxIdSha256))
+   holds.push('MAPFRE_HOLDER_TAX_ID_CONFLICT');
+ }
  const candidates=all.polizas.filter(e=>fields.some(k=>norm(e.data[k])===norm(s.policyNumber))&&
   e.data.vigenciaInicio===s.issuedTerm[0]&&e.data.vigenciaFin===s.issuedTerm[1]&&e.data.pais==='GT');
  if(candidates.length!==1||candidates[0].id!==s.policyId)holds.push('MAPFRE_POLICY_EDITION_NOT_UNIQUE');
@@ -409,24 +453,41 @@ function mapfreReview(binding,snapshot,originals){
  for(const col of ['recibosEsperados','carteraPrimas','cobros'])for(const e of all[col])
   if([e.data.polizaId,e.data.policyId].includes(s.policyId))add({...e,collection:col});
  const previous=binding.preflight.preservedPayments;
- assert.equal(previous.length,9,'MAPFRE_PRESERVED_PAYMENT_SCOPE_REQUIRED');
+ assert.equal(previous.length,profile.previousPayments,'MAPFRE_PRESERVED_PAYMENT_SCOPE_REQUIRED');
  const missingPreserved=previous.filter(t=>{
   const payment=find('cobros',t.cobroId),receipt=find('recibosEsperados',t.receiptId);
   return !payment||!receipt||payment.data.reciboId!==t.receiptId||
    str(payment.data.polizaId)!==s.policyId||moneyCents(payment.data.monto??payment.data.primaTotal)!==t.amountCents;
  });
  if(missingPreserved.length)holds.push('MAPFRE_PRIOR_PAYMENT_PRESERVATION_REQUIRES_REVIEW');
+ let calendarDiagnostic;
+ if(profile.id==='MAPFRE_DOC04_2453'){
+  const receipts=all.recibosEsperados.filter(e=>[e.data.polizaId,e.data.policyId].includes(s.policyId));
+  const paidRecords=all.cobros.filter(e=>[e.data.polizaId,e.data.policyId].includes(s.policyId));
+  const expectedIds=new Set(previous.map(e=>e.cobroId));
+  const sequence=receipts.map(e=>str(e.data.serie)).sort();
+  if(receipts.length!==12||JSON.stringify(sequence)!==JSON.stringify(Array.from({length:12},(_,i)=>(i+1)+'/12').sort())||
+   receipts.some(e=>!Number.isSafeInteger(moneyCents(e.data.primaTotal)))||moneyCents(policy?.primaTotal)!==371524)
+   holds.push('MAPFRE_DOC04_COMPLETE_CALENDAR_REVIEW');
+  if(paidRecords.length!==4||paidRecords.some(e=>!expectedIds.has(e.id)))holds.push('MAPFRE_DOC04_PRIOR_PAYMENT_SET_CHANGED');
+  const total=receipts.reduce((sum,e)=>sum+(moneyCents(e.data.primaTotal)||0),0);
+  calendarDiagnostic={documentedAnnualGrossCents:371524,documentedIssuedScheduleGrossCents:371524,
+   currentReceiptGrossCents:total,contractMinusCurrentReceiptsCents:371524-total,
+   wholeCalendarAccepted:false,untargetedInstallmentsMustRemainExact:true,installment12Excluded:true,
+   issuedLastInstallmentGrossCents:30953,policyTermMustNotUseReceiptInclusiveLastDay:true};
+ }
  for(const target of targets)target.correctionEligible=target.correctionEligible&&holds.length===0;
  return {schema:'GI_I66_MAPFRE_FRESH_CONTROLLED_PREFLIGHT_V1',status:'READONLY_PREFLIGHT_NO_PAYMENT_ADMISSION',
-  sourcePins:mapfrePins,policyId:s.policyId,observedAtUtc:snapshot.observedAtUtc,originals,holderEvidence,
+  ...(profile.id==='MAPFRE_DOC04_2453'?{profileId:profile.id,calendarDiagnostic}:{}),
+  sourcePins:profile.pins,policyId:s.policyId,observedAtUtc:snapshot.observedAtUtc,originals,holderEvidence,
   globalHolds:[...new Set(holds)],targets,correctionEligibleCount:targets.filter(t=>t.correctionEligible).length,
-  paymentWriteEligibleCount:0,writes:0,newPayments:0,annualVarianceCents:3,maxApprovedGtqVarianceCents:5,
-  annualVariancePreserved:true,installment12Excluded:true,privatePreimages:entries,canonicalRequests:snapshot.requests,
+  paymentWriteEligibleCount:0,writes:0,newPayments:0,annualVarianceCents:calendarDiagnostic?.contractMinusCurrentReceiptsCents??3,maxApprovedGtqVarianceCents:5,
+  annualVariancePreserved:profile.annualVariancePreserved,installment12Excluded:true,privatePreimages:entries,canonicalRequests:snapshot.requests,
   beforeHash:sha(JSON.stringify(stable({entries,requests:snapshot.requests}))),
   next:'Existing protected obligation owner CAS; then actual authenticated canonical payment owner and independent readback.'};
 }
-async function mapfreFreshPreflight(db){
- const binding=mapfreBinding(),originals=await mapfreOriginals(binding),snapshot=await mapfreSnapshot(db,binding);
+async function mapfreFreshPreflight(db,profileId='MAPFRE_R46'){
+ const binding=mapfreBinding(profileId),originals=await mapfreOriginals(binding),snapshot=await mapfreSnapshot(db,binding);
  return mapfreReview(binding,snapshot,originals);
 }
 function mapfreCanonicalPayloadDigest(target){
@@ -439,13 +500,14 @@ function mapfreCanonicalPayloadDigest(target){
   currency:String(p.currency || p.moneda || '').trim().slice(0,12).toUpperCase(),actualPaidDateEvidence:p.actualPaidDateEvidence===true})));
 }
 function mapfrePaymentReview(binding,snapshot,originals,aux){
+ const profile=mapfreProfile(binding);
  const {moneyCents}=require('./gravicentra-i66-source-bulk-plan.cjs'),s=binding.preflight.scope;
  const pre=mapfreReview(binding,snapshot,originals),find=(col,id)=>snapshot.collections[col].find(e=>e.id===id);
- const globalHolds=pre.globalHolds.filter(x=>x!=='MAPFRE_PRIOR_PAYMENT_PRESERVATION_REQUIRES_REVIEW');
+ const globalHolds=pre.globalHolds.filter(x=>!['MAPFRE_PRIOR_PAYMENT_PRESERVATION_REQUIRES_REVIEW','MAPFRE_DOC04_PRIOR_PAYMENT_SET_CHANGED'].includes(x));
  const correction=aux.correctionAudit?.data;
  if(!correction||correction.schema!=='GI_I66_MAPFRE_EXISTING_OBLIGATION_CORRECTION_V1'||
-  correction.policyId!==s.policyId||correction.sourceManifestSha256!==mapfrePins.source[1]||
-  correction.authoritySha256!==mapfrePins.authority[1]||correction.paymentWrites!==0||
+  correction.policyId!==s.policyId||correction.sourceManifestSha256!==profile.pins.source[1]||
+  correction.authoritySha256!==profile.pins.authority[1]||correction.paymentWrites!==0||
   correction.rollback?.records?.length!==4)globalHolds.push('MAPFRE_CORRECTION_AUDIT_REQUIRED');
  const entry=(col,id)=>col==='clientes'?snapshot.client:find(col,id);
  const preservation=correction?.preservedRecordHashes?.map(w=>{
@@ -454,11 +516,11 @@ function mapfrePaymentReview(binding,snapshot,originals,aux){
    sameUpdateTime:!!e&&JSON.stringify(stable(e.updateTime))===JSON.stringify(stable(w.updateTime))};
  })||[];
  if(!preservation.length||preservation.some(e=>!e.sameBytes||!e.sameUpdateTime))globalHolds.push('MAPFRE_PRESERVED_RECORD_CHANGED');
- if(preservation.filter(e=>e.collection==='cobros').length!==9)globalHolds.push('MAPFRE_NINE_PREVIOUS_PAYMENTS_REQUIRED');
+ if(preservation.filter(e=>e.collection==='cobros').length!==profile.previousPayments)globalHolds.push(profile.id==='MAPFRE_R46'?'MAPFRE_NINE_PREVIOUS_PAYMENTS_REQUIRED':'MAPFRE_PREVIOUS_PAYMENT_COUNT_REQUIRED');
  const expectedPayments=new Set([...binding.preflight.preservedPayments.map(t=>t.cobroId),
   ...binding.preflight.twoCases.map(t=>t.pendingConditionalCanonicalCall.expectedNewCobroIdIfAbsent)]);
  const policyPayments=snapshot.collections.cobros.filter(e=>[e.data.polizaId,e.data.policyId].includes(s.policyId));
- if(policyPayments.length!==11||policyPayments.some(e=>!expectedPayments.has(e.id)))globalHolds.push('MAPFRE_POLICY_PAYMENT_SET_CHANGED');
+ if(policyPayments.length!==profile.previousPayments+2||policyPayments.some(e=>!expectedPayments.has(e.id)))globalHolds.push('MAPFRE_POLICY_PAYMENT_SET_CHANGED');
  const localPaymentFields={recibosEsperados:new Set(['estado','estadoOperativo','cobroId','paymentOrigin','paymentIntakeState',
   'conciliadoPago','conciliado','paymentState','applicationState','directOrInferred','paymentEvidenceType',
   'applicationEvidenceType','evidenceAsOfDate','inferredEffectiveDate','matchedPolicyId','matchedReceiptId',
@@ -476,7 +538,7 @@ function mapfrePaymentReview(binding,snapshot,originals,aux){
    if(!e?.exists||!e.updateTime||!d){issues.push('MAPFRE_PAYMENT_POSTIMAGE_MISSING');continue;}
    if(d.polizaId!==s.policyId||(d.clienteId&&d.clienteId!==s.clientId)||
     (col!=='recibosEsperados'&&d.reciboId!==t.receiptId)||(d.moneda&&d.moneda!=='GTQ')||
-    moneyCents(col==='cobros'?d.monto:d.primaTotal)!==12777||d.paymentState!=='PAID_DIRECT'||
+    moneyCents(col==='cobros'?d.monto:d.primaTotal)!==profile.grossCents||d.paymentState!=='PAID_DIRECT'||
     d.applicationState!=='APPLIED_DIRECT'||d.fechaPago!==payload.paidDate)issues.push('MAPFRE_PAYMENT_POSTIMAGE_MISMATCH');
    if(str(d.applicationDate)||str(d.invoiceDate)||d.inferredPaid===true||
     (d.directOrInferred&&d.directOrInferred!=='DIRECT'))issues.push('MAPFRE_UNSUPPORTED_DATE_OR_INFERENCE');
@@ -512,25 +574,25 @@ function mapfrePaymentReview(binding,snapshot,originals,aux){
   return {sourceFactId:t.sourceFactId,receiptId:t.receiptId,portfolioId:t.portfolioId,
    cobroId:request.expectedNewCobroIdIfAbsent,requestId:request.requestId,eventId,
    status:issues.length?'PAYMENT_READBACK_HOLD':'CANONICAL_PAYMENT_READBACK_PASS',issues:[...new Set(issues)],
-   grossCents:12777,paidDate:payload.paidDate,sourceDocumentSha256:t.source.sha256,sourceRowSha256:t.source.sourceRowSha256};
+   grossCents:profile.grossCents,paidDate:payload.paidDate,sourceDocumentSha256:t.source.sha256,sourceRowSha256:t.source.sourceRowSha256};
  });
  const count=globalHolds.length?0:targets.filter(t=>t.status==='CANONICAL_PAYMENT_READBACK_PASS').length;
  return {schema:'GI_I66_MAPFRE_CANONICAL_PAYMENT_READBACK_V1',status:count===2?'MAPFRE_TWO_CANONICAL_PAYMENTS_READBACK_PASS':'MAPFRE_PAYMENT_READBACK_HOLD',
-  writes:0,verifiedPayments:count,verifiedGrossCents:count*12777,globalHolds:[...new Set(globalHolds)],targets,
+  writes:0,verifiedPayments:count,verifiedGrossCents:count*profile.grossCents,globalHolds:[...new Set(globalHolds)],targets,
   originals,preservedWitnesses:preservation,previousPaymentsPreserved:preservation.filter(e=>e.collection==='cobros'&&e.sameBytes&&e.sameUpdateTime).length,
   privateSnapshot:snapshot,privateCanonicalAudit:aux,signedReloadMustBeReportedSeparately:true};
 }
-async function mapfrePaymentReadback(db){
- const binding=mapfreBinding(),originals=await mapfreOriginals(binding),snapshot=await mapfreSnapshot(db,binding),s=binding.preflight.scope;
+async function mapfrePaymentReadback(db,profileId='MAPFRE_R46'){
+ const binding=mapfreBinding(profileId),profile=mapfreProfile(binding),originals=await mapfreOriginals(binding),snapshot=await mapfreSnapshot(db,binding),s=binding.preflight.scope;
  const root=db.collection('tenants').doc(s.tenantId),raw=e=>({id:e.id,exists:e.exists===true,
   updateTime:e.updateTime?.toJSON?e.updateTime.toJSON():e.updateTime||null,data:e.exists?e.data():null});
  const auditId=require('./gravicentra-i66-source-bulk-apply.cjs').mapfreAuditId({policyId:s.policyId,
-  sourceManifestSha256:mapfrePins.source[1],authoritySha256:mapfrePins.authority[1]});
+  sourceManifestSha256:profile.pins.source[1],authoritySha256:profile.pins.authority[1]});
  const correctionAudit=raw(await root.collection('operationalRequests').doc(auditId).get());
  const events=await Promise.all(binding.preflight.twoCases.map(async t=>raw(await root.collection('reconciliationEvents')
   .doc('payevt_'+sha(s.tenantId+'|'+t.receiptId+'|'+t.pendingConditionalCanonicalCall.requestId).slice(0,28)).get())));
  return mapfrePaymentReview(binding,snapshot,originals,{correctionAudit,events});
 }
 module.exports={validate,select,report,numberRelation,financialReport,financialPolicyIds,appendEvidence,
- newStatementSource,statementPolicyMatches,mapfreBinding,mapfreOriginals,mapfreSnapshot,mapfreReview,mapfreFreshPreflight,
+ newStatementSource,statementPolicyMatches,mapfreProfile,mapfreBinding,mapfreOriginals,mapfreSnapshot,mapfreReview,mapfreFreshPreflight,
  mapfreCanonicalPayloadDigest,mapfrePaymentReview,mapfrePaymentReadback};

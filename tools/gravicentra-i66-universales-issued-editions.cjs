@@ -2,7 +2,7 @@
 // Documentary create discriminator inside the existing source-bulk owner.
 // No separate transport, environment, payment owner, or vehicle mutation.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const {normalizeSource,sourceAliases,moneyCents}=require('./gravicentra-i66-source-bulk-plan.cjs');
+const {normalizeSource,sourceAliases,moneyCents,paid}=require('./gravicentra-i66-source-bulk-plan.cjs');
 const KIND='ISSUED_MEDICAL_EDITION_CREATE',TENANT='alianzas-soluciones',PROJECT='ays-orbit-360-lab';
 const FILE='artifacts/orbit360-recovery/source-batches/I6_6_UNIVERSALES_TWO_ISSUED_MEDICAL_22_20261124.json';
 const PIN='84265751defc79ce50523da0e43205d1f773f2533c748ff9a1c6a3fba308ccec';
@@ -168,6 +168,8 @@ async function verifySources(c){
  return true;
 }
 async function enrichPlan(db,source,base,verifyDocument=verifySources){
+ if(source.bytesSha256===MISSING_PIN)return enrichMissingPlan(db,source,base,
+  verifyDocument===verifySources?verifyMissingSources:verifyDocument);
  if(source.bytesSha256!==manifest.source302Sha256)return base;
  let plan={...base,chunks:[...base.chunks],exceptions:[...base.exceptions],documentaryDiagnostics:[]};
  for(const c of manifest.cases){
@@ -223,6 +225,8 @@ async function verifyInside(tx,db,c,a){
   beforeHash:data.beforeHash,sourceManifestSha256:PIN,originalRunId:data.runId};
 }
 async function applyChunk(db,chunk,gate,verifyDocument=verifySources){
+ if(chunk.operationKind===MISSING_KIND)return applyMissingChunk(db,chunk,gate,
+  verifyDocument===verifySources?verifyMissingSources:verifyDocument);
  assert.equal(gate.environment,'gravicentra-live-data-writes');assert.equal(gate.reviewerEvidence,true);
  assert.equal(gate.repository,'paulaosoriof86/orbit360-core');assert.equal(gate.ref,'refs/heads/recovery/fase-a-clean-20260831');
  assert.equal(gate.project,PROJECT);assert.equal(gate.sourceManifestSha256,manifest.source302Sha256);
@@ -267,5 +271,292 @@ async function applyChunk(db,chunk,gate,verifyDocument=verifySources){
   return {...outcome,status:'APPLIED_READBACK_PASS',proof};
  }catch(error){return {...outcome,status:'COMMITTED_READBACK_HOLD',reason:'MEDICAL_POSTIMAGE_READBACK_HOLD'};}
 }
+// One missing, issuer-documented obligation on an already created edition.
+// The paid source remains PAID evidence; this operation never creates a Cobro.
+const MISSING_KIND='ISSUED_MEDICAL_MISSING_OBLIGATION_CREATE';
+const MISSING_FILE='artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261124_UNIVERSALES_DOC09_MISSING_OBLIGATION.json';
+const MISSING_PIN='6fa0a38c84a544d2f01beb1d459b6a0e7aeee5ea806de0eceb6e5307793d846f';
+const MISSING_AUDIT_SCHEMA='GI_I66_ISSUED_MEDICAL_MISSING_OBLIGATION_AUDIT_V1';
+const missingCollections=['polizas','clientes','aseguradoras','asesores','recibosEsperados','carteraPrimas','cobros','actividades'];
+function loadMissing(){
+ const bytes=fs.readFileSync(path.join(__dirname,'..',MISSING_FILE));assert.equal(sha(bytes),MISSING_PIN,'MISSING_OBLIGATION_MANIFEST_DRIFT');
+ const data=JSON.parse(bytes),spec=data.documentaryMissingObligation;
+ assert.equal(data.schema,'GRAVICENTRA_I6_6_INSURER_SOURCE_BULK_V1');assert.equal(data.status,'OWNER_RULES_FROZEN_SOURCE_ROWS_VERIFIED');
+ assert.equal(data.tenantId,TENANT);assert.equal(data.projectId,PROJECT);assert.equal(data.rows.length,1);
+ assert.equal(spec.schema,'GI_I66_EXISTING_ISSUED_MEDICAL_MISSING_OBLIGATION_V1');assert.equal(spec.operationKind,MISSING_KIND);
+ assert.equal(spec.originalManifestPath,FILE);assert.equal(spec.originalManifestSha256,PIN);
+ assert.equal(spec.sourceFactsPath,'artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json');
+ assert.equal(spec.sourceFactsSha256,'68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805');
+ const source=fs.readFileSync(path.join(__dirname,'..',spec.sourceFactsPath));assert.equal(sha(source),spec.sourceFactsSha256);
+ const facts=JSON.parse(source).facts.filter(f=>f.sourceFactId===spec.sourceFactId);assert.equal(facts.length,1);
+ assert.equal(spec.sourceFactId,'stmt_6cf59660d845047250795edbf444');assert.equal(spec.originalPolicy,'04-05-01-15590-0');
+ const row=data.rows[0],{caseId,...originalRow}=row;assert.equal(caseId,'UNIVERSALES_DOC09_MISSING_OBLIGATION_02');
+ assert.deepEqual(originalRow,facts[0],'MISSING_ORIGINAL_PAID_FACT_CHANGED');
+ assert.equal(row.state,'PAID');assert.equal(row.paymentConfirmed,true);assert.equal(row.actualPaidDateEvidence,true);
+ assert.equal(row.country,'GT');assert.equal(row.currency,'GTQ');assert.equal(row.insurer,'UNIVERSALES');
+ assert.equal(row.installment,2);assert.equal(row.grossCents,76440);assert.equal(row.requirement,'39470707');
+ const c=manifest.cases.find(x=>x.policy===spec.originalPolicy);assert.ok(c);assert.equal(row.policy,c.policy);
+ assert.deepEqual(spec.boundaries,{receiptCreates:1,portfolioCreates:1,auditCreates:1,policyCreates:0,policyUpdates:0,
+  activityCreates:0,paymentCreates:0,existingQuotaUpdates:0,amountToleranceCents:0,sourceStateRemains:'PAID',
+  newObligationApplication:'PENDING_CANONICAL_PAYMENT_REGISTRATION',existingPendingQuotas:[3,4,5,6,7,8,9,10,11,12]});
+ const label=spec.identityCorrection;
+ assert.equal(label.type,'CURRENCY_COLUMN_INCLUDED_IN_PRINTED_HOLDER_WITNESS');assert.equal(label.historicalWitness,row.holderWitness);
+ assert.equal(label.correctedPrintedHolderWitness,'a906ba3a4b4fc71778805bb0fabaf99e16d7cea7b81592b755e04906ded3ea53');
+ assert.equal(label.originalHolderWitness,c.holderWitness);assert.equal(label.printedNormalizedCharacters,24);
+ assert.equal(label.printedHolderIsTruncated,true);assert.equal(label.sourceColumnCurrency,'Q');
+ assert.equal(label.exactOriginalClientAndFullPolicyRequired,true);assert.equal(label.prefixAloneIsNotIdentity,true);
+ assert.equal(label.economicToleranceAppliedToIdentity,false);
+ return {data,spec,row,c};
+}
+const missing=loadMissing();
+const missingOperation=(c,p)=>'gi_i66_medical_missing_'+sha([TENANT,MISSING_PIN,c.policy,p.id,missing.row.requirement].join('|')).slice(0,28);
+const missingTargets=op=>[['recibosEsperados','rec_'+op+'_'+missing.row.requirement],['carteraPrimas','car_rec_'+op+'_'+missing.row.requirement]];
+function timeWitness(value){
+ const seconds=value?.seconds??value?._seconds,nanoseconds=value?.nanoseconds??value?._nanoseconds;
+ assert.ok(Number.isSafeInteger(seconds)&&seconds>0&&Number.isSafeInteger(nanoseconds)&&nanoseconds>=0&&nanoseconds<1e9,
+  'MISSING_EXACT_UPDATE_TIME_REQUIRED');return {seconds,nanoseconds};
+}
+async function readMissingSnapshot(db,tx){
+ const caps={polizas:5000,clientes:1000,aseguradoras:1000,asesores:400,recibosEsperados:15000,carteraPrimas:15000,cobros:15000,actividades:15000};
+ const s={complete:true,versions:{}};
+ await Promise.all(Object.entries(caps).map(async([collection,max])=>{
+  const q=await tx.get(items(db,collection).limit(max+1));assert.ok(q.size<=max,'MISSING_COMPLETE_CENSUS_TRUNCATED');
+  s[collection]=q.docs.map(d=>{s.versions[collection+'/'+d.id]=timeWitness(d.updateTime);return {...d.data(),id:d.id};});
+ }));
+ const found=s.polizas.filter(p=>p.issuerDocumentSha256===missing.c.sourcePdfSha256&&p.documentRef===missing.c.sourcePdfId);
+ if(found.length===1){
+  const p=found[0],originalId=str(p.operationId),op=missingOperation(missing.c,p);
+  if(/^gi_i66_medical_[a-f0-9]{28}$/.test(originalId)){
+   const a=await tx.get(audit(db,originalId));if(a.exists)s.issuedAudit={id:a.id,data:a.data(),updateTime:timeWitness(a.updateTime)};
+  }
+  const a=await tx.get(audit(db,op));s.missingAudit=a.exists?{id:a.id,data:a.data(),updateTime:timeWitness(a.updateTime)}:null;
+ }
+ return s;
+}
+const gt=x=>['GT','GUATEMALA'].includes(norm(x));
+const countryAliasesValid=r=>gt(r.pais)&&['country','countryCode'].every(k=>!str(r[k])||gt(r[k]));
+const gtqAliasesValid=r=>['moneda','currency','currencyCode'].every(k=>!str(r[k])||norm(r[k])==='GTQ');
+const tenantValid=r=>!str(r.tenantId)||r.tenantId===TENANT;
+const policyRefs=r=>[r.polizaId,r.policyId].map(str).filter(Boolean);
+const receiptRefs=r=>[r.reciboId,r.receiptId,r.reciboEsperadoId].map(str).filter(Boolean);
+function missingEvidenceObjects(r){
+ const out=[r];
+ for(const key of ['sourceEvidence','applicationEvidence','paymentEvidence']){
+  const value=r[key];if(value&&typeof value==='object'&&!Array.isArray(value))out.push(value);
+ }
+ return out;
+}
+function assessMissing(c,s){
+ if(!s?.complete||!s.versions||!missingCollections.every(k=>Array.isArray(s[k])))return stop('MISSING_COMPLETE_VERSIONED_CENSUS_REQUIRED');
+ const {row,spec}=missing;
+ const clients=s.clientes.filter(r=>countryAliasesValid(r)&&holderMatches(c,r));
+ const insurers=s.aseguradoras.filter(r=>countryAliasesValid(r)&&r.activo!==false&&/universales/i.test(str(r.nombre||r.razonSocial)));
+ if(clients.length!==1||insurers.length!==1)return stop('MISSING_ORIGINAL_CLIENT_INSURER_NOT_UNIQUE');
+ const client=clients[0],insurer=insurers[0],names=[client.nombre,client.nombreCompleto,client.razonSocial].map(str).filter(Boolean);
+ if(!names.length||names.some(n=>sha(c.sourcePdfSha256+'|'+norm(n))!==c.holderWitness))return stop('MISSING_ORIGINAL_HOLDER_ALIAS_CONFLICT');
+ const correction=spec.identityCorrection,printed=norm(names[0]).slice(0,correction.printedNormalizedCharacters);
+ if(correction.originalHolderWitness!==c.holderWitness||norm(names[0]).length<=correction.printedNormalizedCharacters||
+  sha(row.sourceSha256+'|'+printed)!==correction.correctedPrintedHolderWitness||
+  sha(row.sourceSha256+'|'+correction.sourceColumnCurrency+printed)!==correction.historicalWitness)
+  return stop('MISSING_DOCUMENTARY_LABEL_CONTRADICTION');
+ const advisors=s.asesores.filter(r=>r.id===client.asesorId&&r.activo!==false&&(!str(r.pais)||gt(r.pais))&&
+  ['country','countryCode'].every(k=>!str(r[k])||gt(r[k]))&&(!Object.hasOwn(r,'paises')||Array.isArray(r.paises)&&r.paises.some(gt)));
+ if(advisors.length!==1)return stop('MISSING_ADVISOR_COUNTRY_UNVERIFIED');
+ const advisor=advisors[0],originalOperation=operation(c,client.id,insurer.id);
+ const family=s.polizas.filter(p=>numberFields.some(k=>numberRelation(p[k],c))||p.documentRef===c.sourcePdfId||p.issuerDocumentSha256===c.sourcePdfSha256);
+ if(family.length!==1)return stop('MISSING_POLICY_EDITION_NOT_UNIQUE');
+ const policy=family[0],pid='pol_'+originalOperation;
+ if(policy.id!==pid||!countryAliasesValid(policy)||policy.moneda!=='GTQ'||!gtqAliasesValid(policy)||
+  policy.clienteId!==client.id||policy.aseguradoraId!==insurer.id||policy.asesorId!==advisor.id||
+  numberFields.some(k=>numberRelation(policy[k],c)!=='EXACT')||policy.vigenciaInicio!==c.termStart||policy.vigenciaFin!==c.termEnd||
+  policy.documentRef!==c.sourcePdfId||policy.issuerDocumentSha256!==c.sourcePdfSha256||policy.operationId!==originalOperation||
+  policy.estado!==c.storedPolicyState||policy.renuevaDe||policy.renovadaPor||
+  [policy,client,insurer,advisor].some(r=>!tenantValid(r))||
+  ['primaTotal','prima','primaTotalDocumentalOriginal'].some(k=>moneyCents(policy[k])!==c.header.grossCents))
+  return stop('MISSING_ORIGINAL_POLICY_IDENTITY_OR_TERM_CONFLICT');
+ if(c.monthlyInstallments!==12||row.installment!==2||row.due!=='2026-11-01'||row.paidDate!=='2026-11-05'||
+  row.due<c.termStart||row.due>c.termEnd||row.paidDate<c.termStart||row.paidDate>c.termEnd)
+  return stop('MISSING_PAID_SOURCE_OUTSIDE_EXACT_TERM');
+ const a=s.issuedAudit;
+ if(!a||a.id!==originalOperation||a.data.schema!=='GI_I66_DOCUMENTARY_MEDICAL_CREATE_AUDIT_V1'||a.data.status!=='COMMITTED'||
+  a.data.operation!==originalOperation||a.data.policy!==c.policy||a.data.manifestSha256!==PIN||
+  a.data.originalSha256!==c.sourcePdfSha256||a.data.source302Sha256!==manifest.source302Sha256||
+  a.data.parents?.client?.id!==client.id||a.data.parents?.insurer?.id!==insurer.id||a.data.parents?.advisor?.id!==advisor.id)
+  return stop('MISSING_ORIGINAL_CREATION_AUDIT_UNVERIFIED');
+ const expectedIds=targets(c,originalOperation),created=(a.data.creates||[]).map(r=>[r.collection,r.data?.id]);
+ if(hash(created)!==hash(expectedIds))return stop('MISSING_ORIGINAL_CREATION_TARGETS_CHANGED');
+ const op=missingOperation(c,policy),ids=missingTargets(op),allReceipts=new Map(s.recibosEsperados.map(r=>[r.id,r]));
+ const related=r=>policyRefs(r).includes(pid)||receiptRefs(r).some(id=>policyRefs(allReceipts.get(id)||{}).includes(pid));
+ const linked={recibosEsperados:s.recibosEsperados.filter(related),carteraPrimas:s.carteraPrimas.filter(related),cobros:s.cobros.filter(related)};
+ if(linked.cobros.length)return stop('MISSING_EXISTING_PAYMENT_REQUIRES_SEPARATE_REVIEW');
+ if(linked.recibosEsperados.length!==10||linked.carteraPrimas.length!==10)return stop('MISSING_EXISTING_OBLIGATION_SET_CHANGED');
+ for(const r of c.pendingRows){
+  const rid='rec_'+originalOperation+'_'+r.requirement,crid='car_'+rid;
+  for(const [collection,id] of [['recibosEsperados',rid],['carteraPrimas',crid]]){
+   const found=linked[collection].filter(x=>x.id===id);if(found.length!==1)return stop('MISSING_PRESERVED_QUOTA_ABSENT_OR_DUPLICATE');
+   const x=found[0];
+   if(!countryAliasesValid(x)||!gtqAliasesValid(x)||!tenantValid(x)||policyRefs(x).some(v=>v!==pid)||x.clienteId!==client.id||
+    x.aseguradoraId!==insurer.id||x.asesorId!==advisor.id||paid(x)||x.carteraActiva!==true||
+    ['primaTotal','monto','montoTotal'].some(k=>moneyCents(x[k])!==r.grossCents)||
+    ['fechaVencimientoContractual','fechaVencimiento','vence','fechaLimite'].some(k=>x[k]!==r.due)||
+    x.numeroReciboFuente!==r.requirement||x.secuencia!==r.sequence||x.numeroCuota!==r.sequence||x.cuota!==r.sequence+'/12'||
+    collection==='carteraPrimas'&&(x.reciboId!==rid||receiptRefs(x).some(v=>v!==rid)))
+    return stop('MISSING_PRESERVED_QUOTA_IDENTITY_AMOUNT_OR_STATUS_CHANGED');
+  }
+ }
+ for(const collection of ['recibosEsperados','carteraPrimas','cobros'])for(const r of s[collection]){
+  const refs=policyRefs(r),inherited=receiptRefs(r).flatMap(id=>policyRefs(allReceipts.get(id)||{}));
+  const sameFamily=refs.includes(pid)||inherited.includes(pid)||
+   ['polizaNumero','numeroPoliza','policyNumber','policyNumberSource','numeroPolizaFuente'].some(k=>numberRelation(r[k],c));
+  const unbound=![...refs,...inherited].length,mayBeSameIssuer=!str(r.aseguradoraId)||r.aseguradoraId===insurer.id;
+  const external=[...sourceAliases,'numeroRecibo','referenciaAseguradora'].some(k=>str(r[k])===row.requirement);
+  const evidence=missingEvidenceObjects(r);
+  const fact=evidence.some(e=>['sourceFactId','sourceId','sourceRef','evidenceId','sourceCaseId'].some(k=>[row.sourceFactId,row.caseId].includes(str(e[k])))||
+   e.sourceRowSha256===row.sourceRowSha256);
+  const invoice=evidence.some(e=>['invoiceNumber','numeroFactura'].some(k=>
+   norm(e[k])===norm(row.invoiceSeries+'-'+row.invoiceNumber)||str(e[k])===row.invoiceNumber&&
+    (['invoiceSeries','serieFactura'].some(k=>str(e[k])===row.invoiceSeries)||sameFamily)));
+  if(fact||invoice||external&&(sameFamily||unbound&&mayBeSameIssuer))return stop('MISSING_SOURCE_REQUIREMENT_OR_PAYMENT_ALREADY_REPRESENTED');
+  if(sameFamily&&!related(r))return stop('MISSING_UNRESOLVED_FINANCIAL_NUMBER_LINK');
+  if(unbound&&mayBeSameIssuer&&['fechaVencimientoContractual','fechaVencimiento','vence'].some(k=>r[k]===row.due)&&
+   ['primaTotal','monto','montoTotal'].some(k=>moneyCents(r[k])===row.grossCents))return stop('MISSING_ORPHAN_FINANCIAL_IDENTITY');
+ }
+ if(ids.some(([collection,id])=>s[collection].some(r=>r.id===id)))return stop('MISSING_CANONICAL_TARGET_OCCUPIED');
+ const preserve=[['polizas',policy],['clientes',client],['aseguradoras',insurer],['asesores',advisor],
+  ...linked.recibosEsperados.map(r=>['recibosEsperados',r]),...linked.carteraPrimas.map(r=>['carteraPrimas',r])];
+ let before;
+ try{before={sourceManifestSha256:MISSING_PIN,originalManifestSha256:PIN,originalOperation,
+  preserved:preserve.map(([collection,data])=>({collection,id:data.id,dataSha256:hash(data),updateTime:timeWitness(s.versions[collection+'/'+data.id])}))
+   .sort((a,b)=>(a.collection+'/'+a.id).localeCompare(b.collection+'/'+b.id)),
+  originalAudit:{id:a.id,dataSha256:hash(a.data),updateTime:timeWitness(a.updateTime)},
+  targets:storedTargets(ids),targetsAbsent:true,linkedPayments:0,existingReceiptCount:10,existingPortfolioCount:10};
+ }catch{return stop('MISSING_EXACT_UPDATE_TIME_REQUIRED');}
+ return {status:'ELIGIBLE',operation:op,policy,client,insurer,advisor,before,beforeHash:hash(before)};
+}
+function missingMutations(identity,at){
+ assert.equal(identity.status,'ELIGIBLE');assert.match(at,/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);assert.ok(Number.isFinite(Date.parse(at)));
+ const {row,c}=missing,op=identity.operation,pid=identity.policy.id,[[,rid],[,cid]]=missingTargets(op);
+ const sourceEvidence={operationKind:MISSING_KIND,sourceManifestSha256:MISSING_PIN,originalManifestSha256:PIN,
+  sourceFactId:row.sourceFactId,sourceRowSha256:row.sourceRowSha256,sourceDriveId:row.sourceDriveId,sourceSha256:row.sourceSha256,
+  sourceState:row.state,sourceReportedPaidDate:row.paidDate,sourceReportedPaidTime:row.paidTime,
+  sourceInvoiceSeries:row.invoiceSeries,sourceInvoiceNumber:row.invoiceNumber,
+  canonicalPaymentRegistration:'PENDING',paymentCreated:false,bankSettlementAsserted:false,
+  identityCorrection:missing.spec.identityCorrection.type,originalHolderIdentityPreserved:true};
+ const receipt={tenantId:TENANT,id:rid,pais:'GT',moneda:'GTQ',clienteId:identity.client.id,aseguradoraId:identity.insurer.id,
+  asesorId:identity.advisor.id,polizaId:pid,polizaNumero:c.policy,operationId:op,createdAt:at,updatedAt:at,
+  sourceDocumentRef:c.sourcePdfId,issuerDocumentSha256:c.sourcePdfSha256,documentRef:c.sourcePdfId,
+  secuencia:2,numeroCuota:2,cuota:'2/12',serie:'2/12',numeroReciboFuente:row.requirement,
+  fechaVencimientoContractual:row.due,fechaVencimiento:row.due,vence:row.due,fechaLimite:row.due,
+  primaTotal:row.grossCents/100,monto:row.grossCents/100,montoTotal:row.grossCents/100,
+  estado:row.due<at.slice(0,10)?'Vencido':'Pendiente',estadoOperativo:row.due<at.slice(0,10)?'pendiente_vencido':'futuro_pendiente',
+  exigibilidad:row.due<at.slice(0,10)?'exigible':'futura',carteraActiva:true,conciliado:false,fechaPago:null,
+  sourceCaseId:row.caseId,sourceFactId:row.sourceFactId,sourceEvidence,receiptKey:TENANT+'|'+pid+'|'+row.requirement};
+ const creates=[['recibosEsperados',receipt],['carteraPrimas',{...receipt,id:cid,reciboId:rid,
+  carteraTipo:'cartera_activa',estadoConciliacionSaldo:'pendiente_conciliacion',saldoConciliado:false}]];
+ const rollback={deleteOnlyOwnedTargets:creates.map(([collection,data])=>({collection,id:data.id,dataSha256:hash(data)})),
+  exactReadbackUpdateTimesRequired:true,noPaymentOrExternalReferenceRequired:true,preserveOriginalPolicyAndQuotas:true,
+  retainAppendOnlyAudit:true,automaticExecution:false};
+ return {creates,rollback,technicalWrites:3,policyCreates:0,activityCreates:0,priorUpdates:0,payments:0};
+}
+async function verifyMissingSources(){
+ await verifySources(missing.c);
+ const {GoogleAuth}=require('google-auth-library'),headers=await(await new GoogleAuth({scopes:['https://www.googleapis.com/auth/drive.readonly']}).getClient()).getRequestHeaders();
+ const response=await fetch('https://www.googleapis.com/drive/v3/files/'+encodeURIComponent(missing.row.sourceDriveId)+'?alt=media&supportsAllDrives=true',
+  {headers,signal:AbortSignal.timeout(25000)});assert.ok(response.ok,'MISSING_PAID_DOCUMENT_UNAVAILABLE');
+ const bytes=Buffer.from(await response.arrayBuffer());assert.equal(bytes.length,426273);assert.equal(bytes.subarray(0,5).toString(),'%PDF-');
+ assert.equal(sha(bytes),missing.row.sourceSha256,'MISSING_PAID_DOCUMENT_BYTES_CHANGED');return true;
+}
+function missingChunk(identity){
+ const rows=[{...normalizeSource(missing.row),operationKind:MISSING_KIND}],chunk={operationKind:MISSING_KIND,
+  policy:missing.c.policy,operation:identity.operation,documentaryManifestSha256:MISSING_PIN,
+  before:identity.before,beforeHash:identity.beforeHash,rows,count:1,sequence:1};
+ chunk.sourcePlanSha256=hash(chunk);return chunk;
+}
+async function verifyMissingInside(tx,db,a){
+ assert.ok(a?.exists,'MISSING_OBLIGATION_AUDIT_ABSENT');const data=a.data();
+ assert.equal(data.schema,MISSING_AUDIT_SCHEMA);assert.equal(data.status,'COMMITTED');assert.equal(data.sourceManifestSha256,MISSING_PIN);
+ assert.equal(data.policy,missing.c.policy);assert.equal(data.originalManifestSha256,PIN);assert.equal(data.sourceFactId,missing.row.sourceFactId);
+ assert.equal(data.beforeHash,hash(data.before));assert.equal(data.paymentWrites,0);assert.equal(data.policyWrites,0);assert.equal(data.activityWrites,0);
+ const snapshot=await readMissingSnapshot(db,tx),old={...snapshot},ids=missingTargets(data.operation);
+ for(const [collection,id] of ids){assert.equal(snapshot[collection].filter(r=>r.id===id).length,1,'MISSING_OBLIGATION_POSTIMAGE_ABSENT');
+  old[collection]=old[collection].filter(r=>r.id!==id);}
+ const decision=assessMissing(missing.c,old);assert.equal(decision.status,'ELIGIBLE','MISSING_OBLIGATION_READBACK_PRESERVATION_HOLD');
+ assert.equal(decision.operation,data.operation);assert.equal(decision.beforeHash,data.beforeHash,'MISSING_OBLIGATION_PRESERVED_RECORD_DRIFT');
+ const expected=missingMutations(decision,data.createdAt);assert.equal(hash(storedCreates(expected.creates)),hash(data.creates));
+ assert.equal(hash(expected.rollback),hash(data.rollback));assert.equal(hash(missingChunk(decision)),data.chunkSha256);
+ const readbackTargets=expected.creates.map(([collection,row])=>{
+  const found=snapshot[collection].find(r=>r.id===row.id);assert.equal(hash(found),hash(row),'MISSING_OBLIGATION_EXACT_POSTIMAGE_DRIFT');
+  return {collection,id:row.id,dataSha256:hash(found),updateTime:timeWitness(snapshot.versions[collection+'/'+row.id])};
+ });
+ return {operation:data.operation,policy:missing.c.policy,beforeHash:data.beforeHash,sourceManifestSha256:MISSING_PIN,
+  receiptCreates:1,portfolioCreates:1,auditCreates:1,policyCreates:0,activityCreates:0,priorUpdates:0,payments:0,
+  sourceState:'PAID',canonicalPaymentRegistration:'PENDING',preservedReceiptCount:10,preservedPortfolioCount:10,
+  readbackTargets,originalRunId:data.runId};
+}
+async function enrichMissingPlan(db,source,base,verifyDocument=verifyMissingSources){
+ assert.equal(source.bytesSha256,MISSING_PIN);assert.equal(hash(source.data),hash(missing.data),'MISSING_SOURCE_DATA_DRIFT');
+ const plan={...base,chunks:[...base.chunks],exceptions:[...base.exceptions],documentaryDiagnostics:[]};
+ assert.equal(plan.inputRows,1);assert.equal(plan.chunks.length,0);assert.equal(plan.readyCount,0);
+ assert.equal(plan.exceptions.length,1);assert.equal(plan.exceptions[0].code,'PAID_REQUIRES_COBRO_PROOF_AND_WRITER');
+ let decision;
+ try{assert.equal(await verifyDocument(missing.c),true,'MISSING_SOURCE_DOCUMENTS_NOT_VERIFIED');
+  decision=await db.runTransaction(async tx=>{
+   const s=await readMissingSnapshot(db,tx);
+   if(s.missingAudit){const a=await tx.get(audit(db,s.missingAudit.id));
+    return {status:'ALREADY_APPLIED_READBACK_PASS',proof:await verifyMissingInside(tx,db,a)};}
+   return assessMissing(missing.c,s);
+  },{readOnly:true});
+ }catch(error){decision=stop(/^[A-Z0-9_]+$/.test(error.message)?error.message:'MISSING_DOCUMENT_OR_CENSUS_HOLD');}
+ if(decision.status==='ELIGIBLE'){
+  plan.chunks=[missingChunk(decision)];plan.readyCount=1;plan.exceptionCount=0;plan.exceptions=[];
+ }else if(decision.status==='ALREADY_APPLIED_READBACK_PASS'){
+  plan.unchangedCount=1;plan.exceptionCount=0;plan.exceptions=[];
+ }
+ plan.documentaryDiagnostics.push({policy:missing.c.policy,operationKind:MISSING_KIND,status:decision.status,
+  reason:decision.reason||null,beforeHash:decision.beforeHash||decision.proof?.beforeHash||null,
+  receiptCreates:decision.status==='ELIGIBLE'?1:0,portfolioCreates:decision.status==='ELIGIBLE'?1:0,
+  auditCreates:decision.status==='ELIGIBLE'?1:0,policyCreates:0,activityCreates:0,payments:0,writes:0,
+  sourceState:'PAID',canonicalPaymentRegistration:'PENDING',readback:decision.proof||null});
+ assert.equal(plan.readyCount+plan.unchangedCount+plan.exceptionCount,1);return plan;
+}
+async function applyMissingChunk(db,chunk,gate,verifyDocument=verifyMissingSources){
+ assert.equal(gate.environment,'gravicentra-live-data-writes');assert.equal(gate.reviewerEvidence,true);
+ assert.equal(gate.repository,'paulaosoriof86/orbit360-core');assert.equal(gate.ref,'refs/heads/recovery/fase-a-clean-20260831');
+ assert.equal(gate.project,PROJECT);assert.equal(gate.sourceManifestSha256,MISSING_PIN);
+ assert.equal(chunk.operationKind,MISSING_KIND);assert.equal(chunk.documentaryManifestSha256,MISSING_PIN);assert.equal(chunk.policy,missing.c.policy);
+ assert.equal(chunk.count,1);assert.equal(chunk.rows.length,1);assert.equal(chunk.sequence,1);
+ assert.equal(hash(chunk.rows),hash([{...normalizeSource(missing.row),operationKind:MISSING_KIND}]));
+ assert.equal(hash({...chunk,sourcePlanSha256:undefined}),chunk.sourcePlanSha256,'MISSING_SIGNED_CHUNK_DRIFT');
+ assert.equal(chunk.beforeHash,hash(chunk.before));assert.equal(await verifyDocument(missing.c),true,'MISSING_SOURCE_DOCUMENTS_NOT_VERIFIED');
+ let preparedWrites=0,outcome;
+ try{outcome=await db.runTransaction(async tx=>{
+  const a=await tx.get(audit(db,chunk.operation));
+  if(a.exists){const proof=await verifyMissingInside(tx,db,a);assert.equal(proof.beforeHash,chunk.beforeHash);
+   return {status:'ALREADY_APPLIED_READBACK_PASS',technicalWrites:0,policyCreates:0,activityCreates:0,proof};}
+  const identity=assessMissing(missing.c,await readMissingSnapshot(db,tx));if(identity.status!=='ELIGIBLE')return {...identity,technicalWrites:0};
+  assert.equal(identity.operation,chunk.operation);assert.equal(identity.beforeHash,chunk.beforeHash,'MISSING_PREIMAGE_CAS_CHANGED');
+  assert.equal(hash(missingChunk(identity)),hash(chunk),'MISSING_SIGNED_PLAN_CHANGED');
+  const at=new Date().toISOString(),projected=missingMutations(identity,at);preparedWrites=3;
+  for(const [collection,data] of projected.creates)tx.create(items(db,collection).doc(data.id),data);
+  tx.create(audit(db,identity.operation),{schema:MISSING_AUDIT_SCHEMA,status:'COMMITTED',operation:identity.operation,
+   policy:missing.c.policy,sourceManifestSha256:MISSING_PIN,originalManifestSha256:PIN,sourceFactId:missing.row.sourceFactId,
+   originalOperation:identity.before.originalOperation,before:identity.before,beforeHash:identity.beforeHash,
+   chunkSha256:hash(chunk),creates:storedCreates(projected.creates),rollback:projected.rollback,
+   paymentWrites:0,policyWrites:0,activityWrites:0,createdAt:at,runId:process.env.GITHUB_RUN_ID});
+  return {status:'COMMITTED_REQUIRES_READBACK',technicalWrites:3,policyCreates:0,activityCreates:0,priorUpdates:0};
+ });}catch(error){
+  if(!preparedWrites)return {status:'HOLD',reason:/^[A-Z0-9_]+$/.test(error.message)?error.message:'MISSING_TRANSACTION_HOLD',technicalWrites:0};
+  try{const proof=await db.runTransaction(async tx=>verifyMissingInside(tx,db,await tx.get(audit(db,chunk.operation))),{readOnly:true});
+   return {status:'APPLIED_READBACK_PASS',technicalWrites:3,policyCreates:0,activityCreates:0,priorUpdates:0,proof,recoveredAfterTransactionError:true};
+  }catch{return {status:'WRITE_OUTCOME_INDETERMINATE',reason:'MISSING_TRANSACTION_OUTCOME_NOT_CERTIFIED',technicalWrites:null,
+   attemptedTechnicalWrites:3,writeOutcomeIndeterminate:true};}
+ }
+ if(outcome.status!=='COMMITTED_REQUIRES_READBACK')return outcome;
+ try{const proof=await db.runTransaction(async tx=>verifyMissingInside(tx,db,await tx.get(audit(db,chunk.operation))),{readOnly:true});
+  return {...outcome,status:'APPLIED_READBACK_PASS',proof};
+ }catch{return {...outcome,status:'COMMITTED_READBACK_HOLD',reason:'MISSING_POSTIMAGE_READBACK_HOLD'};}
+}
 module.exports={KIND,FILE,PIN,manifest,load,numberRelation,holderMatches,operation,targets,readSnapshot,assess,mutations,
- verifySources,enrichPlan,applyChunk,verifyInside,hash};
+ verifySources,enrichPlan,applyChunk,verifyInside,hash,MISSING_KIND,MISSING_FILE,MISSING_PIN,MISSING_AUDIT_SCHEMA,missing,
+ loadMissing,missingOperation,missingTargets,timeWitness,readMissingSnapshot,assessMissing,missingMutations,verifyMissingSources,
+ missingChunk,verifyMissingInside,enrichMissingPlan,applyMissingChunk};

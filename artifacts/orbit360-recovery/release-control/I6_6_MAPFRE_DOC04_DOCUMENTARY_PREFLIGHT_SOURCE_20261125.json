@@ -1,0 +1,394 @@
+{
+  "schema": "GI_I66_MAPFRE_DOC04_CLOSED_DOCUMENTARY_PREFLIGHT_SOURCE_V1",
+  "status": "SOURCE_PREPARED_FRESH_CAS_AND_CANONICAL_UI_PENDING",
+  "profileId": "MAPFRE_DOC04_2453",
+  "sourceHeadRead": "b4793a9def951fd1abc1afb494edb8a5cae1b5a8",
+  "scope": {
+    "policyNumber": "3002600002453",
+    "policyId": "pol_59909e3b0b334ef681fbe31a5baf",
+    "clientId": "cli_pol_0bdd4dd5292184d861a51f98ca56",
+    "insurerId": "gt-mapfre-seguros",
+    "tenantId": "alianzas-soluciones",
+    "projectId": "ays-orbit-360-lab",
+    "country": "GT",
+    "currency": "GTQ",
+    "issuedTerm": [
+      "2026-05-22",
+      "2027-05-22"
+    ],
+    "targetInstallments": [
+      6,
+      7
+    ],
+    "targetReceiptCount": 2,
+    "newObligationCount": 0,
+    "knownPreviousPaymentsToPreserve": 4
+  },
+  "originalDocumentPins": [
+    {
+      "kind": "ISSUED_ORIGINAL_OBLIGATION_ONLY",
+      "driveFileId": "10vJ0Rzi3-Axigs2sG-yB-XcxAWWzxLc2",
+      "sha256": "06e97dc7ba6a6834108a01ef14646691d560ab397573f57224dc665f7e7f655a",
+      "sourceIsPaymentProof": false,
+      "executionIdentityAccessProofPending": true
+    },
+    {
+      "kind": "ISSUED_COVER_IDENTITY_AND_TERM",
+      "driveFileId": "1cdkxgNJu-5ORr7FFoaTntl961M0y65RT",
+      "sha256": "2526c5372a1469af9aae8f5a90c659a13772c865b6c0b0b305983230ab477c74",
+      "sourceIsPaymentProof": false,
+      "executionIdentityAccessProofPending": true
+    },
+    {
+      "kind": "COMMISSION_STATEMENT_INSTALLMENT_N",
+      "sourceId": "mapfre-commission-202610",
+      "driveFileId": "19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P",
+      "sha256": "235d23552a76f4ea90cc60fd71b44b68c76b009f97ec9f1456bacaa431e36a91",
+      "sourceRowSha256": "b803c79d7b291f77812dd39d1267c171d1c15f49ba2709737296fb35ba322007",
+      "rowNumber": 3,
+      "executionIdentityAccessProofPending": true
+    },
+    {
+      "kind": "INSURER_CONFIRMED_PAID_STATEMENT",
+      "sourceId": "mapfre-cobros-20261122",
+      "driveFileId": "1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1",
+      "sha256": "71a33d9e4cc1ffe52dceca992231c499460c342aa2fb0f28b025decdb4674c2a",
+      "sourceRowSha256": "3e1fda3ad07d6c4cb78dabc0cc7a35e751608f911d67d7ac079fb6335f12f292",
+      "rowNumber": 26,
+      "executionIdentityAccessProofPending": true
+    }
+  ],
+  "twoCases": [
+    {
+      "installment": 6,
+      "totalInstallments": 12,
+      "requirement": "3041843",
+      "receiptId": "rec_e5bb2b7a3ecda6a26b266435",
+      "portfolioId": "rec_e5bb2b7a3ecda6a26b266435",
+      "sourceFactId": "stmt_84fea0e32ca227018d800ed80191",
+      "source": {
+        "sourceId": "mapfre-commission-202610",
+        "insurer": "MAPFRE",
+        "driveFileId": "19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P",
+        "sha256": "235d23552a76f4ea90cc60fd71b44b68c76b009f97ec9f1456bacaa431e36a91",
+        "bytes": 6185,
+        "asOfDate": "2026-10-31",
+        "sourceKind": "COMMISSION_STATEMENT_INSTALLMENT_N",
+        "country": "GT",
+        "currency": "GTQ",
+        "fullContractualSequenceAttested": false,
+        "cutClassification": "PREVIOUSLY_PINNED_OCTOBER_COMMISSION",
+        "asOfDateBasis": "October commission period end from the pinned source inventory; generation date is not asserted.",
+        "evidencePeriod": [
+          "2026-10-01",
+          "2026-10-31"
+        ],
+        "rowNumber": 3,
+        "sheet": "HTML",
+        "sourceRowSha256": "b803c79d7b291f77812dd39d1267c171d1c15f49ba2709737296fb35ba322007",
+        "invoiceSeries": "997339E9",
+        "invoiceNumber": "2126007274"
+      },
+      "historicalOnlyBaseline": {
+        "receiptSha256": "c11ec82598ce1225e26d7a4661c23f6b11ce0e86c0c18a224117a67287fb6298",
+        "grossCents": 30960,
+        "dates": {
+          "fechaLimite": "2026-11-01"
+        },
+        "portfolios": [
+          {
+            "id": "rec_e5bb2b7a3ecda6a26b266435",
+            "sha256": "754e05ed42eb407fd7475a3b62e90dceb91ee82b4ef7886a98857e057d3e094b"
+          }
+        ],
+        "existingPayments": [],
+        "isFreshCasPreimage": false
+      },
+      "documentedTarget": {
+        "grossCents": 30961,
+        "contractualDue": "2026-11-02",
+        "paidDate": "2026-10-16",
+        "invoiceSeries": "997339E9",
+        "invoiceNumber": "2126007274",
+        "paymentSourceType": "commission_statement",
+        "evidenceType": "COMMISSION_STATEMENT_INSTALLMENT_N",
+        "evidenceAsOfDate": "2026-10-31",
+        "grossCorrectionCents": 1,
+        "installmentDerivedFromIssuedScheduleNotCommissionInference": true
+      },
+      "pendingConditionalCanonicalCall": {
+        "callable": "orbit360CobrosReconciliationCommand",
+        "operation": "apply_payment",
+        "requestId": "mapfre_paid_c5bb7920ae8ada3512449ce2c8144cd2",
+        "expectedNewCobroIdIfAbsent": "cob_cd6b373a44330ff78fd639a81792",
+        "payload": {
+          "receiptId": "rec_e5bb2b7a3ecda6a26b266435",
+          "sourceType": "commission_statement",
+          "amount": 309.61,
+          "paidDate": "2026-10-16",
+          "actualPaidDateEvidence": true,
+          "evidenceId": "stmt_84fea0e32ca227018d800ed80191",
+          "sourceRef": "drive:19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P",
+          "evidenceType": "COMMISSION_STATEMENT_INSTALLMENT_N",
+          "evidenceAsOfDate": "2026-10-31",
+          "invoiceNumber": "2126007274",
+          "paymentSupportDocumentRef": "drive:19U_xqMJmlitl8_muzZ8Jp__q0h0Dke1P"
+        },
+        "executableNow": false,
+        "sourceDocumentAndRowHashesMustBeInControlReceipt": true
+      }
+    },
+    {
+      "installment": 7,
+      "totalInstallments": 12,
+      "requirement": "3041844",
+      "receiptId": "rec_14e754d44cdac1e54abd7ca0",
+      "portfolioId": "rec_14e754d44cdac1e54abd7ca0",
+      "sourceFactId": "stmt_c28d9b1ab4346198147e92bd3ecb",
+      "source": {
+        "sourceId": "mapfre-cobros-20261122",
+        "insurer": "MAPFRE",
+        "driveFileId": "1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1",
+        "sha256": "71a33d9e4cc1ffe52dceca992231c499460c342aa2fb0f28b025decdb4674c2a",
+        "bytes": 7062,
+        "asOfDate": "2026-11-22",
+        "sourceKind": "INSURER_CONFIRMED_PAID_STATEMENT",
+        "country": "GT",
+        "currency": "GTQ",
+        "fullContractualSequenceAttested": false,
+        "rowNumber": 26,
+        "sheet": "HTML",
+        "sourceRowSha256": "3e1fda3ad07d6c4cb78dabc0cc7a35e751608f911d67d7ac079fb6335f12f292",
+        "invoiceSeries": "86150F77",
+        "invoiceNumber": "2357347620"
+      },
+      "historicalOnlyBaseline": {
+        "receiptSha256": "4fc95b0cb4c387d0bb264b7fcfbd8fc8da532a3121bb567f459b177f22631d67",
+        "grossCents": 30960,
+        "dates": {
+          "fechaLimite": "2026-12-02"
+        },
+        "portfolios": [
+          {
+            "id": "rec_14e754d44cdac1e54abd7ca0",
+            "sha256": "4a736c7c4b6c872fb343912e320d090819c7cf810c1d8971fe9f7280bd5f56d8"
+          }
+        ],
+        "existingPayments": [],
+        "isFreshCasPreimage": false
+      },
+      "documentedTarget": {
+        "grossCents": 30961,
+        "contractualDue": "2026-12-02",
+        "paidDate": "2026-11-18",
+        "invoiceSeries": "86150F77",
+        "invoiceNumber": "2357347620",
+        "paymentSourceType": "insurer_statement",
+        "evidenceType": "INSURER_CONFIRMED_PAID_STATEMENT",
+        "evidenceAsOfDate": "2026-11-22",
+        "grossCorrectionCents": 1,
+        "installmentDerivedFromIssuedScheduleNotCommissionInference": true
+      },
+      "pendingConditionalCanonicalCall": {
+        "callable": "orbit360CobrosReconciliationCommand",
+        "operation": "apply_payment",
+        "requestId": "mapfre_paid_d41f28af87a8cc656ddc6afca29f421e",
+        "expectedNewCobroIdIfAbsent": "cob_d7206a81c9f8b51304044fb9eeab",
+        "payload": {
+          "receiptId": "rec_14e754d44cdac1e54abd7ca0",
+          "sourceType": "insurer_statement",
+          "amount": 309.61,
+          "paidDate": "2026-11-18",
+          "actualPaidDateEvidence": true,
+          "evidenceId": "stmt_c28d9b1ab4346198147e92bd3ecb",
+          "sourceRef": "drive:1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1",
+          "evidenceType": "INSURER_CONFIRMED_PAID_STATEMENT",
+          "evidenceAsOfDate": "2026-11-22",
+          "invoiceNumber": "2357347620",
+          "paymentSupportDocumentRef": "drive:1MaHarJLB2xRXBZE6mZ5oBjcyvBxbzcR1"
+        },
+        "executableNow": false,
+        "sourceDocumentAndRowHashesMustBeInControlReceipt": true
+      }
+    }
+  ],
+  "preservedPayments": [
+    {
+      "receiptId": "rec_c99a6d1740aa887a2885d11a",
+      "receiptSha256": "9a91b9634a3c598ce46608e52acaf0b65cb326570982a3886ddc897cf7ee4e76",
+      "cobroId": "cob_018a12a41fed5431a919e594695d",
+      "cobroSha256": "e2043270a95b2788018a85fb8227576bf5d0c260744be729280c524cad537ee2",
+      "amountCents": 30960,
+      "preservation": "KEEP_ID_AMOUNT_DATES_STATE_AND_PROVENANCE; FRESH_READ_REQUIRED"
+    },
+    {
+      "receiptId": "rec_b38b07ed971dfeb3d69c5559",
+      "receiptSha256": "420471802c3ee3f34021bcaf931ea3dfb568c9459e9d7b322b4b7731e655b68b",
+      "cobroId": "cob_320f4ca0e75f3f2187e7920b88b2",
+      "cobroSha256": "85e2a00b277b41e138c75adad2ab38050def4c303f0e43277354631bbcff59d7",
+      "amountCents": 30960,
+      "preservation": "KEEP_ID_AMOUNT_DATES_STATE_AND_PROVENANCE; FRESH_READ_REQUIRED"
+    },
+    {
+      "receiptId": "rec_c8712c1098bcce0f5f3e0be5",
+      "receiptSha256": "9deb4e33d5a38e67651ec541143dd693860df950a99f4cf221cf354ba97e750d",
+      "cobroId": "cob_bfca3ec46101b51ece4f60ed87cf",
+      "cobroSha256": "fcfaf084cb554d4572e03beb8d353ad656a78c9e52ebe0e50c39475505ad6d88",
+      "amountCents": 30960,
+      "preservation": "KEEP_ID_AMOUNT_DATES_STATE_AND_PROVENANCE; FRESH_READ_REQUIRED"
+    },
+    {
+      "receiptId": "rec_6caf7f62d75a2e0374cd239a",
+      "receiptSha256": "07cd03e3e18b934bafd0bfa3204028207cd494ffce33587c78bbf46be31b10ce",
+      "cobroId": "cob_conc_2f7881ae89111b10519eae66",
+      "cobroSha256": "a7bd70922021455ebb95e764c289ae26c5f5ea10fad6af507a72545093faee6c",
+      "amountCents": 30960,
+      "preservation": "KEEP_ID_AMOUNT_DATES_STATE_AND_PROVENANCE; FRESH_READ_REQUIRED"
+    }
+  ],
+  "documentedSchedule": [
+    {
+      "page": 1,
+      "requirement": "3041838",
+      "installment": 1,
+      "totalInstallments": 12,
+      "due": "2026-06-02",
+      "gross": "309.61",
+      "printedDue": "02/06/2026"
+    },
+    {
+      "page": 1,
+      "requirement": "3041839",
+      "installment": 2,
+      "totalInstallments": 12,
+      "due": "2026-07-02",
+      "gross": "309.61",
+      "printedDue": "02/07/2026"
+    },
+    {
+      "page": 1,
+      "requirement": "3041840",
+      "installment": 3,
+      "totalInstallments": 12,
+      "due": "2026-08-02",
+      "gross": "309.61",
+      "printedDue": "02/08/2026"
+    },
+    {
+      "page": 2,
+      "requirement": "3041841",
+      "installment": 4,
+      "totalInstallments": 12,
+      "due": "2026-09-02",
+      "gross": "309.61",
+      "printedDue": "02/09/2026"
+    },
+    {
+      "page": 2,
+      "requirement": "3041842",
+      "installment": 5,
+      "totalInstallments": 12,
+      "due": "2026-10-02",
+      "gross": "309.61",
+      "printedDue": "02/10/2026"
+    },
+    {
+      "page": 2,
+      "requirement": "3041843",
+      "installment": 6,
+      "totalInstallments": 12,
+      "due": "2026-11-02",
+      "gross": "309.61",
+      "printedDue": "02/11/2026"
+    },
+    {
+      "page": 3,
+      "requirement": "3041844",
+      "installment": 7,
+      "totalInstallments": 12,
+      "due": "2026-12-02",
+      "gross": "309.61",
+      "printedDue": "02/12/2026"
+    },
+    {
+      "page": 3,
+      "requirement": "3041845",
+      "installment": 8,
+      "totalInstallments": 12,
+      "due": "2027-01-02",
+      "gross": "309.61",
+      "printedDue": "02/01/2027"
+    },
+    {
+      "page": 3,
+      "requirement": "3041846",
+      "installment": 9,
+      "totalInstallments": 12,
+      "due": "2027-02-02",
+      "gross": "309.61",
+      "printedDue": "02/02/2027"
+    },
+    {
+      "page": 4,
+      "requirement": "3041847",
+      "installment": 10,
+      "totalInstallments": 12,
+      "due": "2027-03-02",
+      "gross": "309.61",
+      "printedDue": "02/03/2027"
+    },
+    {
+      "page": 4,
+      "requirement": "3041848",
+      "installment": 11,
+      "totalInstallments": 12,
+      "due": "2027-04-02",
+      "gross": "309.61",
+      "printedDue": "02/04/2027"
+    },
+    {
+      "page": 4,
+      "requirement": "3041849",
+      "installment": 12,
+      "totalInstallments": 12,
+      "due": "2027-05-02",
+      "gross": "309.53",
+      "printedDue": "02/05/2027"
+    }
+  ],
+  "annualDocumentaryBoundary": {
+    "documentedAnnualGrossCents": 371524,
+    "documentedSumScheduleCents": 371524,
+    "historicalReceiptSumCents": 371520,
+    "onlyTwoExistingObligationsMayChange": true,
+    "historicalSumAfterTwoCorrectionsCents": 371522,
+    "remainingCalendarDifferenceCents": 2,
+    "installment12DocumentedGrossCents": 30953,
+    "installment12Excluded": true,
+    "doNotForceAnnualBalance": true,
+    "sourceOriginalFullTermPreserved": true,
+    "receiptInclusiveEndNotPolicyTermEnd": true
+  },
+  "freshRequired": {
+    "completeBoundedRead": true,
+    "fullOriginalBytes": true,
+    "exactHolderAgainstOriginalHashes": true,
+    "contradictoryTaxIdIsHold": true,
+    "fullRawPreimagesAndUpdateTimes": true,
+    "absenceOfDuplicateReceiptsPaymentsRequests": true,
+    "preserveAllUntargetedRecords": true
+  },
+  "sourceFactCounting": {
+    "commissionAnchorFactKeptCommissionAnchor": true,
+    "onePaidFactPreviouslyInNine": true,
+    "noNewPaymentsCertified": true
+  },
+  "authority": "Existing R51 completion instruction and documentary five-GTQ-cent tolerance. No identity, country, currency or actor impersonation exception.",
+  "effects": {
+    "cloudWrites": 0,
+    "obligationWrites": 0,
+    "paymentWrites": 0,
+    "newPayments": 0
+  },
+  "rollback": "The existing protected audit retains four exact target preimages. Any later rollback must require the whole current postimage hash to match and must not cross subsequent canonical payments. No rollback is executed here."
+}

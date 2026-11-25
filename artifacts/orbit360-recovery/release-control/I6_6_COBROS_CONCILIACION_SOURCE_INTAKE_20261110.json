@@ -565,6 +565,26 @@
       "normalizedWorkbookHashIsNotRawSourceHash": true,
       "additionalSourceVerificationDateGuatemala": "2026-11-19",
       "newestInsurerSourceMustPrecedeOlderSourceOnSameOpenRequirement": true
+    },
+    "insurerStatementContinuation20261124": {
+      "files": [
+        {
+          "filename": "Universales - Comportamiento de pagos - 2026-11-23.PDF",
+          "driveFileId": "13CIEJd0yEUTvnM3zomCZIzmDFhC5xoh_",
+          "bytes": 426273,
+          "mimeType": "application/pdf",
+          "hashStatus": "RAW_BYTES_SHA256_VERIFIED_CONNECTED_DRIVE_20261124",
+          "identityStatus": "PINNED_SOURCE_FACT_PENDING_EXACT_LIVE_IDENTITY",
+          "sha256": "28762cf44ea50f1a2aa2ebc7285413c97286a54e600c345639aea75017d472a7",
+          "sourceManifestPath": "artifacts/orbit360-recovery/source-batches/I6_6_NEW_INSURER_SOURCE_DELTA_20261124.json",
+          "sourceManifestSha256": "68ebdc6f04e0ee5e4d7aa92b2a3bd9564f17a8a5e7b23528522cc6381f782805"
+        }
+      ],
+      "count": 1,
+      "insurerFamilies": [
+        "UNIVERSALES"
+      ],
+      "role": "Exact DOC09 missing obligation only; paid source remains PAID and does not execute payment. Existing inventory groups and counts are historical and unchanged."
     }
   },
   "ownerFrozenDecisions": [

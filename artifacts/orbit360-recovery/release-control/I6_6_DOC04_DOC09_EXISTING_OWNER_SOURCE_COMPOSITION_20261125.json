@@ -1,0 +1,89 @@
+{
+  "schema": "GI_I66_DOC04_DOC09_EXISTING_OWNERS_COMPOSITION_SOURCE_V1",
+  "status": "SOURCE_INTEGRATED_LOCAL_CONTRACTS_PASS_REAL_PREFLIGHT_PENDING",
+  "recordedAtUtc": "2026-11-25T01:07:03.956155+00:00",
+  "parent": "9a699defebab9c122343fd1318db2e80bd06f5d7",
+  "profiles": [
+    "MAPFRE_DOC04_2453",
+    "UNIVERSALES_DOC09_MISSING_OBLIGATION"
+  ],
+  "paths": [
+    {
+      "path": ".github/workflows/gravicentra-i66-insurer-source-bulk-protected.yml",
+      "gitBlobSha": "a258834ab5df3c44ac737ff0e3d58d508efee6dc",
+      "sha256": "011a6a6dc255f1768fdac7ea5452bbb4a4158aed12be0e8d283d480c4e9f3c95"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_COBROS_CONCILIACION_SOURCE_INTAKE_20261110.json",
+      "gitBlobSha": "edb87e4a0210d27cbd3d8647f4e1e61f19d3b187",
+      "sha256": "d16f93ed408fe9c27743954e6a6f05371203bd5c313151355e88843523e526f0"
+    },
+    {
+      "path": "tools/gravicentra-i66-financial-identity-readback.cjs",
+      "gitBlobSha": "de3267452af06a635ce5db516af889eb696e5892",
+      "sha256": "b8785f2f9ccaadb5ac6b72f1ce84e70fd3c4e430b48eb0f551434f8d06b86567"
+    },
+    {
+      "path": "tools/gravicentra-i66-mapfre-obligation-cas.test.cjs",
+      "gitBlobSha": "67dca9b488799533b97ab3eccb3541141dd9bc60",
+      "sha256": "24cc5257e9044c84a15e80aa027d39f9bb3e6b317ab5c0de2e24b7d52d635d34"
+    },
+    {
+      "path": "tools/gravicentra-i66-source-bulk-apply.cjs",
+      "gitBlobSha": "38ca0167513e2c5abfee9d9a9b6cff4865699f88",
+      "sha256": "1c0295fe6516e1873c6bfa704f6e5801fd65ed1bfc1dd9841dff72d24de4ef1f"
+    },
+    {
+      "path": "tools/gravicentra-i66-source-bulk-apply.test.cjs",
+      "gitBlobSha": "8c50944b59e21626ce0646bb9cd01d279d6aef31",
+      "sha256": "05382701a77713f451e77296a917865bbd14372ac6cb04d960567ece9be8a027"
+    },
+    {
+      "path": "tools/gravicentra-i66-source-bulk-live.cjs",
+      "gitBlobSha": "1652690c6889598e30a9415e0cd0c8d7b66f28b8",
+      "sha256": "eb45c9e6328030de1ee5cd835d4b17ac71e1b5c7f808b88c187c5620617c462f"
+    },
+    {
+      "path": "tools/gravicentra-i66-universales-issued-editions.cjs",
+      "gitBlobSha": "0db1630efd5fefb28e9d4ee1cf6e10906b5f1e9c",
+      "sha256": "201fd8466c90e0e6a4cbb5b6a36993c3858bfd1da7f51c709c51d3a4e702639a"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAPFRE2453_HOLDER_WITNESS_SOURCE_READONLY_20261125.json",
+      "gitBlobSha": "6aff778f7a66a6b41127e2c5d2ae85be4ebaa9a3",
+      "sha256": "d0bcedb375a0e853cb8b4d2b444cdf6827f8d9d016a3653dda352f624d16ab5b"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_MAPFRE_DOC04_DOCUMENTARY_PREFLIGHT_SOURCE_20261125.json",
+      "gitBlobSha": "2c686e3fd98694141850bcdea212e3db39158c1e",
+      "sha256": "cf3973b7eda170446a0e95b955f6ff51ef1e2234edfb5c758457c947dfcccc5b"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/source-batches/I6_6_SOURCE_BULK_20261124_UNIVERSALES_DOC09_MISSING_OBLIGATION.json",
+      "gitBlobSha": "ce38b983db31b1d52f7848528d7796b8a17479f7",
+      "sha256": "6fa0a38c84a544d2f01beb1d459b6a0e7aeee5ea806de0eceb6e5307793d846f"
+    }
+  ],
+  "validation": {
+    "command": "node --test --test-reporter=tap tools/gravicentra-i66-mapfre-obligation-cas.test.cjs tools/gravicentra-i66-source-bulk-apply.test.cjs",
+    "topLevelTests": 17,
+    "topLevelPassed": 17,
+    "failures": 0,
+    "doc04AndR46Contracts": 16,
+    "doc09Checks": 61,
+    "existingMedicalChecks": 45,
+    "bulkRowsRegression": 750,
+    "tapSha256": "f92a228196290136c439191fe1ad1f8d4a95c1088452c8df173531a8d2fe97c2"
+  },
+  "boundaries": {
+    "productSourceChanged": false,
+    "urgentArtifactModified": false,
+    "realDataWrites": 0,
+    "paymentsCreated": 0,
+    "prior155Reapplied": false,
+    "realCurrentPreflightRequired": true,
+    "protectedEnvironmentApprovalRequiredForApply": true,
+    "newLiveAcceptance": false
+  },
+  "next": "Run the existing DOC04 read-only preflight against the originals and current canonical records. DOC09 uses the existing source_manifest dispatch and protected environment. Source PAID facts do not create canonical payments by this preparation."
+}

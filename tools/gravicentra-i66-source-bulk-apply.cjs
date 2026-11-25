@@ -157,7 +157,7 @@ async function applyProtectedBatch(db,plan,gate){
   for(const chunk of plan.chunks){
     if(!chunk.operationKind){if(chunk.rows.some(r=>r.operationKind))hold('DOCUMENTARY_DISCRIMINATOR_MISSING');continue;}
     const medical=require('./gravicentra-i66-universales-issued-editions.cjs');
-    if(chunk.operationKind!==medical.KIND)hold('UNKNOWN_DOCUMENTARY_OPERATION');
+    if(![medical.KIND,medical.MISSING_KIND].includes(chunk.operationKind))hold('UNKNOWN_DOCUMENTARY_OPERATION');
     if(documentaryOperations.has(chunk.operation))hold('DUPLICATE_DOCUMENTARY_OPERATION');
     documentaryOperations.add(chunk.operation);
   }
@@ -197,18 +197,22 @@ async function applyProtectedBatch(db,plan,gate){
     ['APPLIED_READBACK_PASS','COMMITTED_READBACK_HOLD'].includes(x.status));
   const documentaryRows=documentaryCommitted.reduce((n,r)=>n+
     plan.chunks.find(c=>c.policy===r.policy&&c.operationKind===r.operationKind).count,0);
+  const indeterminate=documentaryResults.some(r=>r.writeOutcomeIndeterminate),
+    indeterminateEdition=documentaryResults.some(r=>r.writeOutcomeIndeterminate&&r.operationKind==='ISSUED_MEDICAL_EDITION_CREATE');
   return {status:failed.length?'BULK_PARTIAL_HOLD':'BULK_PROTECTED_READBACK_PASS',
     approvedManifest:gate.sourceManifestSha256,
     inputRows:plan.inputRows,readyCount:plan.readyCount,sourceExceptions:plan.exceptionCount,
     applied:accepted.filter(x=>x.status==='APPLIED_READBACK_PASS').length,
     alreadyApplied:accepted.filter(x=>x.status==='ALREADY_APPLIED_READBACK_PASS').length,
-    receiptWrites:normalApplied+documentaryRows,
-    portfolioWrites:normalApplied+documentaryRows,
-    policyCreates:documentaryCommitted.length,activityCreates:documentaryCommitted.length,
-    priorPolicyUpdates:documentaryCommitted.reduce((n,r)=>n+(r.priorUpdates||0),0),
-    auditCreates:normalApplied+documentaryCommitted.length,
-    technicalDocumentWrites:normalApplied*3+documentaryCommitted.reduce((n,r)=>n+r.technicalWrites,0),
-    writeOutcomeIndeterminate:documentaryResults.some(r=>r.writeOutcomeIndeterminate),
+    receiptWrites:indeterminate?null:normalApplied+documentaryRows,
+    portfolioWrites:indeterminate?null:normalApplied+documentaryRows,
+    policyCreates:indeterminateEdition?null:documentaryCommitted.reduce((n,r)=>n+(r.operationKind==='ISSUED_MEDICAL_EDITION_CREATE'?1:0),0),
+    activityCreates:indeterminateEdition?null:documentaryCommitted.reduce((n,r)=>n+(r.operationKind==='ISSUED_MEDICAL_EDITION_CREATE'?1:0),0),
+    priorPolicyUpdates:indeterminateEdition?null:documentaryCommitted.reduce((n,r)=>n+(r.priorUpdates||0),0),
+    auditCreates:indeterminate?null:normalApplied+documentaryCommitted.length,
+    technicalDocumentWrites:indeterminate?null:normalApplied*3+documentaryCommitted.reduce((n,r)=>n+r.technicalWrites,0),
+    ...(indeterminate?{attemptedTechnicalDocumentWrites:normalApplied*3+documentaryResults.reduce((n,r)=>n+(r.attemptedTechnicalWrites||r.technicalWrites||0),0)}:{}),
+    writeOutcomeIndeterminate:indeterminate,
     documentaryResults,cobroWrites:0,paymentWrites:0,failed,accepted};
 }
 // The two MAPFRE installments are existing unpaid obligations backed by paid
@@ -221,24 +225,26 @@ const mapfreRecordKey=e=>e.collection+'/'+e.id;
 const mapfreDataView=entries=>entries.map(e=>({collection:e.collection,id:e.id,data:e.data}))
   .sort((a,b)=>mapfreRecordKey(a).localeCompare(mapfreRecordKey(b)));
 function mapfreCorrectionPlan(review,binding){
+  const profile=require('./gravicentra-i66-financial-identity-readback.cjs').mapfreProfile(binding);
   if(review.schema!=='GI_I66_MAPFRE_FRESH_CONTROLLED_PREFLIGHT_V1'||review.writes!==0||
     review.paymentWriteEligibleCount!==0||review.correctionEligibleCount!==2||review.globalHolds.length||
     !/^[a-f\d]{64}$/.test(review.beforeHash)||review.targets.length!==2||
     review.targets.some(t=>!t.correctionEligible||t.localHolds.length)||
-    review.originals.length!==3||review.originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED'))
+    review.originals.length!==profile.originals||review.originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED')||
+    (profile.id==='MAPFRE_DOC04_2453'&&review.profileId!==profile.id))
     hold('MAPFRE_EXACT_FRESH_PLAN_REQUIRED');
   const patches=[];
   for(const target of binding.preflight.twoCases){
     const approved=review.targets.find(t=>t.sourceFactId===target.sourceFactId);
-    if(!approved||approved.requirement!==target.requirement||approved.sourceGrossCents!==12777)
+    if(!approved||approved.requirement!==target.requirement||approved.sourceGrossCents!==profile.grossCents)
       hold('MAPFRE_TARGET_PIN_CHANGED');
     for(const [collection,id] of [['recibosEsperados',target.receiptId],['carteraPrimas',target.portfolioId]]){
       const before=review.privatePreimages.find(e=>e.collection===collection&&e.id===id);
       if(!before?.exists||!before.updateTime)hold('MAPFRE_FULL_PREIMAGE_REQUIRED');
       const fields=['primaTotal',...grossAliasFields].filter(k=>Object.hasOwn(before.data,k));
-      if(!fields.length||fields.some(k=>moneyCents(before.data[k])!==12776&&moneyCents(before.data[k])!==12777))
+      if(!fields.length||fields.some(k=>moneyCents(before.data[k])!==profile.beforeGrossCents&&moneyCents(before.data[k])!==profile.grossCents))
         hold('MAPFRE_EXPECTED_ONE_CENT_CORRECTION_REQUIRED');
-      const patch=Object.fromEntries(fields.map(k=>[k,typeof before.data[k]==='string'?'127.77':127.77]));
+      const patch=Object.fromEntries(fields.map(k=>[k,typeof before.data[k]==='string'?(profile.grossCents/100).toFixed(2):profile.grossCents/100]));
       if(collection==='recibosEsperados')Object.assign(patch,{numeroReciboFuente:target.requirement,
         fechaVencimientoContractual:target.documentedTarget.contractualDue});
       patches.push({collection,id,sourceFactId:target.sourceFactId,patch,
@@ -250,13 +256,14 @@ function mapfreCorrectionPlan(review,binding){
     return patch?{...e,data:{...e.data,...patch.patch}}:e;
   });
   const body={schema:'GI_I66_MAPFRE_EXISTING_OBLIGATION_CAS_V1',
+    ...(profile.id==='MAPFRE_DOC04_2453'?{profileId:profile.id,calendarDiagnostic:review.calendarDiagnostic}:{}),
     status:'MAPFRE_OBLIGATION_PREFLIGHT_ONLY_NO_PAYMENT_WRITES',writes:0,paymentWrites:0,
     inputRows:2,readyCount:2,policyId:binding.preflight.scope.policyId,
     sourcePins:review.sourcePins,sourceManifestSha256:review.sourcePins.source[1],
     authoritySha256:review.sourcePins.authority[1],beforeHash:review.beforeHash,
     originals:review.originals,patches,beforeDataHash:mapfreHash(mapfreDataView(review.privatePreimages)),
     expectedAfterDataHash:mapfreHash(mapfreDataView(afterEntries)),
-    priorPayments:9,annualVariancePreserved:true,installment12Excluded:true};
+    priorPayments:profile.previousPayments,annualVariancePreserved:profile.annualVariancePreserved,installment12Excluded:true};
   return JSON.parse(JSON.stringify({...body,planHash:mapfreHash(body)}));
 }
 function mapfreAuditId(plan){return 'gi_i66_mapfre_obligation_'+sha(plan.sourceManifestSha256+'|'+
@@ -272,8 +279,11 @@ function mapfreGate(gate,plan){
 async function applyMapfreObligations(db,plan,gate,binding,originals){
   const reader=require('./gravicentra-i66-financial-identity-readback.cjs');
   if(!mapfreGate(gate,plan))hold('MAPFRE_PROTECTED_ENVIRONMENT_REQUIRED');
-  binding=binding||reader.mapfreBinding();originals=originals||await reader.mapfreOriginals(binding);
-  if(originals.length!==3||originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED')||
+  binding=binding||reader.mapfreBinding(plan.profileId||'MAPFRE_R46');
+  const profile=reader.mapfreProfile(binding);
+  if((plan.profileId||'MAPFRE_R46')!==profile.id)hold('MAPFRE_PLAN_PROFILE_CHANGED');
+  originals=originals||await reader.mapfreOriginals(binding);
+  if(originals.length!==profile.originals||originals.some(o=>o.status!=='ORIGINAL_BYTES_VERIFIED')||
     originals.some(o=>!binding.preflight.originalDocumentPins.some(p=>p.driveFileId===o.fileId&&p.sha256===o.sha256))||
     mapfreHash(originals)!==mapfreHash(plan.originals))hold('MAPFRE_ORIGINAL_BYTES_CHANGED');
   const auditId=mapfreAuditId(plan),auditRef=audit(db,auditId),before=[],after=[];
@@ -305,6 +315,7 @@ async function applyMapfreObligations(db,plan,gate,binding,originals){
       attempted=true;
       for(const patch of plan.patches)tx.update(items(db,patch.collection).doc(patch.id),patch.patch);
       tx.create(auditRef,{schema:'GI_I66_MAPFRE_EXISTING_OBLIGATION_CORRECTION_V1',
+        ...(profile.id==='MAPFRE_DOC04_2453'?{profileId:profile.id,calendarDiagnostic:plan.calendarDiagnostic}:{}),
         status:'EXISTING_OBLIGATIONS_CORRECTED_NO_PAYMENTS',planHash:plan.planHash,
         authoritySha256:plan.authoritySha256,sourceManifestSha256:plan.sourceManifestSha256,
         sourcePins:plan.sourcePins,originals,policyId:plan.policyId,patches:plan.patches,
@@ -317,7 +328,7 @@ async function applyMapfreObligations(db,plan,gate,binding,originals){
           state:binding.source.facts.find(f=>f.sourceFactId===t.sourceFactId).state,
           sourceDocumentSha256:t.source.sha256,sourceRowSha256:t.source.sourceRowSha256})),
         receiptWrites:2,portfolioWrites:2,auditWrites:1,paymentWrites:0,cobroWrites:0,
-        previousPaymentsPreserved:9,annualVariancePreserved:true,installment12Excluded:true,
+        previousPaymentsPreserved:profile.previousPayments,annualVariancePreserved:profile.annualVariancePreserved,installment12Excluded:true,
         committedAt:new Date().toISOString()});
       return {replayed:false};
     });

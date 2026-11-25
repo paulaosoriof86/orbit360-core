@@ -286,13 +286,16 @@ async function locateAttestedPayments(db,groups,rows){
 
 async function main(){
   const mode=str(process.env.GI_I66_BULK_MODE);
+  const mapfreProfileId=str(process.env.GI_I66_MAPFRE_PROFILE)||'MAPFRE_R46';
+  require('./gravicentra-i66-financial-identity-readback.cjs').mapfreProfile(mapfreProfileId);
+  if(mapfreProfileId!=='MAPFRE_R46')assert.ok(mode.startsWith('mapfre-'),'MAPFRE_PROFILE_CANNOT_ENTER_OTHER_WRITERS');
   assert.ok(['preflight','case-readback','mapfre-readback','mapfre-payment-readback','mapfre-cas-preflight','mapfre-cas-apply','apply'].includes(mode),'I66_BULK_MODE_MUST_BE_EXPLICIT');
   assert.equal(process.env.GCLOUD_PROJECT,PROJECT,'I66_PROJECT_NOT_EXISTING_FIREBASE');
   const admin=require('firebase-admin');
   admin.initializeApp({credential:admin.credential.applicationDefault(),projectId:PROJECT});
   const db=admin.firestore();
   if(mode==='mapfre-payment-readback'){
-    const report=await require('./gravicentra-i66-financial-identity-readback.cjs').mapfrePaymentReadback(db);
+    const report=await require('./gravicentra-i66-financial-identity-readback.cjs').mapfrePaymentReadback(db,mapfreProfileId);
     output('GI_I66_BULK_REPORT_OUT',report);
     output('GI_I66_BULK_PLAN_OUT',{status:'BULK_MAPFRE_READONLY_PREFLIGHT_NO_WRITES',readOnly:true,
       writes:0,paymentWriteEligibleCount:0,inputRows:2,chunks:[],privateReportRequired:true,
@@ -307,6 +310,7 @@ async function main(){
     const filename=str(process.env.GI_I66_BULK_PLAN_IN);
     assert.ok(path.isAbsolute(filename),'MAPFRE_CAS_PLAN_FILE_REQUIRED');
     const plan=JSON.parse(fs.readFileSync(filename));
+    assert.equal(plan.profileId||'MAPFRE_R46',mapfreProfileId,'MAPFRE_LOADED_PLAN_PROFILE_MISMATCH');
     const writer=require('./gravicentra-i66-source-bulk-apply.cjs');
     const gate={environment:process.env.GI_I66_BULK_PROTECTED_ENV,reviewerEvidence:true,
       repository:process.env.GITHUB_REPOSITORY,ref:process.env.GITHUB_REF,project:PROJECT,
@@ -323,12 +327,12 @@ async function main(){
     return;
   }
   if(['mapfre-readback','mapfre-cas-preflight'].includes(mode)){
-    const review=await require('./gravicentra-i66-financial-identity-readback.cjs').mapfreFreshPreflight(db);
+    const review=await require('./gravicentra-i66-financial-identity-readback.cjs').mapfreFreshPreflight(db,mapfreProfileId);
     output('GI_I66_BULK_REPORT_OUT',review);
     if(mode==='mapfre-cas-preflight'){
       let plan;
       try{
-        const binding=require('./gravicentra-i66-financial-identity-readback.cjs').mapfreBinding();
+        const binding=require('./gravicentra-i66-financial-identity-readback.cjs').mapfreBinding(mapfreProfileId);
         plan=require('./gravicentra-i66-source-bulk-apply.cjs').mapfreCorrectionPlan(review,binding);
       }catch(error){plan={schema:'GI_I66_MAPFRE_EXISTING_OBLIGATION_CAS_V1',status:'MAPFRE_OBLIGATION_PREFLIGHT_HOLD',
         writes:0,paymentWrites:0,inputRows:2,readyCount:0,
