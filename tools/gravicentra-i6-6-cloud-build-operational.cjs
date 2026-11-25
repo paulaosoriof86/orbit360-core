@@ -22,7 +22,7 @@ const F=Object.freeze({proof:'gi-i66-native-operational-proof.json',signed:'gi-i
 // to a real mechanism commit and its real preimage at the package source.
 const HISTORICAL_ADMISSION_TEST='tools/gravicentra-i6-6-composite-preview-admission.test.cjs';
 const MECHANISM_PATHS=Object.freeze([
-  HISTORICAL_ADMISSION_TEST,
+  HISTORICAL_ADMISSION_TEST,'tools/gravicentra-i66-composite-acceptance.test.cjs',
   C.tool,C.test,pkg.C.tool,pkg.C.test,pkg.C.branding,pkg.C.brandingTest,
   preview.C.tool,preview.C.test,preview.C.readback,preview.C.readbackTest,
   'tools/gravicentra-i6-6-operational-release-candidate.cjs',
@@ -72,6 +72,9 @@ function validateMechanism(m,sourceSha){
   // recorded in I6_6_ASSIGNED_ROLES_HISTORICAL_FIXTURE_PROVIDER_QA_20261125.
   const fixture=m.files[HISTORICAL_ADMISSION_TEST];
   if(fixture)equal([fixture.beforeBlob,fixture.blob],['c6485d21daa40ea5a0521521163b67a375d6fd6d','3978f19272a435984207b40f928398fa8046f0b3'],'HISTORICAL_ADMISSION_FIXTURE_EXACT_REVISION');
+  const compositeFixture=m.files['tools/gravicentra-i66-composite-acceptance.test.cjs'];
+  if(compositeFixture)equal([compositeFixture.beforeBlob,compositeFixture.blob],
+    ['3bab3e94cdd575b40efda54eb8d6d7ba72f87a39','db304f586b758321d4d84d1e25e793fb3c9b65f1'],'HISTORICAL_COMPOSITE_FIXTURE_EXACT_REVISION');
   return m;
 }
 function validateBinding(p){

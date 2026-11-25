@@ -10,7 +10,16 @@ const {assertCompositeRollbackAllowed}=require('./gravicentra-i66-frontend-promo
 // remain top-level and cannot be cancelled as nested tests of makeFixture.
 const makeExamples=require('./gravicentra-i66-make-release-scope.test.cjs');
 const {P,genName,serial,blob}=owner,clone=v=>JSON.parse(JSON.stringify(v));
-const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+// Read the four-function fixture and its observer evidence from their tested revision.
+// Reading a later native request here gives the synthetic transaction two releases.
+const fixtureRevision='b67845000de4a8a2472ce3ea432118344c0c21e7';
+const fixtureBytes=new Map();
+function readFixtureText(path){
+  if(!fixtureBytes.has(path))fixtureBytes.set(path,require('node:child_process').execFileSync('git',
+    ['show',fixtureRevision+':'+path],{encoding:'utf8',maxBuffer:8*1024*1024}));
+  return fixtureBytes.get(path);
+}
+const read=p=>JSON.parse(readFixtureText(p));
 function fixture(){
   const cp=read(P.cp),state=read(P.state),transport=read(P.transport),ledger=read(P.ledger),previous=cp.i66FrontendReleaseHead;
   const p=clone(read(g.ACCEPTANCE_RECEIPT).candidate),proof=read(g.ACCEPTANCE_PROOF);
@@ -58,7 +67,7 @@ function fixture(){
   progress.executionSynchronization=owner.executionSnapshot(transport);cp.i66ActiveRecoveryCursor.currentEvidenceBlobSha=blob(serial(progress));
   const files=new Map([[P.cp,cp],[P.state,state],[P.transport,transport],[P.ledger,ledger],[progressPath,progress]]);
   const readFile=p=>clone(files.has(p)?files.get(p):read(p));
-  const readText=p=>files.has(p)?serial(files.get(p)):fs.readFileSync(p,'utf8');
+  const readText=p=>files.has(p)?serial(files.get(p)):readFixtureText(p);
   const jp=genName(request.generation,'JOURNAL'),rp=genName(request.generation,'RECEIPT');
   const model={current:request.target.hostingVersion,commits:0,clones:0,checks:0};
   const io={readJournal:async()=>files.get(jp)||null,
@@ -83,6 +92,8 @@ test('composite acceptance synchronizes one generation and four revisions withou
   const f=fixture(),priorProgressPath=f.cp.i66ActiveRecoveryCursor.currentEvidencePath;
   const priorProgress=f.readFile(priorProgressPath),priorProgressBytes=f.readText(priorProgressPath);
   const priorObservations=priorProgress.postAcceptanceObserverResults;
+  assert.equal(f.transport.frontendPreviewRequest.version,14);
+  assert.ok(priorObservations && priorObservations.receiptGitBlobSha,'FOUR_FUNCTION_OBSERVER_FIXTURE_REQUIRED');
   const priorObserverBytes=priorObservations?f.readText(priorObservations.receiptPath):null;
   const out=await tx.acceptComposite(f.io,f.request,f.proof);await f.io.verifyCommitted(out);
   assert.equal(out.operation,'ACCEPT_EXECUTED_COMPOSITE_LIVE');assert.equal(f.model.clones,0);assert.equal(f.model.commits,1);

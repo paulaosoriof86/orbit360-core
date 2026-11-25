@@ -188,6 +188,16 @@ test('historical admission fixture permits only its recorded predecessor and suc
     assert.throws(()=>n.validateMechanism(bad,bad.sourceSha),/HISTORICAL_ADMISSION_FIXTURE_EXACT_REVISION/);
   }
 });
+test('the composite acceptance fixture admits only its exact source and corrected bytes',()=>{
+  const mechanism=candidate().p.providerBinding.mechanism,file='tools/gravicentra-i66-composite-acceptance.test.cjs';
+  const bytes=fs.readFileSync(file);
+  mechanism.files[file]={beforeBlob:'3bab3e94cdd575b40efda54eb8d6d7ba72f87a39',blob:pkg.blob(bytes),sha256:pkg.sha(bytes)};
+  assert.equal(n.validateMechanism(mechanism,mechanism.sourceSha),mechanism);
+  for(const key of ['beforeBlob','blob']){
+    const changed=clone(mechanism);changed.files[file][key]='1'.repeat(40);
+    assert.throws(()=>n.validateMechanism(changed,changed.sourceSha),/HISTORICAL_COMPOSITE_FIXTURE_EXACT_REVISION/);
+  }
+});
 test('continuity owner regression test is admissible only with its exact mechanism preimage and current bytes',()=>{
   const f=realGitFixture(),file='tools/gravicentra-i66-frontend-control.test.cjs';
   try{
