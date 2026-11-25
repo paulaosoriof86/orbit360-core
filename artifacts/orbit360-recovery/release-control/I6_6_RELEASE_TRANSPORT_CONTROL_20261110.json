@@ -11249,22 +11249,27 @@
         "mechanism": {
           "schema": "GI_I66_NATIVE_MECHANISM_REVISION_V1",
           "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
-          "commit": "ad3b3c1420d286e068c13b3f8ca7dd00c8c6dec6",
+          "commit": "f59587a7ad69394127faf535fda29a504e695ae2",
           "files": {
             "tools/gravicentra-i6-6-composite-preview-admission.test.cjs": {
               "beforeBlob": "c6485d21daa40ea5a0521521163b67a375d6fd6d",
               "blob": "3978f19272a435984207b40f928398fa8046f0b3",
               "sha256": "a1d3bf2721c2649009c5657b5588e257733cacb7d26724d0fd09e8d07358771b"
             },
+            "tools/gravicentra-i66-composite-acceptance.test.cjs": {
+              "beforeBlob": "3bab3e94cdd575b40efda54eb8d6d7ba72f87a39",
+              "blob": "db304f586b758321d4d84d1e25e793fb3c9b65f1",
+              "sha256": "d44b70cc7c97bd1ececb9c86c20d7b0a31e922c2d73100f0d2d9ae39a60deb5f"
+            },
             "tools/gravicentra-i6-6-cloud-build-operational.cjs": {
               "beforeBlob": null,
-              "blob": "e3c3bff076de8323073ba849d78e58aa3f9a8520",
-              "sha256": "ddf15a0d9c433377681f02b226a34b6f26483654e3d7a61cdf8cf30d356540d4"
+              "blob": "216c07aabbdffe0eb66097a455b0770acfea03e9",
+              "sha256": "708d3f0b596fb49d918e9ca829686a84f8d0b4670065e2279323e8a6a2511bd5"
             },
             "tools/gravicentra-i6-6-cloud-build-operational.test.cjs": {
               "beforeBlob": null,
-              "blob": "4970ee8f80fd1f7c40f2ed38e16a4d22ae9fc8a0",
-              "sha256": "b59e60f5c08279fd56a7b2c487d3d91ec47115036d198554b90f372381380f4b"
+              "blob": "dfc4a08911869c3a5d230e2a27c63af0cfd82269",
+              "sha256": "7f9563221dce6537dccff3d753bf98b49617a8bbf0e5a7c336aca82cf040db71"
             },
             "tools/gravicentra-i6-6-cloud-build-package.cjs": {
               "beforeBlob": null,

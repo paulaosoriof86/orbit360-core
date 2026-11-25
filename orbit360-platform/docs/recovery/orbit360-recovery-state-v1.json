@@ -56,11 +56,11 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R87.json",
-    "evidenceGitBlobSha": "c085a819b3ca8301ace59bfccc21fd5cbe7aae68",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R88.json",
+    "evidenceGitBlobSha": "b6e614204e9a10bfae2b270bc513c13abcd6838f",
     "activeGate": "I6.6",
-    "currentWork": "Continue I6.6 through the active R87 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
-    "nextAction": "Continue I6.6 through the active R87 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+    "currentWork": "Continue I6.6 through the active R88 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+    "nextAction": "Continue I6.6 through the active R88 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
     "frontendPreviewRequest": {
       "version": 35,
       "sourceQaHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b",
@@ -564,7 +564,7 @@
     "phaseAIterationStatuses": "HISTORICAL_FIELDS_ABOVE_PRESERVED_UNTIL_FORMAL_GATE_EVIDENCE;_NO_NEW_PASS_INFERRED",
     "labDataWriteScope": "ONLY_35_AUTHORIZED_COUNTRY_FIELDS;_NO_AUGUST_REFRESH"
   },
-  "nextAction": "Continue I6.6 through the active R87 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+  "nextAction": "Continue I6.6 through the active R88 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
   "sourceOfTruth": {
     "projectBoundaryPrevalentAddendum": "orbit360-platform/docs/recovery/ADDENDUM_PREVALENTE_CHATGPT_PROJECT_BOUNDARY_20260831.md",
     "mutableState": "orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json",
@@ -6012,6 +6012,37 @@
         "activeGate": "I6.6",
         "currentWork": "Continue I6.6 through the active R86 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
         "nextAction": "Continue I6.6 through the active R86 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+        "frontendPreviewRequest": {
+          "version": 35,
+          "sourceQaHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b",
+          "sourceQaRunId": 45548703476,
+          "guardRunId": 45548703495
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "30678971d8f3f7d3692283bf929d3e7862f3ca46",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R87.json",
+        "evidenceGitBlobSha": "c085a819b3ca8301ace59bfccc21fd5cbe7aae68",
+        "activeGate": "I6.6",
+        "currentWork": "Continue I6.6 through the active R87 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+        "nextAction": "Continue I6.6 through the active R87 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
         "frontendPreviewRequest": {
           "version": 35,
           "sourceQaHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b",

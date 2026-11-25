@@ -1,0 +1,62 @@
+{
+  "recordType": "SUBORDINATE_EXECUTION_AND_DOCUMENT_SOURCE_EVIDENCE",
+  "authorityHeadAtExecution": "eaf1619e4e127b0faf0aa7ac1b6a640a9a1a2614",
+  "requestVersion": 35,
+  "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+  "artifactDigest": "sha256:1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+  "previousAttempt": {
+    "buildId": "07eff990-2648-4046-b638-756e636468b3",
+    "status": "FAILURE",
+    "source": "eaf1619e4e127b0faf0aa7ac1b6a640a9a1a2614",
+    "providerError": "I66_CLOUD_BUILD_COMMAND_FAILED_gi-i66-operational-execution.log",
+    "failedBeforeBackendDeploy": true,
+    "log": {
+      "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/cloud-build-logs/log-07eff990-2648-4046-b638-756e636468b3.txt",
+      "generation": "1795627409465046",
+      "bytes": 27961,
+      "crc32c": "Lka7Ng==",
+      "sha256": "d64e482eff09558594b641df891591685c96f58bc47da314e9e26b224f6a1788"
+    }
+  },
+  "mechanism": {
+    "commit": "f59587a7ad69394127faf535fda29a504e695ae2",
+    "changedFiles": [
+      "tools/gravicentra-i6-6-cloud-build-operational.cjs",
+      "tools/gravicentra-i6-6-cloud-build-operational.test.cjs",
+      "tools/gravicentra-i66-composite-acceptance.test.cjs"
+    ],
+    "historicalFixture": "b67845000de4a8a2472ce3ea432118344c0c21e7",
+    "localReproduction": {
+      "total": 146,
+      "passed": 145,
+      "error": "I66_NATIVE_PROGRESS_REQUEST_DRIFT",
+      "pendingRequest": 35,
+      "historicalTransactionRequest": 14
+    },
+    "afterCorrection": {
+      "total": 196,
+      "passed": 196,
+      "scope": "composite, native, transaction and continuity tests; includes negative pin tests"
+    }
+  },
+  "invoice": {
+    "source": "ORIGINAL_PDF_RECEIVED_FROM_DIRECTION",
+    "sha256": "63c7ce49e5655a78673547f43565387122225947a2cf1b5e7fd5aaabc0d4448f",
+    "bytes": 60935,
+    "match": [
+      "ISSUER",
+      "POLICY",
+      "TERM",
+      "INSTALLMENT",
+      "INVOICE_NUMBER",
+      "GROSS_AMOUNT"
+    ],
+    "userConfirmedScope": "Common existing-payment attachment and durable relationship across reload; example is a regression case.",
+    "applicationLinked": false,
+    "afterReloadVerified": false,
+    "financialWrites": 0,
+    "documentWrites": 0
+  },
+  "signedPreviewAcceptance": false,
+  "liveAcceptance": false
+}
