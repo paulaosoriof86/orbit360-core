@@ -618,6 +618,218 @@ jobs:
           path: ${{ runner.temp }}/i66-make-preimages-sanitized.json
           if-no-files-found: error
           retention-days: 14
+      - name: Diagnose only the exact Preview33 traffic conflict with logs and validation-only API
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, 'I66_MAKE_TRAFFIC_409_READONLY_R33')
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +x
+          node - <<'TRAFFICCONFLICTREADONLY'
+          'use strict';
+          // Extracted copy of the existing diagnostic workflow's inline step; not a new deployed owner.
+          const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+          const {createRequire}=require('node:module'),{execFileSync}=require('node:child_process');
+          const PROJECT='ays-orbit-360-lab',REGION='us-east1',NAME='orbit360makeleadingresspreview';
+          const SERVICE='projects/'+PROJECT+'/locations/'+REGION+'/services/'+NAME;
+          const FN='projects/'+PROJECT+'/locations/'+REGION+'/functions/orbit360MakeLeadIngressPreview';
+          const FN_URL='https://cloudfunctions.googleapis.com/v2/'+FN,RUN_URL='https://run.googleapis.com/v2/'+SERVICE;
+          const LOG_URL='https://logging.googleapis.com/v2/entries:list';
+          const VALIDATE_URL=RUN_URL+'?updateMask=traffic&validateOnly=true&allowMissing=false&forceNewRevision=false';
+          const MARKER='I66_MAKE_TRAFFIC_409_READONLY_R33',WORKFLOW='.github/workflows/gravicentra-i66-greenapi-metadata-readonly.yml';
+          const EXPECTED={revision:NAME+'-00005-juw',trafficRevision:NAME+'-00001-cuy',uid:'2cb4dc4b-ad08-442e-bf39-4fc0803bd111',generation:'5',
+            fnDigest:'e49c9ad346ef99bc9510d05a3cf61dcb50c953658b9959153ba756d4e07cf4a3',
+            trafficDigest:'1a2ddf6fce5df2060de48d339b87f67d63986a432460069f5949950c14e83e50',
+            grantDigest:'a020555d0efc3e9cf68baf5b2b309eeb3fc004fadbf0e2539aff680a00a9aae4',
+            failureRunId:45528595084,failureJobId:138918077657,failureSourceSha:'504829b30e1a3e0fde97bdef54fe3d0636e1344e',
+            failureArtifactId:14982534576,failureArtifactDigest:'sha256:6cd65439f2c6ed9fcb0b574c611010d1e626ad48f9b0f55d2914cc3785c5087c',
+            observationSha256:'56a2a9219aa3f28f05e6a7c9f6abb34bb518a764719bb9d47caa4610ece088e9',
+            requestSha256:'1f11a18159772c99443f383beaca5586ee9d508d2c39accbb18c6c5293421735',
+            etagSha256:'91cd15d3683c5d8fd25df1e7a6df54063c001b26bce73791816a6cbe7daed1bc',
+            from:'2026-11-25T01:52:48Z',to:'2026-11-25T01:53:04Z'};
+          const OWNER_PINS={
+            'tools/gravicentra-i66-make-lead-protected-executor.cjs':'9620fc1aefeb30e95c57aca0b87896c3e9fefc59',
+            'tools/gravicentra-i66-make-release-scope.cjs':'40c215ca67e17f9e1287ba562b0abfca1b55077d',
+            'functions/product-lead-ingress-contract.js':'ee29ee1fb12b1a30bf24b7c2c2a8180a2f2ef937'};
+          const hash=x=>crypto.createHash('sha256').update(x).digest('hex');
+          const code=e=>/^(?:I66_TRAFFIC_DIAGNOSTIC|INGRESS)_[A-Z0-9_]+$/.test(String(e?.message||'').split('\n')[0])?
+            String(e.message).split('\n')[0]:'I66_TRAFFIC_DIAGNOSTIC_UNVERIFIED';
+          function cleanMessage(value,etags=[]){
+            if(typeof value!=='string')return null;
+            let text=value.slice(0,4096).replace(/[\x00-\x1f\x7f]/g,' ');
+            for(const etag of etags)if(typeof etag==='string'&&etag)text=text.split(etag).join('[ETAG_REDACTED]');
+            text=text.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi,'[EMAIL_REDACTED]')
+              .replace(/Bearer\s+\S+/gi,'Bearer [REDACTED]').replace(/https?:\/\/[^\s"']+/gi,'[URL_REDACTED]')
+              .replace(/(["'])[A-Za-z0-9+\/_=-]{16,}\1/g,'[OPAQUE_VALUE_REDACTED]')
+              .replace(/((?:etag|token|secret|password|authorization|credential|private[_ -]?key)\s*(?:is|=|:)\s*)["']?[^\s,;"']+["']?/gi,'$1[REDACTED]');
+            return text.slice(0,1200);
+          }
+          function safeError(value,etags=[]){
+            const e=value?.error||value||{};
+            return {code:Number.isSafeInteger(e.code)?e.code:null,status:/^[A-Z][A-Z0-9_]{1,63}$/.test(e.status||'')?e.status:null,
+              message:cleanMessage(e.message,etags),messageSha256:typeof e.message==='string'?hash(e.message):null,
+              messageTruncated:typeof e.message==='string'&&e.message.length>1200};
+          }
+          function logsRequest(){
+            return {resourceNames:['projects/'+PROJECT],filter:[
+              'logName="projects/'+PROJECT+'/logs/cloudaudit.googleapis.com%2Factivity"',
+              'protoPayload.serviceName="run.googleapis.com"',
+              '(protoPayload.methodName="google.cloud.run.v2.Services.UpdateService" OR protoPayload.methodName="/Services.UpdateService")',
+              'timestamp>="'+EXPECTED.from+'"','timestamp<="'+EXPECTED.to+'"',
+              '(protoPayload.resourceName="'+SERVICE+'" OR protoPayload.request.service.name="'+SERVICE+'" OR '+
+                '(resource.labels.project_id="'+PROJECT+'" AND resource.labels.location="'+REGION+'" AND resource.labels.service_name="'+NAME+'"))'
+            ].join('\n'),orderBy:'timestamp asc',pageSize:10};
+          }
+          function validateData(etag){
+            assert.ok(typeof etag==='string'&&etag.length>0&&etag.length<=512&&!/[\x00-\x1f\x7f]/.test(etag),'I66_TRAFFIC_DIAGNOSTIC_ETAG_REQUIRED');
+            return {name:SERVICE,etag,traffic:[{type:'TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION',revision:EXPECTED.revision,percent:100}]};
+          }
+          function limitedClient(client,journal,now){
+            return {request:async options=>{
+              const keys=Object.keys(options||{}).sort();
+              if(options?.method==='GET'){
+                assert.deepEqual(keys,['method','url'],'I66_TRAFFIC_DIAGNOSTIC_GET_SHAPE');
+                assert.ok([FN_URL,RUN_URL].includes(options.url),'I66_TRAFFIC_DIAGNOSTIC_GET_RESOURCE');
+              }else if(options?.method==='POST'){
+                assert.deepEqual(keys,['data','method','url'],'I66_TRAFFIC_DIAGNOSTIC_LOG_SHAPE');
+                assert.equal(options.url,LOG_URL,'I66_TRAFFIC_DIAGNOSTIC_LOG_RESOURCE');
+                assert.deepEqual(options.data,logsRequest(),'I66_TRAFFIC_DIAGNOSTIC_LOG_SCOPE');
+              }else{
+                assert.deepEqual(keys,['data','method','url'],'I66_TRAFFIC_DIAGNOSTIC_VALIDATE_SHAPE');
+                assert.equal(options?.method,'PATCH','I66_TRAFFIC_DIAGNOSTIC_METHOD_DENIED');
+                assert.equal(options.url,VALIDATE_URL,'I66_TRAFFIC_DIAGNOSTIC_VALIDATE_ONLY_REQUIRED');
+                assert.deepEqual(options.data,validateData(options.data?.etag),'I66_TRAFFIC_DIAGNOSTIC_EXACT_TARGET_REQUIRED');
+              }
+              const row={method:options.method,url:options.url,startedAtUtc:now(),httpStatus:null,responseSha256:null};journal.push(row);
+              let response;
+              try{response=await client.request({...options,timeout:30000,retry:false});}
+              catch(error){if(error?.response)response=error.response;else throw Error('I66_TRAFFIC_DIAGNOSTIC_NETWORK_UNVERIFIED');}
+              row.httpStatus=Number(response.status);assert.ok(Number.isInteger(row.httpStatus)&&row.httpStatus>=100&&row.httpStatus<=599,'I66_TRAFFIC_DIAGNOSTIC_HTTP_STATUS');
+              assert.ok(response.data&&typeof response.data==='object'&&!Array.isArray(response.data),'I66_TRAFFIC_DIAGNOSTIC_RESPONSE_OBJECT');
+              const bytes=Buffer.from(JSON.stringify(response.data));assert.ok(bytes.length<=1048576,'I66_TRAFFIC_DIAGNOSTIC_RESPONSE_BOUND');
+              row.responseSha256=hash(bytes);row.completedAtUtc=now();return response;
+            }};
+          }
+          function auditRows(data,digest,expected=EXPECTED){
+            const entries=data.entries||[];assert.ok(Array.isArray(entries)&&entries.length<=10,'I66_TRAFFIC_DIAGNOSTIC_LOG_BOUND');
+            return entries.map(entry=>{
+              const p=entry?.protoPayload||{},request=p.request||{},service=request.service||{};
+              const mask=typeof request.updateMask==='string'?request.updateMask:
+                Array.isArray(request.updateMask?.paths)?request.updateMask.paths.join(','):null;
+              const etag=typeof service.etag==='string'?service.etag:null;
+              const serviceKeys=Object.keys(service).sort();
+              const requestKeysClosed=Object.keys(request).every(key=>['@type','service','updateMask','validateOnly','allowMissing','forceNewRevision'].includes(key));
+              const closedFlags=['validateOnly','allowMissing','forceNewRevision'].every(key=>request[key]===undefined||request[key]===false);
+              const requestMatches=service.name===SERVICE&&mask==='traffic'&&etag!==null&&closedFlags&&requestKeysClosed&&
+                JSON.stringify(serviceKeys)===JSON.stringify(['etag','name','traffic'])&&
+                hash(etag)===expected.etagSha256&&digest(service)===expected.requestSha256;
+              const method=['google.cloud.run.v2.Services.UpdateService','/Services.UpdateService'].includes(p.methodName);
+              const timestamp=typeof entry.timestamp==='string'&&Number.isFinite(Date.parse(entry.timestamp))?entry.timestamp:null;
+              const within=timestamp&&Date.parse(timestamp)>=Date.parse(EXPECTED.from)&&Date.parse(timestamp)<=Date.parse(EXPECTED.to);
+              return {timestamp,method:method?p.methodName:null,requestService:service.name===SERVICE?SERVICE:null,
+                updateMask:mask==='traffic'?'traffic':null,requestEtagSha256:etag?hash(etag):null,
+                matchedObservedRequest:Boolean(requestMatches&&method&&p.serviceName==='run.googleapis.com'&&within),
+                status:safeError(p.status,[etag]),entrySha256:digest(entry)};
+            });
+          }
+          async function collect({client,executor,contract,provenance,now=()=>new Date().toISOString()}){
+            const journal=[],auth=limitedClient(client,journal,now),p={makeIngress:{runtimeAccess:{principal:provenance.runtimePrincipal}}};
+            const {runtimePrincipal,...publicProvenance}=provenance;
+            const report={schema:'GI_I66_PREVIEW33_TRAFFIC_CONFLICT_READONLY_V1',status:'DIAGNOSTIC_HOLD',provenance:publicProvenance,
+              observedFailure:EXPECTED,startedAtUtc:now(),audit:null,dryValidation:null,before:null,after:null,identicalPrePostResponses:null,
+              httpCalls:journal,persistentMutationRequests:0,cloudWrites:0,configurationWrites:0,canonicalLeadWrites:0,iamWrites:0,
+              externalMessagesSent:0,rawRequestsPublished:false,rawResponsesPublished:false,releaseAuthority:false,errorCode:null};
+            const pair=async()=>{
+              const fr=await auth.request({method:'GET',url:FN_URL}),rr=await auth.request({method:'GET',url:RUN_URL});
+              assert.equal(fr.status,200,'I66_TRAFFIC_DIAGNOSTIC_FUNCTION_READ');assert.equal(rr.status,200,'I66_TRAFFIC_DIAGNOSTIC_SERVICE_READ');
+              const fn=executor.fnProjection(fr.data,p,'preview'),traffic=executor.trafficProjection(rr.data,fn,'preview');
+              assert.equal(fn.revision,EXPECTED.revision,'I66_TRAFFIC_DIAGNOSTIC_API_REVISION_DRIFT');assert.equal(fn.configurationDigest,EXPECTED.fnDigest,'I66_TRAFFIC_DIAGNOSTIC_FUNCTION_CONFIG_DRIFT');
+              assert.equal(traffic.serviceUid,EXPECTED.uid,'I66_TRAFFIC_DIAGNOSTIC_SERVICE_UID_DRIFT');assert.equal(traffic.generation,EXPECTED.generation,'I66_TRAFFIC_DIAGNOSTIC_GENERATION_DRIFT');
+              assert.equal(traffic.observationDigest,EXPECTED.trafficDigest,'I66_TRAFFIC_DIAGNOSTIC_TRAFFIC_DRIFT');
+              validateData(rr.data.etag);
+              return {fnRaw:fr.data,runRaw:rr.data,etag:rr.data.etag,safe:{apiRevision:fn.revision,functionConfigurationDigest:fn.configurationDigest,
+                functionResponseSha256:contract.digest(fr.data),runResponseSha256:contract.digest(rr.data),traffic,etagSha256:hash(rr.data.etag)}};
+            };
+            try{
+              try{
+                const logs=await auth.request({method:'POST',url:LOG_URL,data:logsRequest()});
+                report.audit={httpStatus:logs.status,filterSha256:hash(logsRequest().filter),paginationPresent:Boolean(logs.data.nextPageToken),
+                  rows:logs.status===200?auditRows(logs.data,contract.digest):[],error:logs.status===200?null:safeError(logs.data)};
+              }catch(error){report.audit={httpStatus:null,filterSha256:hash(logsRequest().filter),paginationPresent:null,rows:[],errorCode:code(error)};}
+              const matched=report.audit.rows.filter(x=>x.matchedObservedRequest&&x.status.code>0&&x.status.code<=16&&x.status.message);
+              if(!report.audit.paginationPresent&&matched.length===1){
+                report.status='OBSERVED_PATCH_ERROR_RECOVERED_FROM_AUDIT_NOT_RELEASE_AUTHORITY';
+              }else{
+                const before=await pair();report.before=before.safe;
+                try{
+                  const validated=await auth.request({method:'PATCH',url:VALIDATE_URL,data:validateData(before.etag)});
+                  report.dryValidation={httpStatus:validated.status,validateOnly:true,allowMissing:false,forceNewRevision:false,
+                    targetRevision:EXPECTED.revision,updateMask:'traffic',requestEtagSha256:hash(before.etag),
+                    acceptedForValidation:validated.status>=200&&validated.status<300&&!validated.data.error,
+                    operationDone:typeof validated.data.done==='boolean'?validated.data.done:null,
+                    provider:safeError(validated.data,[before.etag]),reproducesOriginal409:validated.status===409,
+                    originalFailureCauseProvenByThisReplay:false};
+                }finally{
+                  const after=await pair();report.after=after.safe;
+                  assert.deepEqual(after.fnRaw,before.fnRaw,'I66_TRAFFIC_DIAGNOSTIC_FUNCTION_CHANGED_DURING_VALIDATION');
+                  assert.deepEqual(after.runRaw,before.runRaw,'I66_TRAFFIC_DIAGNOSTIC_SERVICE_CHANGED_DURING_VALIDATION');
+                  report.identicalPrePostResponses=true;
+                }
+                report.status='VALIDATE_ONLY_RESPONSE_OBSERVED_NO_PERSISTENCE_NOT_RELEASE_AUTHORITY';
+              }
+            }catch(error){report.errorCode=code(error);}
+            report.completedAtUtc=now();report.reportDigest=contract.digest(report);return report;
+          }
+          function validateTrigger(env,event){
+            assert.equal(env.GITHUB_REPOSITORY,'paulaosoriof86/orbit360-core','I66_TRAFFIC_DIAGNOSTIC_REPOSITORY');
+            assert.equal(env.GITHUB_REF,'refs/heads/recovery/fase-a-clean-20260831','I66_TRAFFIC_DIAGNOSTIC_BRANCH');
+            assert.equal(env.GITHUB_EVENT_NAME,'push','I66_TRAFFIC_DIAGNOSTIC_PUSH_REQUIRED');
+            assert.match(env.GITHUB_SHA||'',/^[a-f0-9]{40}$/,'I66_TRAFFIC_DIAGNOSTIC_SOURCE_REQUIRED');
+            assert.equal(event?.head_commit?.id,env.GITHUB_SHA,'I66_TRAFFIC_DIAGNOSTIC_EVENT_SOURCE_DRIFT');
+            assert.ok(event.head_commit.message.includes(MARKER),'I66_TRAFFIC_DIAGNOSTIC_MARKER_REQUIRED');
+          }
+          async function main(){
+            assert.equal(process.argv.length,2,'I66_TRAFFIC_DIAGNOSTIC_NO_ARGUMENTS');
+            validateTrigger(process.env,JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH)));
+            const repo=process.cwd(),git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+            assert.equal(git('rev-parse','HEAD'),process.env.GITHUB_SHA,'I66_TRAFFIC_DIAGNOSTIC_CHECKOUT_DRIFT');
+            for(const [file,pin] of Object.entries(OWNER_PINS))assert.equal(git('rev-parse','HEAD:'+file),pin,'I66_TRAFFIC_DIAGNOSTIC_OWNER_PIN_DRIFT');
+            const previous=JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP,'i66-make-preimages-sanitized.json')));
+            assert.equal(previous.provenance.sourceSha,process.env.GITHUB_SHA,'I66_TRAFFIC_DIAGNOSTIC_FRESH_SOURCE_REQUIRED');
+            assert.equal(previous.provenance.runId,Number(process.env.GITHUB_RUN_ID),'I66_TRAFFIC_DIAGNOSTIC_FRESH_RUN_REQUIRED');
+            assert.equal(previous.provenance.runAttempt,Number(process.env.GITHUB_RUN_ATTEMPT),'I66_TRAFFIC_DIAGNOSTIC_FRESH_ATTEMPT_REQUIRED');
+            assert.deepEqual(previous.provenance.ownerPins,OWNER_PINS,'I66_TRAFFIC_DIAGNOSTIC_FRESH_OWNER_DRIFT');
+            assert.equal(previous.status,'PREIMAGES_OBSERVED_CLOSED_OR_ABSENT','I66_TRAFFIC_DIAGNOSTIC_CLOSED_REQUIRED');
+            assert.equal(previous.phases.preview.functionApi.projection.revision,EXPECTED.revision,'I66_TRAFFIC_DIAGNOSTIC_FRESH_API_DRIFT');
+            assert.equal(previous.phases.preview.cloudRunTraffic.observationDigest,EXPECTED.trafficDigest,'I66_TRAFFIC_DIAGNOSTIC_FRESH_TRAFFIC_DRIFT');
+            assert.equal(previous.phases.preview.grant.expectedDigest,EXPECTED.grantDigest,'I66_TRAFFIC_DIAGNOSTIC_FRESH_GRANT_DRIFT');
+            assert.equal(previous.phases.live.grant.expectedDigest,'ABSENT','I66_TRAFFIC_DIAGNOSTIC_LIVE_GRANT_DRIFT');
+            const credential=JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS));
+            assert.equal(credential.type,'service_account');assert.equal(credential.project_id,PROJECT);
+            const requireFrom=createRequire(path.join(repo,'functions/package.json')),{GoogleAuth}=requireFrom('google-auth-library');
+            const contract=require(path.join(repo,'functions/product-lead-ingress-contract.js'));
+            const executor=require(path.join(repo,'tools/gravicentra-i66-make-lead-protected-executor.cjs'));
+            const scope=require(path.join(repo,'tools/gravicentra-i66-make-release-scope.cjs'));
+            const client=await new GoogleAuth({projectId:PROJECT,scopes:['https://www.googleapis.com/auth/cloud-platform']}).getClient();
+            const report=await collect({client,executor,contract,provenance:{repository:process.env.GITHUB_REPOSITORY,sourceSha:process.env.GITHUB_SHA,
+              runId:Number(process.env.GITHUB_RUN_ID),runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT),job:'existing_inbound_config',
+              workflowPath:WORKFLOW,workflowGitBlob:git('rev-parse','HEAD:'+WORKFLOW),ownerPins:OWNER_PINS,runtimePrincipal:scope.RUNTIME,
+              freshPreimageReportDigest:previous.reportDigest}});
+            fs.writeFileSync(path.join(process.env.RUNNER_TEMP,'i66-make-traffic-conflict-sanitized.json'),JSON.stringify(report,null,2)+'\n',{mode:0o600});
+            console.log('I66_MAKE_TRAFFIC_CONFLICT_READONLY='+JSON.stringify({status:report.status,reportDigest:report.reportDigest,
+              auditHttpStatus:report.audit?.httpStatus,dryValidationHttpStatus:report.dryValidation?.httpStatus,cloudWrites:0,externalMessagesSent:0}));
+            if(report.status==='DIAGNOSTIC_HOLD')process.exitCode=1;
+          }
+          if(process.argv[1]==='-')main().catch(error=>{console.error(code(error));process.exitCode=1;});
+          module.exports={EXPECTED,OWNER_PINS,FN_URL,RUN_URL,LOG_URL,VALIDATE_URL,MARKER,logsRequest,validateData,limitedClient,auditRows,collect,validateTrigger,cleanMessage,safeError};
+          TRAFFICCONFLICTREADONLY
+      - name: Retain only sanitized Preview33 traffic conflict evidence
+        if: always() && github.event_name == 'push' && contains(github.event.head_commit.message, 'I66_MAKE_TRAFFIC_409_READONLY_R33')
+        uses: actions/upload-artifact@v4
+        with:
+          name: gi-i66-make-traffic-conflict-readonly-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/i66-make-traffic-conflict-sanitized.json
+          if-no-files-found: error
+          retention-days: 14
       - name: Validate exact existing inbound configuration without payload or credential output
         shell: bash
         run: node tools/gravicentra-i66-greenapi-existing-config-readonly.cjs
