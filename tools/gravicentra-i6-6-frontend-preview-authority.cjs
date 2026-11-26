@@ -522,6 +522,46 @@ function previewRequestTransition(request, previousRequest) {
   return true;
 }
 
+const historicalPaymentUnit=Object.freeze({
+  name:'documented-historical-payment',
+  target:'orbit360CobrosReconciliationCommand',
+  region:'us-central1',
+  roles:['Dirección','Operativo'],
+  changedOwners:['functions/cobros-reconciliation-domain.js','functions/payment-inference-engine.js'],
+  closure:['b4-003-scoped-access-boundary.js','cobros-ledger-contract.js','cobros-reconciliation-domain.js',
+    'cobros-source-intake-v2.js','payment-inference-engine.js','product-active-role-contract.js','proposal-application-boundary.js'],
+  packagePaths:['bootstrap.js','index.js','package-lock.json','package.json'],
+  tests:['tools/gravicentra-i6-6-r51-documentary-variance.test.cjs','tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs','tools/gravicentra-i6-6-siga-historical-payment-reconciliation.test.cjs'],
+  requires:['firebase-auth','firestore','cloud-functions','existing-hosting'],
+  providerBindingSchema:'GI_I66_SCOPED_FUNCTION_PACKAGE_V1'
+});
+function validateFunctionalUnitSuccessor(binding,current,readBlob) {
+  const c=historicalPaymentUnit;
+  assert.deepEqual(Object.keys(binding||{}).sort(),['schema','scope','unit','dependencies','targets','roles','owners','sourcePins','sourceQa','predecessor','releaseEpoch'].sort(),'SCOPED_BINDING_FIELDS');
+  assert.equal(binding.schema,c.providerBindingSchema);
+  assert.equal(binding.unit,c.name);assert.equal(binding.scope,'BACKEND_CALLABLE');
+  assert.deepEqual(binding.dependencies,c.requires,'FUNCTIONAL_DEPENDENCIES_REQUIRED');
+  assert.deepEqual(binding.targets,{preview:c.target+'Preview',live:c.target,region:c.region},'EXACT_FUNCTION_TARGETS_REQUIRED');
+  assert.deepEqual(binding.roles,c.roles,'SIGNED_ROLE_COVERAGE_REQUIRED');assert.deepEqual(binding.owners,c.changedOwners,'BOTH_FINANCIAL_OWNERS_REQUIRED');
+  assert.deepEqual(binding.sourceQa,c.tests,'EXACT_FUNCTIONAL_REGRESSIONS_REQUIRED');
+  const paths=[...c.closure,...c.packagePaths].map(p=>'functions/'+p).concat(c.tests).sort();
+  assert.deepEqual(Object.keys(binding.sourcePins).sort(),paths,'COMPLETE_DEPENDENCY_CLOSURE_REQUIRED');
+  for(const file of paths){
+    assert.match(binding.sourcePins[file],/^[a-f0-9]{40}$/);
+    assert.equal(readBlob(file),binding.sourcePins[file],'FUNCTIONAL_SOURCE_PIN_DRIFT '+file);
+  }
+  assert.ok(Number.isSafeInteger(binding.releaseEpoch)&&binding.releaseEpoch>=0);
+  assert.equal(binding.releaseEpoch,current.functionalEpoch||0,'STALE_FUNCTIONAL_RELEASE_EPOCH');
+  assert.deepEqual(Object.keys(binding.predecessor).sort(),['artifactDigest','buildId','hostingVersion','sourceSha','revision','archiveSha256','sourceGeneration','previewRevision','previewSourceGeneration','previewArchiveSha256'].sort());
+  for(const k of ['sourceSha','buildId','artifactDigest','hostingVersion'])assert.equal(binding.predecessor[k],current[k],'PHYSICAL_PREDECESSOR_'+k);
+  const live=current.backendRevisions.find(r=>r.name===c.target&&r.region===c.region);
+  assert.equal(binding.predecessor.revision,live?.currentRevision,'LIVE_BACKEND_PREDECESSOR');
+  for(const k of ['archiveSha256','previewArchiveSha256'])assert.match(binding.predecessor[k],/^[a-f0-9]{64}$/);
+  for(const k of ['sourceGeneration','previewSourceGeneration'])assert.match(binding.predecessor[k],/^[1-9][0-9]+$/);
+  assert.match(binding.predecessor.previewRevision,/^orbit360cobrosreconciliationcommandpreview-[0-9]+-[a-z0-9]+$/);
+  return binding;
+}
+
 async function admitPreview(transport,api,readMarker) {
   const request = transport.frontendPreviewRequest;
   const previous = JSON.parse(git('show','HEAD^:'+transportPath));
@@ -616,7 +656,7 @@ async function admitPreview(transport,api,readMarker) {
   }
   return true;
 }
-module.exports={COMPOSED_PUBLISHED_SOURCE,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB,DIRECT_FORMS_ASSIGNED_ROLES_PROFILE,DIRECT_FORMS_ASSIGNED_ROLES_CHANGED_QA,DIRECT_FORMS_ASSIGNED_ROLES_PREDECESSOR,
+module.exports={historicalPaymentUnit,validateFunctionalUnitSuccessor,COMPOSED_PUBLISHED_SOURCE,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB,DIRECT_FORMS_ASSIGNED_ROLES_PROFILE,DIRECT_FORMS_ASSIGNED_ROLES_CHANGED_QA,DIRECT_FORMS_ASSIGNED_ROLES_PREDECESSOR,
   DIRECT_FORMS_INSURER_EDITOR_PATH,DIRECT_FORMS_INSURER_EDITOR_TEST_PATH,DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH,DIRECT_FORMS_INSURER_FINDINGS,validateAssignedRolesInsurerRevision,validateInsurerEditorSource,
   FINANCIAL_SUCCESSOR_RECEIPT_PATH,FINANCIAL_SUCCESSOR_PREDECESSOR,validateFinancialQaBinding,CANCELLATION_SUCCESSOR_RECEIPT_PATH,CANCELLATION_SUCCESSOR_PREDECESSOR,validateCancellationQaBinding,
   admitPreview,previewRequestTransition,validateStartupRecovery,STARTUP_PATHS,STARTUP_RECEIPT_PATH,STARTUP_TEST_PATH,

@@ -37,7 +37,7 @@ assert.match(policies,/q\.expectedReceiptDisplayStatus\s*\?\s*q\.expectedReceipt
 assert.match(detail,/Orbit\.q\.expectedReceiptDisplayStatus\(r\)/,'CLIENT_POLICY_DETAIL_OWNER');
 assert.match(cobros,/const origin='insurer_invoice';/,'APPLICATION_IS_ENRICHMENT_NOT_SECOND_CRM_PAYMENT');
 assert.doesNotMatch(cobros,/const origin=paymentOriginKind\(receipt\) === 'CRM_DIRECT' \? 'crm_migrated_direct'/,'CRM_DUPLICATE_PAYMENT_PATH_REMOVED');
-assert.match(backend,/const legacyPaidReceiptReconciliation = !existingCobro && receiptPaid && operationName === 'reconcile_payment';/,'LEGACY_PAID_RECEIPT_CAN_ENRICH_NOT_REAPPLY');
+assert.match(backend,/const legacyPaidReceiptReconciliation = !existingCobro && \(receiptPaid \|\| !!historicalSiga\) && operationName === 'reconcile_payment';/,'LEGACY_PAID_RECEIPT_CAN_ENRICH_NOT_REAPPLY');
 assert.match(backend,/const enrichment = applicationEvidenceSource && \(cobroPaid \|\| legacyPaidReceiptReconciliation\)/,'SERVER_ENRICHMENT_ONLY_FOR_EXISTING_PAID_EVIDENCE');
 assert.match(backend,/PAYMENT_RECEIPT_COBRO_STATE_CONFLICT/,'CONFLICTING_LINKED_PAYMENT_STATES_FAIL_CLOSED');
 assert.match(backend,/PAYMENT_DETERMINISTIC_COBRO_ID_CONFLICT/,'HISTORIC_RELINK_ID_COLLISION_FAIL_CLOSED');

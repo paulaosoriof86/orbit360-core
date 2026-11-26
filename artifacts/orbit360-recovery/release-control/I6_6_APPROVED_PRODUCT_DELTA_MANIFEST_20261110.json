@@ -4385,6 +4385,29 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_DOCUMENTED_HISTORICAL_PAYMENT_SCOPE_20261125",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_FUNCTION_RELEASE.json",
+      "scope": "One reconciliation callable per environment. Preserve the original payment, policy, customer, fiscal date, and established permissions. Attach documentary evidence to the existing movement.",
+      "paths": [
+        {
+          "path": "functions/cobros-reconciliation-domain.js",
+          "gitBlobSha": "f673af776484431295aa7e4b20ae26d3b09eab7e",
+          "replaces": {
+            "path": "functions/cobros-reconciliation-domain.js",
+            "priorGitBlobSha": "3d84423fd985841c6f9b230dcf729b41f2512556",
+            "priorChangeId": "I6_6_R51_DOCUMENTARY_TOLERANCE_AND_CANONICAL_DOCUMENTARY_PAYMENT_UI_20261124"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-siga-historical-payment-reconciliation.test.cjs",
+          "gitBlobSha": "242027512ada8c8010917bfb75daff731e2d50da"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
@@ -4679,6 +4702,25 @@
           }
         }
       ]
+    },
+    {
+      "id": "I6_6_DOCUMENTED_HISTORICAL_PAYMENT_QA_20261125",
+      "scope": "EXISTING_DECLARED_TESTS_ONLY",
+      "approvedByDirection": true,
+      "paths": [],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+          "gitBlobSha": "770453876880cc05f93552e4c0e8e3ac9ac1bcfc",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+            "priorGitBlobSha": "41ee9f9aa0ef65d9e19ecc18eee20fdbc3ddc54d",
+            "priorChangeId": "I6_6_LEGACY_PAID_RECEIPT_APPLICATION_WITHOUT_DOUBLE_PAYMENT_P0"
+          }
+        }
+      ],
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_DOCUMENTED_HISTORICAL_PAYMENT_QA_20261125.json",
+      "receiptGitBlobSha": "151cd510be042c71e9b1e6cab27dca3f079091b3"
     }
   ]
 }

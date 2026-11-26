@@ -77,7 +77,12 @@ function validateMechanism(m,sourceSha){
     ['3bab3e94cdd575b40efda54eb8d6d7ba72f87a39','db304f586b758321d4d84d1e25e793fb3c9b65f1'],'HISTORICAL_COMPOSITE_FIXTURE_EXACT_REVISION');
   return m;
 }
-function validateBinding(p){
+function validateBinding(p,physical){
+  if(p?.providerBinding?.schema==='GI_I66_SCOPED_FUNCTION_PACKAGE_V1'){
+    need(native(p)&&physical&&typeof physical.readBlob==='function','FUNCTIONAL_PHYSICAL_AUTHORITY_REQUIRED');
+    equal(Object.keys(p).sort(),['executionProvider','providerBinding'],'SCOPED_CANDIDATE_FIELDS');
+    return scopeOwner().validateFunctionalUnitSuccessor(p.providerBinding,physical.current,physical.readBlob);
+  }
   need(native(p),'EXPLICIT_CLOUD_PROVIDER');const b=p.providerBinding;
   equal(Object.keys(b||{}).sort(),['schema','requestVersion','mechanism','hostingPlan','hostingBuildId','hostingProof','hostingVersion'].sort(),'BINDING_KEYS');
   equal(b.schema,C.bindingSchema,'BINDING_SCHEMA');preview.validatePlan(b.hostingPlan);
@@ -286,7 +291,7 @@ function bindingFromHosting(cwd,hostingPlan,receipt,mechanismSha){
 }
 function makePlan(cwd,phase){
   need(PHASES.includes(phase),'PHASE');const g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
-  const control=json(path.join(cwd,g.CONTROL)),p=g.candidateForPhase(control,phase);validateBinding(p);
+  const control=json(path.join(cwd,g.CONTROL)),p=g.candidateForPhase(control,phase);assertCompositeFresh(p,json(path.join(cwd,C.control)),(ref,f)=>git(cwd,'rev-parse',ref+':'+f));validateBinding(p);
   const authorityHead=git(cwd,'rev-parse','HEAD');equal(git(cwd,'status','--porcelain','--untracked-files=no'),'','CLEAN_AUTHORITY_CHECKOUT');
   verifyPinnedOwners(p,{head:authorityHead,cwd});
   const workflow=phase==='preview'?C.previewWorkflow:C.liveWorkflow,bytes=gitBytes(cwd,p.sourceSha,workflow),blocks=workflowBlocks(bytes.toString(),phase);runtimeBlocks(blocks,phase);
@@ -424,7 +429,7 @@ function consumeNativeEnv(file,env){
 function branchGuard(p,plan,cwd){
   git(cwd,'fetch','--quiet',C.repositoryUrl,'refs/heads/'+C.branch);const head=git(cwd,'rev-parse','FETCH_HEAD');
   const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),tr=JSON.parse(gitBytes(cwd,head,g.CONTROL));
-  equal(g.candidateForPhase(tr,plan.phase),p,'CURRENT_CANONICAL_AUTHORIZATION');verifyPinnedOwners(p,{head,cwd});
+  assertCompositeFresh(p,JSON.parse(gitBytes(cwd,head,C.control)),(ref,f)=>git(cwd,'rev-parse',ref+':'+f));equal(g.candidateForPhase(tr,plan.phase),p,'CURRENT_CANONICAL_AUTHORIZATION');verifyPinnedOwners(p,{head,cwd});
   equal(blob(gitBytes(cwd,head,'artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_PROMOTION_AUTHORITY.json')),plan.financialAuthorityBlob,'CURRENT_FINANCIAL_AUTHORITY');return head;
 }
 async function retainMake(phase){
@@ -664,8 +669,324 @@ async function runOperationalCycle(phase,out) {
   throw Error('I66_TERMINAL_PROVIDER_CLAIM_MISSING');
 }
 
+const scopeOwner=()=>require('./gravicentra-i6-6-frontend-preview-authority.cjs');
+const UNIT_FILE='artifacts/orbit360-recovery/release-control/I6_6_SCOPED_FUNCTION_RELEASE.json';
+function scopedPhysical(control) {
+  const hosting=control[control.currentExecutionDecisionPointer],journal=control.i66ScopedFunctionRelease;
+  need(hosting?.gate==='I6.6'&&control.gateState.gates.I6.activeSubgate==='I6.6','CURRENT_PHYSICAL_I66');
+  if(!journal?.accepted)return {...hosting,functionalEpoch:0};
+  const accepted=journal.accepted;
+  need(Number.isSafeInteger(accepted.epoch)&&accepted.epoch>0&&sha40(accepted.sourceSha),'SCOPED_PHYSICAL_RECEIPT');
+  return {...hosting,functionalEpoch:accepted.epoch,backendRevisions:hosting.backendRevisions.map(target=>
+    target.name===accepted.target?{...target,currentRevision:accepted.revision}:target)};
+}
+function assertCompositeFresh(candidate,control,readBlob){
+  const release=control.i66ScopedFunctionRelease;
+  need(!release?.providerStages?.LIVE_DEPLOYED||!!release.accepted,'LIVE_FUNCTION_PENDING_POSTCHECK');
+  const last=release?.accepted;
+  if(!last)return;
+  // No older composite may overwrite this function. Recomposition must prove
+  // the latest accepted code in the immutable candidate and its rollback base.
+  for(const [file,sha] of Object.entries(last.sourcePins))equal(readBlob(candidate.sourceSha,file),sha,'SUPERSEDED_FUNCTIONAL_SOURCE');
+  equal(candidate.scopedPredecessor?.epoch,last.epoch,'SUPERSEDED_FUNCTIONAL_PREDECESSOR');
+  equal(candidate.scopedPredecessor?.revision,last.revision,'SUPERSEDED_FUNCTIONAL_REVISION');
+}
+function scopedCandidate(cwd=process.cwd()) {
+  const c=json(path.join(cwd,C.control)),record=json(path.join(cwd,UNIT_FILE)),authority=c.i66ScopedFunctionRelease;
+  equal(authority?.candidatePath,UNIT_FILE,'ACTIVE_SCOPED_UNIT');
+  equal(authority.candidateBlob,blob(fs.readFileSync(path.join(cwd,UNIT_FILE))),'SIGNED_SCOPE_RECORD');
+  const p={executionProvider:C.provider,providerBinding:record};
+  validateBinding(p,{current:scopedPhysical(c),readBlob:file=>git(cwd,'rev-parse','HEAD:'+file)});
+  return record;
+}
+function packageProviderSource(out,sourceSha) {
+  need(sha40(sourceSha),'EXACT_FUNCTION_PACKAGE_INPUT');
+  const checkout=fs.mkdtempSync(path.join(os.tmpdir(),'gi-i66-function-source-'));
+  try {
+    execFileSync('git',['init','-q',checkout]);
+    execFileSync('git',['-C',checkout,'fetch','-q','--no-tags','--depth=1',C.repositoryUrl,sourceSha]);
+    execFileSync('git',['-C',checkout,'checkout','-q','--detach','FETCH_HEAD']);
+    equal(git(checkout,'rev-parse','HEAD'),sourceSha,'FETCHED_FUNCTION_PACKAGE_SOURCE');
+    equal(blob(fs.readFileSync(C.tool)),git(checkout,'rev-parse','HEAD:'+C.tool),'BUILDER_SAME_SIGNED_SOURCE');
+    return packageFunctionalUnit(path.resolve(out),checkout);
+  } finally { fs.rmSync(checkout,{recursive:true,force:true}); }
+}
+function packageFunctionalUnit(out,cwd=process.cwd()){
+  const binding=scopedCandidate(cwd),source=git(cwd,'rev-parse','HEAD');
+  equal(git(cwd,'status','--porcelain','--untracked-files=no'),'','CLEAN_UNIT_WORKTREE');
+  const tree=git(cwd,'rev-parse',source+':functions');
+  const archive=path.join(out,'function-source.zip');fs.mkdirSync(out,{recursive:false});
+  // A fresh, complete Functions source archive. The only deployable names are
+  // the two explicit entry points in the signed binding. Hosting is retained.
+  execFileSync('git',['archive','--format=zip','--output='+archive,source+':functions'],{cwd});
+  const report=path.join(out,'source-tests.tap');
+  pkg.execLogged(process.execPath,['--test',...binding.sourceQa],{cwd,log:report});
+  const data=fs.readFileSync(archive);
+  const receipt={schema:'GI_I66_SCOPED_FUNCTION_BUILD_V1',scope:binding.scope,sourceSha:source,functionTree:tree,
+    digest:sha(data),bytes:data.length,bindingBlob:blob(fs.readFileSync(path.join(cwd,UNIT_FILE))),
+    sourceTestsSha256:sha(fs.readFileSync(report)),targets:binding.targets,sourcePins:binding.sourcePins};
+  write(path.join(out,'package.json'),receipt);return receipt;
+}
+function functionalBuildConfig(cwd=process.cwd(),sourceSha){
+  const binding=scopedCandidate(cwd),head=sourceSha||git(cwd,'rev-parse','HEAD'),base='i66/functional/'+binding.unit+'/'+head+'/$BUILD_ID/';
+  return {steps:[{name:C.image,id:'certify-function-package',entrypoint:'node',args:[C.tool,'package-functional-unit','gi-functional-output',head]}],
+    serviceAccount:'projects/'+C.projectId+'/serviceAccounts/'+C.serviceAccount,
+    logsBucket:'gs://'+C.bucket+'/i66/cloud-build-logs',options:{logging:'GCS_ONLY',sourceProvenanceHash:['SHA256']},timeout:'1200s',
+    artifacts:{objects:{location:'gs://'+C.bucket+'/'+base,paths:['gi-functional-output/function-source.zip','gi-functional-output/package.json','gi-functional-output/source-tests.tap']}}};
+}
+
+function readGcloud(args,options={}){
+  return execFileSync('gcloud',[...args,'--project='+C.projectId],{maxBuffer:48*1024*1024,stdio:['ignore','pipe','pipe'],...options});
+}
+function readFunctionSnapshot(target,region) {
+  const fn=JSON.parse(readGcloud(['functions','describe',target,'--gen2','--region='+region,'--format=json']));
+  equal(fn.name,'projects/'+C.projectId+'/locations/'+region+'/functions/'+target,'EXACT_FUNCTION_RESOURCE');
+  equal(fn.state,'ACTIVE','EXISTING_ACTIVE_FUNCTION');equal(fn.buildConfig.entryPoint,target,'EXACT_FUNCTION_ENTRYPOINT');
+  const sc=fn.serviceConfig,source=fn.buildConfig.sourceProvenance?.resolvedStorageSource||fn.buildConfig.source?.storageSource;
+  need(source?.bucket&&source.object&&/^[1-9][0-9]+$/.test(String(source.generation)),'IMMUTABLE_BACKEND_SOURCE');
+  const service=sc.service.split('/').at(-1);equal(service,target.toLowerCase(),'EXACT_RUN_SERVICE');
+  const run=JSON.parse(readGcloud(['run','services','describe',service,'--region='+region,'--format=json(status.traffic,status.conditions,status.latestReadyRevisionName)']));
+  const traffic=run.status.traffic.filter(x=>Number(x.percent)>0);
+  need(traffic.length===1&&Number(traffic[0].percent)===100,'EXCLUSIVE_REVISION_TRAFFIC');
+  const revision=traffic[0].revisionName;
+  equal(sc.revision,revision,'FUNCTION_SOURCE_MUST_MATCH_SERVING_REVISION');
+  need(run.status.conditions.some(x=>x.type==='Ready'&&x.status==='True'),'RUN_READY');
+  const config={...sc};for(const k of ['revision','uri','service','allTrafficOnLatestRevision'])delete config[k];
+  return {target,region,service,revision,source,configurationDigest:digest(config)};
+}
+function scopedArchive(uri,generation){
+  need(typeof uri==='string'&&uri.startsWith('gs://')&&!uri.includes('#')&&/^[1-9][0-9]+$/.test(String(generation)),'FROZEN_ARCHIVE_REQUIRED');
+  return readGcloud(['storage','cat',uri+'#'+generation]);
+}
+function checkServingSnapshot(snapshot,expected,phase) {
+  const live=phase==='live',src=snapshot.source;
+  equal(snapshot.revision,live?expected.revision:expected.previewRevision,'SERVING_REVISION_PRECONDITION');
+  equal(String(src.generation),live?expected.sourceGeneration:expected.previewSourceGeneration,'SERVING_SOURCE_GENERATION');
+  equal(sha(scopedArchive('gs://'+src.bucket+'/'+src.object,src.generation)),live?expected.archiveSha256:expected.previewArchiveSha256,'SERVING_PACKAGE_PRECONDITION');
+}
+async function verifyScopedHosting(binding) {
+  const origins=['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app'];
+  const markers=await Promise.all(origins.map(async origin=>{
+    const response=await fetch(origin+'/__recovery__/build.json',{cache:'no-store',redirect:'error'});
+    need(response.ok,'HOSTING_READBACK');return Buffer.from(await response.arrayBuffer());
+  }));
+  equal(markers[0],markers[1],'CUSTOM_AND_FIREBASE_HOSTING_MARKERS');
+  const marker=JSON.parse(markers[0]);equal([marker.sourceSha,marker.buildId],[binding.predecessor.sourceSha,binding.predecessor.buildId],'HOSTING_FRONTEND_COMPATIBILITY');
+  const token=readGcloud(['auth','print-access-token']).toString().trim();
+  const response=await fetch('https://firebasehosting.googleapis.com/v1beta1/sites/'+C.projectId+'/releases?pageSize=1',{headers:{Authorization:'Bearer '+token}});
+  need(response.ok,'HOSTING_PROVIDER_READBACK');const release=(await response.json()).releases?.[0];
+  equal(release?.version?.name,binding.predecessor.hostingVersion,'PROVIDER_HOSTING_VERSION');
+  return {version:release.version.name,buildId:marker.buildId,sourceSha:marker.sourceSha,markerSha256:sha(markers[0])};
+}
+function readFunctionalPackage(buildId,cwd=process.cwd()){
+  need(uuid(buildId),'FUNCTIONAL_BUILD_UUID');
+  const build=JSON.parse(readGcloud(['builds','describe',buildId,'--region='+C.region,'--format=json']));
+  const sourceSha=build.sourceProvenance?.resolvedGitSource?.revision, b=scopedCandidate(cwd);
+  equal([build.status,build.projectId,build.source.gitSource.url,build.source.gitSource.revision,build.sourceProvenance.resolvedGitSource.url],
+    ['SUCCESS',C.projectId,C.repositoryUrl,sourceSha,C.repositoryUrl],'SIGNED_PROVIDER_BUILD_SOURCE');
+  need(sha40(sourceSha),'EXACT_FUNCTION_PACKAGE_SOURCE');git(cwd,'merge-base','--is-ancestor',sourceSha,'HEAD');
+  equal(git(cwd,'rev-parse',sourceSha+':'+UNIT_FILE),blob(fs.readFileSync(path.join(cwd,UNIT_FILE))),'UNCHANGED_BINDING');
+  equal(git(cwd,'rev-parse',sourceSha+':functions'),git(cwd,'rev-parse','HEAD:functions'),'STALE_FUNCTION_TREE');
+  const cfg=functionalBuildConfig(cwd,sourceSha);
+  equal(build.serviceAccount,cfg.serviceAccount,'PACKAGE_PROVIDER_PRINCIPAL');equal(build.steps.length,1,'EXACT_PACKAGE_STEP_COUNT');
+  for(const k of ['name','id','entrypoint','args'])equal(build.steps[0][k],cfg.steps[0][k],'EXACT_PACKAGE_STEP_'+k);
+  for(const k of ['env','secretEnv','volumes'])need(!build.steps[0][k]?.length&&!build.options?.[k]?.length,'NO_EXECUTION_OVERRIDE');
+  need(!build.availableSecrets&&!build.secrets?.length&&!build.buildTriggerId,'NO_ALTERNATE_BUILD_INPUT');
+  const prefix='i66/functional/'+b.unit+'/'+sourceSha+'/'+buildId+'/',bucket='gs://'+C.bucket+'/';
+  const manifest=build.results?.artifactManifest;need(manifest?.startsWith(bucket+prefix+'artifacts-'),'EXACT_NATIVE_ARTIFACT_MANIFEST');
+  const manifestUri=manifest.split('#')[0],meta=JSON.parse(readGcloud(['storage','objects','describe',manifestUri,'--raw','--format=json']));
+  const parsed=pkg.parseArtifactManifest(scopedArchive(manifestUri,manifest.split('#')[1]||meta.generation));
+  const records=Array.isArray(parsed)?parsed:parsed.artifacts;
+  need(Array.isArray(records)&&records.length===3,'EXACT_FUNCTION_PACKAGE_MEMBERS');
+  function retained(name){
+    const expected=[bucket+prefix+name,bucket+prefix+'gi-functional-output/'+name];
+    const rows=records.filter(row=>expected.includes(row.location?.split('#')[0]));equal(rows.length,1,'EXACT_RETAINED_'+name);
+    const [uri,generation]=rows[0].location.split('#');const bytes=scopedArchive(uri,generation);
+    const md5=crypto.createHash('md5').update(bytes).digest('hex'),reported=pkg.nativeArtifactMd5(rows[0]);
+    need([md5,Buffer.from(md5,'hex').toString('base64')].includes(reported),'PROVIDER_OBJECT_HASH_'+name);
+    return {uri,generation,sha256:sha(bytes),bytes:bytes.length,data:bytes};
+  }
+  const artifact=retained('function-source.zip'),receipt=JSON.parse(retained('package.json').data);
+  equal(receipt.digest,artifact.sha256,'FUNCTION_PACKAGE_DIGEST');equal(receipt.bytes,artifact.bytes,'FUNCTION_PACKAGE_BYTES');
+  equal([receipt.sourceSha,receipt.functionTree,receipt.bindingBlob,receipt.targets,receipt.sourcePins,receipt.sourceTestsSha256],
+    [sourceSha,git(cwd,'rev-parse',sourceSha+':functions'),blob(fs.readFileSync(path.join(cwd,UNIT_FILE))),b.targets,b.sourcePins,retained('source-tests.tap').sha256],'CERTIFIED_FUNCTION_PACKAGE');
+  delete artifact.data;return {sourceSha,buildId,artifact,receipt};
+}
+
+function checkedBranch(){
+  const head=git(process.cwd(),'rev-parse','HEAD'),remote=git(process.cwd(),'ls-remote',C.repositoryUrl,'refs/heads/'+C.branch).split(/\s+/)[0];
+  equal(remote,head,'FUNCTIONAL_AUTHORITY_CHANGED_RECOMPOSE');return head;
+}
+function writeFunctionalStage(stage,facts){
+  const owner=require('./gravicentra-i66-frontend-control.cjs');
+  const change=owner.prepareFunctionalStage(stage,facts,checkedBranch());
+  return change.status==='NOOP_ALREADY_RECONCILED'?{status:change.status}:owner.commitProviderOutcome(change);
+}
+function retainedFunctionRecord(name,value){
+  const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'gi-functional-evidence-')),file=path.join(tmp,'record.json'),uri='gs://'+C.bucket+'/'+name;
+  try{
+    const raw=Buffer.from(JSON.stringify(value,null,2)+'\n');fs.writeFileSync(file,raw,{mode:0o600});
+    const reader=operationalClaimReader();
+    return (async()=>{
+      let existing=await reader.findClaim(name);
+      if(!existing){
+        try{readGcloud(['storage','cp',file,uri,'--if-generation-match=0','--quiet']);}
+        catch(error){existing=await reader.findClaim(name);if(!existing)throw error;}
+      }
+      existing=existing||await reader.findClaim(name);need(existing,'FUNCTIONAL_OBJECT_UNCONFIRMED');
+      equal(existing.sha256,sha(raw),'EXCLUSIVE_FUNCTIONAL_OBJECT');return existing;
+    })().finally(()=>fs.rmSync(tmp,{recursive:true,force:true}));
+  }catch(error){fs.rmSync(tmp,{recursive:true,force:true});throw error;}
+}
+function functionalFacts(pkg){
+  return {sourceSha:pkg.sourceSha,buildId:pkg.buildId,packageSha256:pkg.artifact.sha256,bindingBlob:pkg.receipt.bindingBlob,artifact:pkg.artifact};
+}
+async function executeFunctionalPhase(phase,buildId){
+  need(['package','preview','live'].includes(phase),'FUNCTIONAL_PHASE');
+  checkedBranch();const binding=scopedCandidate(),pkg=readFunctionalPackage(buildId),facts=functionalFacts(pkg);
+  await verifyScopedHosting(binding);
+  const c=json(C.control),stages=c.i66ScopedFunctionRelease.providerStages||{};
+  need(!Object.keys(stages).some(k=>/_(HOLD|ROLLED_BACK)$/.test(k)),'TERMINAL_FUNCTIONAL_UNIT_REQUIRES_FRESH_ADMISSION');
+  if(phase==='package')return writeFunctionalStage('PACKAGE_CERTIFIED',facts);
+  equal(stages.PACKAGE_CERTIFIED,facts,'ARTIFACT_SIGNED_IN_AUTHORITY');
+  if(phase==='live')need(stages.PREVIEW_VERIFIED&&stages.PREVIEW_VERIFIED.packageSha256===facts.packageSha256,'SIGNED_PREVIEW_REQUIRED');
+  const target=binding.targets[phase],region=binding.targets.region,stage=phase==='preview'?'PREVIEW_DEPLOYED':'LIVE_DEPLOYED';
+  const snapshot=readFunctionSnapshot(target,region),prefix='i66/functional/'+binding.unit+'/'+pkg.sourceSha+'/'+buildId+'/';
+  const claimName=prefix+phase+'-claim.json',reader=operationalClaimReader(),previous=await reader.findClaim(claimName);
+  const holdKey=prefix+phase+'-hold.json';
+  async function recordHold(ref) {
+    const terminal=JSON.parse((await reader.object(ref)).data);
+    equal([terminal.target,terminal.phase,terminal.buildId,terminal.packageSha256],[target,phase,buildId,facts.packageSha256],'EXACT_HELD_OPERATION');
+    return writeFunctionalStage(phase.toUpperCase()+'_HOLD',{...facts,target,receipt:ref,revision:terminal.observedRevision,trafficPercent:100});
+  }
+  const pendingHold=await reader.findClaim(holdKey);
+  if(pendingHold)return recordHold(pendingHold);
+  let before;
+  if(previous){
+    const claim=JSON.parse((await reader.object(previous)).data);
+    equal([claim.phase,claim.target,claim.packageSha256,claim.buildId,claim.bindingBlob],[phase,target,facts.packageSha256,buildId,facts.bindingBlob],'FUNCTIONAL_EXISTING_CLAIM_BINDING');
+    before=claim.before;
+    // A lost ACK can be adopted only from a physical source and config readback.
+    // An unfinished or rolled-back attempt cannot execute a second deployment.
+    need(snapshot.revision!==before.revision,'CONSUMED_FUNCTIONAL_CLAIM_NO_REDEPLOY');
+  }else{
+    before=snapshot;checkServingSnapshot(before,binding.predecessor,phase);
+    if(phase==='preview')checkServingSnapshot(readFunctionSnapshot(binding.targets.live,region),binding.predecessor,'live');
+    if(phase==='live'){
+      const preview=readFunctionSnapshot(binding.targets.preview,region);
+      equal(preview.revision,stages.PREVIEW_VERIFIED.revision,'CURRENT_ACCEPTED_PREVIEW_REVISION');
+    }
+    checkedBranch();
+    // The compare-and-create must be exclusive even if two observers read no claim.
+    const claim={...facts,phase,target,before,authorityHead:checkedBranch()};
+    const dir=fs.mkdtempSync(path.join(os.tmpdir(),'gi-function-claim-')),file=path.join(dir,'claim.json');
+    try{fs.writeFileSync(file,JSON.stringify(claim)+'\n',{mode:0o600});readGcloud(['storage','cp',file,'gs://'+C.bucket+'/'+claimName,'--if-generation-match=0','--quiet']);}
+    finally{fs.rmSync(dir,{recursive:true,force:true});}
+    checkedBranch();checkServingSnapshot(readFunctionSnapshot(target,region),binding.predecessor,phase);
+    const meta=JSON.parse(readGcloud(['storage','objects','describe',pkg.artifact.uri,'--raw','--format=json']));
+    equal(String(meta.generation),pkg.artifact.generation,'FROZEN_SOURCE_STILL_CURRENT');
+    try{readGcloud(['functions','deploy',target,'--gen2','--region='+region,'--entry-point='+target,'--source='+pkg.artifact.uri,'--quiet']);}
+    catch(error){
+      const fresh=readFunctionSnapshot(target,region),src=fresh.source;
+      if(fresh.revision===before.revision||sha(scopedArchive('gs://'+src.bucket+'/'+src.object,src.generation))!==facts.packageSha256){
+        const held=await retainedFunctionRecord(holdKey,{...facts,target,phase,beforeRevision:before.revision,observedRevision:fresh.revision});
+        return recordHold(held);
+      }
+    }
+  }
+  const after=readFunctionSnapshot(target,region),src=after.source;
+  need(after.revision!==before.revision,'FUNCTIONAL_NEW_REVISION_REQUIRED');
+  equal(sha(scopedArchive('gs://'+src.bucket+'/'+src.object,src.generation)),facts.packageSha256,'EXACT_DEPLOYED_FUNCTION_ARCHIVE');
+  equal(after.configurationDigest,before.configurationDigest,'FUNCTION_CONFIGURATION_CHANGED');
+  const receipt=await retainedFunctionRecord(prefix+phase+'-deployment.json',{...facts,phase,target,before,after,trafficPercent:100});
+  return writeFunctionalStage(stage,{...facts,target,revision:after.revision,trafficPercent:100,receipt,rollbackRevision:before.revision});
+}
+
+function firestoreFields(values){
+  const decode=v=>{
+    if('mapValue'in v)return firestoreFields(v.mapValue.fields||{});
+    if('arrayValue'in v)return (v.arrayValue.values||[]).map(decode);
+    if('integerValue'in v)return Number(v.integerValue);
+    return Object.values(v)[0];
+  };
+  return Object.fromEntries(Object.entries(values).map(([k,v])=>[k,decode(v)]));
+}
+async function acceptFunctionalJourney(phase,buildId,refFile){
+  need(phase==='preview'||phase==='live','FUNCTIONAL_ACCEPT_PHASE');
+  checkedBranch();const b=scopedCandidate(),pkg=readFunctionalPackage(buildId),facts=functionalFacts(pkg),target=b.targets[phase];
+  const stages=json(C.control).i66ScopedFunctionRelease.providerStages||{},deployed=stages[phase==='preview'?'PREVIEW_DEPLOYED':'LIVE_DEPLOYED'];
+  equal(deployed?.packageSha256,facts.packageSha256,'EXACT_DEPLOYED_PACKAGE_REQUIRED');
+  const snapshot=readFunctionSnapshot(target,b.targets.region);equal(snapshot.revision,deployed.revision,'CURRENT_SIGNED_TEST_REVISION');
+  const hosting=await verifyScopedHosting(b),ref=json(refFile),io=gcloudReadIo();
+  const base='gs://'+C.bucket+'/i66/functional/'+b.unit+'/'+pkg.sourceSha+'/'+buildId+'/';
+  equal(ref.uri,base+phase+'-role-journeys.json','EXACT_PRIVATE_JOURNEY_RECEIPT');
+  const {data,meta}=await io.object(ref),report=JSON.parse(data);
+  const deployEvidence=await io.object(deployed.receipt);
+  equal([report.phase,report.sourceSha,report.revision,report.packageSha256,report.hostingBuildId],
+    [phase,pkg.sourceSha,snapshot.revision,facts.packageSha256,hosting.buildId],'JOURNEY_PROVENANCE');
+  need(Date.parse(meta.timeCreated)>=Date.parse(deployEvidence.meta.timeCreated),'JOURNEY_AFTER_DEPLOY');
+  equal(report.journeys.map(x=>x.role),b.roles,'BOTH_AUTHENTICATED_JOURNEYS');
+  const token=readGcloud(['auth','print-access-token']).toString().trim();
+  const stem='https://firestore.googleapis.com/v1/projects/'+C.projectId+'/databases/(default)/documents/tenants/alianzas-soluciones/';
+  async function doc(collection,id){
+    need(typeof id==='string'&&/^[A-Za-z0-9_-]{1,180}$/.test(id),'SCOPED_JOURNEY_DOC_ID');
+    const r=await fetch(stem+collection+'/'+id,{headers:{Authorization:'Bearer '+token}});need(r.ok,'SERVER_READBACK_REQUIRED');return firestoreFields((await r.json()).fields);
+  }
+  const prefix=phase==='preview'?'previewReconciliation':'reconciliation';
+  const actors=new Set();
+  for(const j of report.journeys){
+    need(j.origin===(phase==='live'?'https://app.aysseguros.com':json(C.control).i66FrontendReleaseHead.previewUrl),'SCOPED_TEST_ORIGIN');
+    need(j.route.startsWith('/#/')&&j.reloaded===true&&j.originalPaymentCount===j.afterPaymentCount&&j.originalPaymentCount===1,'UI_RELOAD_AND_NO_NEW_COLLECTION');
+    const audit=await doc(prefix+'Events',j.eventId),request=await doc(prefix+'Requests',j.requestId),result=request.result;
+    equal([audit.eventId,audit.requestId,audit.operation,request.status,request.eventId,audit.receiptId,audit.cobroId],
+      [j.eventId,j.requestId,'reconcile_payment','committed',j.eventId,j.receiptId,j.cobroId],'SERVER_COMMITTED_JOURNEY');
+    equal(audit.actor.activeRole.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''),j.role.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''),'SERVER_AUTHORIZED_ROLE');
+    need(audit.actor.uid&&!actors.has(audit.actor.uid),'DISTINCT_SIGNED_ACTORS');actors.add(audit.actor.uid);
+    need(Date.parse(audit.createdAt)>=Date.parse(deployEvidence.meta.timeCreated),'FRESH_SERVER_AUDIT_REQUIRED');
+    const r=await doc('data/recibosEsperados/items',j.receiptId),payment=await doc('data/cobros/items',j.cobroId);
+    equal([payment.reciboId,r.cobroId,payment.polizaId,payment.clienteId,r.polizaId,r.clienteId],[j.receiptId,j.cobroId,result.policyId,result.clientId,result.policyId,result.clientId],'PERSISTED_PAYMENT_RELATIONS');
+    equal([r.invoiceNumber,payment.invoiceNumber,r.paidDate,payment.paidDate,result.amount],[j.invoiceNumber,j.invoiceNumber,j.originalPaidDate,j.originalPaidDate,j.originalAmount],'PERSISTED_HISTORICAL_FACTS');
+    const proof=payment.historicalPaymentEvidence;
+    need(proof?.newCollection===false&&proof.receiptId===j.receiptId&&proof.policyId===result.policyId&&
+      proof.fechaPagoReportada===j.originalPaidDate&&proof.amount===j.originalAmount&&/^[a-f0-9]{64}$/.test(proof.sourceKey),'HISTORICAL_PAYMENT_NO_NEW_REVENUE');
+    equal([audit.recordedPaymentBefore?.amount,audit.recordedPaymentAfter?.amount],[j.originalAmount,j.originalAmount],'AUDITED_ORIGINAL_AND_RECORDED_AMOUNT');
+    const query=await fetch(stem+'data/cobros:runQuery',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({structuredQuery:{select:{fields:[{fieldPath:'reciboId'}]},from:[{collectionId:'items'}],where:{fieldFilter:{field:{fieldPath:'reciboId'},op:'EQUAL',value:{stringValue:j.receiptId}}},limit:2}})});
+    need(query.ok,'SERVER_PAYMENT_UNIQUENESS_READBACK');
+    equal((await query.json()).flatMap(row=>row.document?[row.document.name.split('/').at(-1)]:[]),[j.cobroId],'ONE_PERSISTED_MOVEMENT');
+
+    if(phase==='preview')need(r.__syntheticQa===true&&payment.__syntheticQa===true,'SYNTHETIC_PREVIEW_ONLY');
+  }
+  return writeFunctionalStage(phase==='preview'?'PREVIEW_VERIFIED':'LIVE_VERIFIED',{...facts,target,revision:snapshot.revision,trafficPercent:100,roles:b.roles,journeys:ref});
+}
+async function rollbackFunctionalPhase(phase,buildId){
+  need(['preview','live'].includes(phase),'FUNCTIONAL_ROLLBACK_PHASE');
+  checkedBranch();const b=scopedCandidate(),pkg=readFunctionalPackage(buildId),c=json(C.control);
+  const stages=c.i66ScopedFunctionRelease.providerStages||{},deployed=stages[phase==='preview'?'PREVIEW_DEPLOYED':'LIVE_DEPLOYED'];
+  need(!stages[phase==='preview'?'PREVIEW_VERIFIED':'LIVE_VERIFIED'],'NO_ROLLBACK_AFTER_ACCEPTANCE');
+  const target=b.targets[phase],snapshot=readFunctionSnapshot(target,b.targets.region);
+  equal([deployed?.revision,deployed?.packageSha256],[snapshot.revision,pkg.artifact.sha256],'OWN_DEPLOYMENT_ONLY');
+  const before=JSON.parse((await gcloudReadIo().object(deployed.receipt)).data).before;
+  equal(deployed.rollbackRevision,before.revision,'EXACT_RETAINED_ROLLBACK');
+  checkServingSnapshot(before,b.predecessor,phase);
+  const rev=JSON.parse(readGcloud(['run','revisions','describe',before.revision,'--region='+b.targets.region,'--format=json(status.conditions)']));
+  need(rev.status.conditions.some(x=>x.type==='Ready'&&x.status==='True'),'PREVIOUS_REVISION_READY');
+  checkedBranch();
+  readGcloud(['run','services','update-traffic',snapshot.service,'--region='+b.targets.region,'--to-revisions='+before.revision+'=100','--quiet']);
+  const status=JSON.parse(readGcloud(['run','services','describe',snapshot.service,'--region='+b.targets.region,'--format=json(status.traffic)']));
+  const traffic=status.status.traffic.filter(x=>x.percent>0);equal(traffic.map(x=>[x.revisionName,x.percent]),[[before.revision,100]],'ROLLBACK_TRAFFIC_READBACK');
+  const facts={...functionalFacts(pkg),phase,target,revision:before.revision,trafficPercent:100,rolledBackRevision:snapshot.revision};
+  const receipt=await retainedFunctionRecord('i66/functional/'+b.unit+'/'+pkg.sourceSha+'/'+buildId+'/'+phase+'-rollback.json',facts);
+  return writeFunctionalStage(phase.toUpperCase()+'_ROLLED_BACK',{...facts,receipt});
+}
+
 async function main(args=process.argv.slice(2)){
   if(args[0]==='bind'&&args.length===4){const binding=bindingFromHosting(process.cwd(),json(args[1]),json(args[2]),git(process.cwd(),'rev-parse','HEAD'));write(args[3],binding);console.log('I66_NATIVE_BINDING_PREPARED_NOT_AUTHORIZED');return binding;}
+  if(args[0]==='verify-functional-journey'&&args.length===4){const result=await acceptFunctionalJourney(args[1],args[2],args[3]);console.log(JSON.stringify(result));return result;}
+  if(args[0]==='rollback-functional-phase'&&args.length===3){const result=await rollbackFunctionalPhase(args[1],args[2]);console.log(JSON.stringify(result));return result;}
+  if(args[0]==='functional-phase'&&args.length===3){const result=await executeFunctionalPhase(args[1],args[2]);console.log(JSON.stringify(result));return result;}
+  if(args[0]==='package-functional-unit'&&args.length===3)return packageProviderSource(args[1],args[2]);
+  if(args[0]==='prepare-functional-build'&&args.length===2){const config=functionalBuildConfig();write(args[1],config);return config;}
   if(args[0]==='run'&&args.length===3)return runOperationalCycle(args[1],args[2]);
   if(args[0]==='resume'&&args.length===3)return reconcileBeforeExecution(args[1],args[2]);
   if(args[0]==='prepare'&&args.length===3){const prior=await reconcileBeforeExecution(args[1],args[2]);if(prior){console.log(JSON.stringify(prior));return prior;}const p=makePlan(process.cwd(),args[1]);fs.mkdirSync(args[2],{recursive:false});write(path.join(args[2],'plan.json'),p);write(path.join(args[2],'cloudbuild.json'),configFor(p));console.log('I66_NATIVE_OPERATIONAL_PREPARED_NO_EXECUTION '+digest(p));return p;}
@@ -675,5 +996,5 @@ async function main(args=process.argv.slice(2)){
   if(args[0]==='verify-runtime'&&args.length===2){const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=g.candidateForPhase(json(g.CONTROL),args[1]);return verifyRuntimeAuthority(p,{phase:args[1],action:'worker'});}
   throw Error('I66_NATIVE_OPERATIONAL_USE_BIND_PREPARE_WORKER_VERIFY');
 }
-module.exports={observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
+module.exports={readFunctionSnapshot,checkServingSnapshot,verifyScopedHosting,readFunctionalPackage,scopedPhysical,assertCompositeFresh,scopedCandidate,packageFunctionalUnit,functionalBuildConfig,observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(error=>{console.error(String(error.message||'I66_NATIVE_OPERATIONAL_HOLD').split('\n')[0]);process.exitCode=1;});

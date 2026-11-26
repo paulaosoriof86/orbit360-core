@@ -521,6 +521,52 @@ function commitProviderOutcome(change) {
   }finally{fs.rmSync(temp,{recursive:true,force:true});}
 }
 
+function prepareFunctionalStage(stage,facts,head,io=require('node:fs')){
+  const track=['PACKAGE_CERTIFIED','PREVIEW_DEPLOYED','PREVIEW_VERIFIED','LIVE_DEPLOYED','LIVE_VERIFIED'];
+  const terminal=/^(PREVIEW|LIVE)_(HOLD|ROLLED_BACK)$/.exec(stage);
+  const deployedStage=terminal&&terminal[1]+'_DEPLOYED',i=track.indexOf(terminal?deployedStage:stage);
+  assert.ok(i>=0,'UNKNOWN_FUNCTIONAL_STAGE');
+  const read=p=>JSON.parse(io.readFileSync(p,'utf8')),cp=read(P.cp),state=read(P.state),tr=read(P.transport);
+  const authority=cp.i66ScopedFunctionRelease,cursor=cp.i66ActiveRecoveryCursor;
+  assert.ok(authority?.candidatePath&&authority.candidateBlob===blob(io.readFileSync(authority.candidatePath,'utf8')),'SCOPED_CANDIDATE_DRIFT');
+  const binding=read(authority.candidatePath);assert.equal(facts.bindingBlob,authority.candidateBlob);
+  assert.match(facts.sourceSha,/^[a-f0-9]{40}$/);assert.match(facts.packageSha256,/^[a-f0-9]{64}$/);
+  const stages=authority.providerStages||{},prior=stages[stage];
+  if(prior){assert.deepEqual(prior,facts,'SCOPED_STAGE_IDENTITY_DRIFT');return {status:'NOOP_ALREADY_RECONCILED',expectedHeadOid:head,changes:{}};}
+  const predecessorCount=terminal&&terminal[2]==='ROLLED_BACK'?i+1:i;
+  assert.deepEqual(Object.keys(stages),track.slice(0,predecessorCount),'SCOPED_STAGE_PREDECESSOR');
+  if(terminal){
+    assert.ok(facts.receipt?.uri&&/^[0-9]+$/.test(facts.receipt.generation)&&/^[a-f0-9]{64}$/.test(facts.receipt.sha256),'SCOPED_TERMINAL_PROVIDER_EVIDENCE');
+    if(terminal[2]==='ROLLED_BACK')assert.deepEqual([facts.revision,facts.rolledBackRevision],[stages[deployedStage].rollbackRevision,stages[deployedStage].revision]);
+  }
+  if(i){const first=stages.PACKAGE_CERTIFIED;for(const key of ['sourceSha','buildId','packageSha256','bindingBlob','artifact'])assert.deepEqual(facts[key],first[key],'SCOPED_SAME_ARTIFACT_'+key);}
+  if(i>=1){
+    assert.equal(facts.target,i<3?binding.targets.preview:binding.targets.live);
+    assert.ok(typeof facts.revision==='string'&&facts.revision.startsWith(facts.target.toLowerCase()+'-'));
+    assert.equal(facts.trafficPercent,100);
+  }
+  if(stage.endsWith('VERIFIED')){assert.equal(facts.revision,stages[track[i-1]].revision);assert.deepEqual(facts.roles,binding.roles);}
+  const old=cursor.currentEvidencePath,oldRaw=io.readFileSync(old,'utf8'),progress=JSON.parse(oldRaw);
+  assert.equal(blob(oldRaw),cursor.currentEvidenceBlobSha);const next=old.replace(/_R\d+\.json$/,'_R'+(progress.version+1)+'.json');
+  assert.notEqual(next,old);assert.ok(!io.existsSync(next));
+  const expectedPreimages=Object.fromEntries([P.cp,P.state,P.transport,old,authority.candidatePath].map(p=>[p,blob(io.readFileSync(p,'utf8'))]));expectedPreimages[next]=null;
+  authority.providerStages={...stages,[stage]:facts};authority.status=stage;authority.packageStatus='CERTIFIED';
+  if(stage==='LIVE_VERIFIED'){
+    authority.accepted={epoch:binding.releaseEpoch+1,target:facts.target,revision:facts.revision,sourceSha:facts.sourceSha,packageSha256:facts.packageSha256,
+      sourcePins:Object.fromEntries(binding.owners.map(p=>[p,binding.sourcePins[p]]))};
+  }
+  progress.previousEvidencePath=old;progress.previousEvidenceBlobSha=cursor.currentEvidenceBlobSha;progress.version++;
+  progress.recordedAtUtc=new Date().toISOString();
+  progress.currentSuccessorPlan.independentFunctionalRelease=progress.independentFunctionalRelease=cursor.independentFunctionalRelease=authority;
+  synchronizeExecutionProgress(progress);
+  Object.assign(cursor,{previousEvidencePath:old,previousEvidenceBlobSha:blob(oldRaw),currentEvidencePath:next,currentEvidenceBlobSha:blob(serial(progress))});
+  synchronizeOwnerPlanContinuation(cp,state,tr);
+  const changes={[P.cp]:cp,[P.state]:state,[next]:progress};
+  const view={...io,readFileSync:(p,e)=>Object.hasOwn(changes,p)?serial(changes[p]):io.readFileSync(p,e)};
+  assertExecutionProgress(cp,progress,view);assertOwnerPlanContinuation(cp,state,tr);
+  return {status:'ATOMIC_METADATA_RECONCILIATION_PREPARED',expectedHeadOid:head,expectedPreimages,changes};
+}
+
 function prepareTerminalCli(args=process.argv.slice(2)){
   assert.equal(args.length,3,'I66_TERMINAL_USE_PREPARE_TERMINAL_RECEIPT_NEW_DIRECTORY');
   assert.equal(args[0],'prepare-terminal','I66_TERMINAL_UNKNOWN_ACTION');
@@ -1228,7 +1274,7 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
-module.exports={prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
+module.exports={prepareFunctionalStage,prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
   resolveNativeExecutionProgress,assertNativeExecutionProgress,terminalAttemptRecords,assertTerminalAttemptProgress,
   prepareTerminalAttemptReconciliation,assertTerminalAttemptChangeSetPreimages,prepareTerminalCli,
   ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveFinancialAndPlanProjections,assertActiveReleaseProgress,

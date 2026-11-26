@@ -1,0 +1,18 @@
+{
+  "revisionId": "I6_6_DOCUMENTED_HISTORICAL_PAYMENT_QA_20261125",
+  "scope": "EXISTING_DECLARED_TESTS_ONLY",
+  "productSourceChanges": 0,
+  "productionAcceptanceClaimed": false,
+  "tests": [
+    {
+      "path": "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+      "gitBlobSha": "770453876880cc05f93552e4c0e8e3ac9ac1bcfc",
+      "replaces": {
+        "path": "tools/gravicentra-i6-6-cobros-application-and-temporal-search.test.cjs",
+        "priorGitBlobSha": "41ee9f9aa0ef65d9e19ecc18eee20fdbc3ddc54d",
+        "priorChangeId": "I6_6_LEGACY_PAID_RECEIPT_APPLICATION_WITHOUT_DOUBLE_PAYMENT_P0"
+      }
+    }
+  ],
+  "reason": "The server admits an existing paid receipt or verified historical payment facts only for reconciliation. The accompanying executable regression suite exercises both roles, forged provenance, missing evidence, and replay."
+}

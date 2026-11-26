@@ -1,0 +1,58 @@
+{
+  "schema": "GI_I66_SCOPED_FUNCTION_PACKAGE_V1",
+  "scope": "BACKEND_CALLABLE",
+  "unit": "documented-historical-payment",
+  "dependencies": [
+    "firebase-auth",
+    "firestore",
+    "cloud-functions",
+    "existing-hosting"
+  ],
+  "targets": {
+    "preview": "orbit360CobrosReconciliationCommandPreview",
+    "live": "orbit360CobrosReconciliationCommand",
+    "region": "us-central1"
+  },
+  "roles": [
+    "Dirección",
+    "Operativo"
+  ],
+  "owners": [
+    "functions/cobros-reconciliation-domain.js",
+    "functions/payment-inference-engine.js"
+  ],
+  "sourceQa": [
+    "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs",
+    "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs",
+    "tools/gravicentra-i6-6-siga-historical-payment-reconciliation.test.cjs"
+  ],
+  "sourcePins": {
+    "functions/b4-003-scoped-access-boundary.js": "bc4cfabae86027657d08aaac21963fb605f5f17a",
+    "functions/bootstrap.js": "bd0837a9d5296a456e0575aec555b2971fdedcd7",
+    "functions/cobros-ledger-contract.js": "6d11841dcf743837c6ffd255e4f5e2ac0c48f229",
+    "functions/cobros-reconciliation-domain.js": "f673af776484431295aa7e4b20ae26d3b09eab7e",
+    "functions/cobros-source-intake-v2.js": "31bb921f5c58cd47af606ec43217b445be519c4a",
+    "functions/index.js": "aadd9dedff6bc7ce1858a3ffe8507765713d620b",
+    "functions/package-lock.json": "868690d441b0073c550aea2de56c35950fafa9d1",
+    "functions/package.json": "a016a9f9d6a48ab44d45dedc88611cff083091ef",
+    "functions/payment-inference-engine.js": "a3d6bf99288c0c309759dce954d48c1ecc4db9dc",
+    "functions/product-active-role-contract.js": "09681f536c5cbbd36bcba6514d4829d2494b9387",
+    "functions/proposal-application-boundary.js": "4c9cbf708a0dc353ca213c806fcedb580f7a25ec",
+    "tools/gravicentra-i6-6-r51-documentary-variance.test.cjs": "637a2b5c5980d5dab850f61e2f67376130090a4a",
+    "tools/gravicentra-i6-6-r51-payment-application-preservation.test.cjs": "b519081d11a4309d3eea6a58c7e6831bbecdd189",
+    "tools/gravicentra-i6-6-siga-historical-payment-reconciliation.test.cjs": "242027512ada8c8010917bfb75daff731e2d50da"
+  },
+  "releaseEpoch": 0,
+  "predecessor": {
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+    "revision": "orbit360cobrosreconciliationcommand-00021-zex",
+    "sourceGeneration": "1795478167126952",
+    "archiveSha256": "7c3c43b381310e94d6c9cb618c6016fae31965acc479b6c0e8902e8240431719",
+    "previewRevision": "orbit360cobrosreconciliationcommandpreview-00093-kih",
+    "previewSourceGeneration": "1795629259597938",
+    "previewArchiveSha256": "8a7aaeb2a4883cedd049685156f563f6eeff7ebfd08f65264678d51dc215e43d"
+  }
+}

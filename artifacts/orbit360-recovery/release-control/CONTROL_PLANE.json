@@ -26448,8 +26448,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R89.json",
-    "currentEvidenceBlobSha": "32444158fb3df63f9216368eb99bb8c1d45d0aa6",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R90.json",
+    "currentEvidenceBlobSha": "2d62a79e4fac8c28f01282b3a02fbd81cdfc4b29",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -26470,8 +26470,8 @@
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R88.json",
-    "previousEvidenceBlobSha": "b6e614204e9a10bfae2b270bc513c13abcd6838f",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R89.json",
+    "previousEvidenceBlobSha": "32444158fb3df63f9216368eb99bb8c1d45d0aa6",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "155_EXISTING_PAYMENTS_465_RECORDS_CAPTURE_VERIFIED_2_CANONICAL_CALLS_6_APPLICATION_CASES_DOC07_ALREADY_APPLIED_DATE_REVIEW_OPEN",
@@ -26580,6 +26580,17 @@
         "bytes": 21617,
         "sha256": "2431e63d63d007d89800c63c7d59b8a33fdd86c778aacd9048de0d10d2a62684"
       }
+    },
+    "independentFunctionalRelease": {
+      "candidatePath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_FUNCTION_RELEASE.json",
+      "candidateBlob": "91cbaac0bec001ac4516f5fc0bd0462afb1a39f9",
+      "unit": "documented-historical-payment",
+      "releaseEpoch": 0,
+      "status": "SOURCE_ADMITTED_BUILD_AND_SIGNED_PREVIEW_REQUIRED",
+      "packageStatus": "PENDING",
+      "accepted": null,
+      "protectedHosting": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+      "previousLiveRevision": "orbit360cobrosreconciliationcommand-00021-zex"
     }
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
@@ -26700,5 +26711,16 @@
     "proofSha256": "4013a99719ba5f8bb3087a5e5f43c189a22daf55aabfcea37e8df5030bb5653c",
     "rollbackHostingVersion": "sites/ays-orbit-360-lab/versions/e4e8f31b02ba2aef",
     "fullI66ProductionAccepted": false
+  },
+  "i66ScopedFunctionRelease": {
+    "candidatePath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_FUNCTION_RELEASE.json",
+    "candidateBlob": "91cbaac0bec001ac4516f5fc0bd0462afb1a39f9",
+    "unit": "documented-historical-payment",
+    "releaseEpoch": 0,
+    "status": "SOURCE_ADMITTED_BUILD_AND_SIGNED_PREVIEW_REQUIRED",
+    "packageStatus": "PENDING",
+    "accepted": null,
+    "protectedHosting": "sites/ays-orbit-360-lab/versions/332999a55b189108",
+    "previousLiveRevision": "orbit360cobrosreconciliationcommand-00021-zex"
   }
 }

@@ -19,7 +19,7 @@ const db = getFirestore(app);
 const ADMIN_ROLES = new Set(['superadmin', 'admintenant', 'direccion', 'admin', 'operativo', 'finanzas']);
 const ADVISOR_REPORT_ROLES = new Set(['asesor', 'asesora', 'asesor_sr', 'asesora_sr', 'asesor_jr', 'asesora_jr', 'comercial']);
 const PERMISSIONS = new Set(['cobros_manage', 'conciliaciones_manage', 'payments_reconcile']);
-const OPERATIONS = new Set(['preview_policy', 'preview_proposal_application', 'resolve_proposal_application', 'apply_proposal_application', 'intake_source_run', 'report_advisor_payment', 'apply_payment', 'reconcile_payment', 'reconcile_evidence', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
+const OPERATIONS = new Set(['read_payment_document_commit', 'preview_policy', 'preview_proposal_application', 'resolve_proposal_application', 'apply_proposal_application', 'intake_source_run', 'report_advisor_payment', 'apply_payment', 'reconcile_payment', 'reconcile_evidence', 'register_evidence', 'confirm_application', 'hold_proposal', 'reopen_proposal']);
 
 const text = (value, max = 1000) => String(value == null ? '' : value).replace(/\u0000/g, '').trim().slice(0, max);
 const norm = value => text(value, 180).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -482,6 +482,116 @@ function assertPaymentIdentity(authz, policy, receipt, row, kind, amountMustMatc
     throw new HttpsError('failed-precondition', 'PAYMENT_EXISTING_PAID_DATE_ALIASES_CONFLICT');
 }
 
+// This admitted I6.5 bundle distinguishes primary actual-payment evidence from
+// schedules and crosschecks. New imports require their own verified mapping;
+// a SIGA label or an arbitrary hash must never confirm a historical payment.
+const SIGA_HISTORICAL_PAYMENT_SOURCES = Object.freeze({
+  f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a: Object.freeze({
+    contract:'SIGA_I65_PAID_PRIMARY_20260918',cutoff:'2026-09-18',
+    primary:'CobranzaCendoso (24).xlsx',primarySha256:'36de3d35055716af4ca85d48719d4ef58154286a3136f41fac35287e740c03db',
+    firstRow:11,lastRow:1569,from:'2025-01-02',through:'2026-09-17'
+  })
+});
+function historicalSigaPaymentFacts(authz, policy, receipt, receiptId) {
+  const hold=()=>{throw new HttpsError('failed-precondition','PAYMENT_SIGA_HISTORICAL_PROOF_REQUIRED');};
+  // Ordinary receipt edits retain the imported provenance but force these
+  // server-owned marks. The edited facts must be checked against the primary
+  // source again; retained bundle/row references cannot attest their values.
+  if(['updatedAt','updatedByUid'].some(key=>Object.prototype.hasOwnProperty.call(receipt,key)))hold();
+  const strictDate=value=>{const s=text(value,32);return /^\d{4}-\d{2}-\d{2}$/.test(s)&&
+    !Number.isNaN(Date.parse(s+'T00:00:00Z'))&&new Date(s+'T00:00:00Z').toISOString().slice(0,10)===s?s:'';};
+  const bundleId=text(receipt.sourceBundleSha256,100);
+  const source=/^[a-f0-9]{64}$/.test(bundleId)&&receipt.sourceBundleSha256===bundleId?
+    SIGA_HISTORICAL_PAYMENT_SOURCES[bundleId]:null;
+  const refs=Array.isArray(receipt.sourceRefsI65)?receipt.sourceRefsI65:[];
+  const primary=source?unique(refs.filter(ref=>typeof ref==='string'&&ref.startsWith(source.primary+'#row'))):[];
+  const primaryRow=primary.length===1&&primary[0].match(/#row([1-9]\d*)$/);
+  const paidDate=strictDate(receipt.fechaPagoReportada);
+  if(!source||!primaryRow||primary[0]!==source.primary+'#row'+primaryRow[1]||
+      Number(primaryRow[1])<source.firstRow||Number(primaryRow[1])>source.lastRow||
+      refs.some(ref=>typeof ref!=='string')||!text(receipt.sourceRef,500)||
+      norm(receipt.fuenteAutoridad)!=='siga'||norm(receipt.estadoOperativo)!=='pago reportado'||
+      receipt.matchQuality!=='I6_5_EXACT_POLICY_TERM'||receipt.requiereValidacion!==false||
+      receipt.enCartera!==false||norm(receipt.exigibilidad)!=='no pendiente'||
+      receipt.fechaCorteFuente!==source.cutoff||!paidDate||paidDate<source.from||paidDate>source.through)
+    hold();
+  if(text(receipt.id,180)!==receiptId||text(receipt.polizaId,180)!==text(policy.id,180)||
+      !text(policy.clienteId,180)||text(receipt.clienteId,180)!==text(policy.clienteId,180)||
+      !text(policy.aseguradoraId,180)||text(receipt.aseguradoraId,180)!==text(policy.aseguradoraId,180)||
+      !text(policy.numero,180)||text(receipt.polizaNumero,180)!==text(policy.numero,180)||
+      !strictDate(policy.vigenciaInicio)||!strictDate(policy.vigenciaFin)||
+      receipt.vigenciaInicio!==policy.vigenciaInicio||receipt.vigenciaFin!==policy.vigenciaFin||
+      !text(receipt.moneda,12)||text(receipt.moneda,12).toUpperCase()!==text(policy.moneda,12).toUpperCase()||
+      text(receipt.cobroId,180))hold();
+  const contradictory=['partialPayment','pagoParcial','reversal','reversed','revertido','conflictingEvidence',
+    'refinanciado','restructured','inferred','inferredPaid','paidInferred','pagoReportado'];
+  if(contradictory.some(key=>receipt[key]===true)||
+      ['estado','paymentState','applicationState','reversalId','reversedAt'].some(key=>text(receipt[key],180))||
+      receipt.directOrInferred&&text(receipt.directOrInferred,40).toUpperCase()!=='DIRECT'||
+      ['paidDate','fechaPago','actualPaidDate'].some(key=>text(receipt[key],32)&&text(receipt[key],32)!==paidDate))hold();
+  const facts={paymentState:'PAID_DIRECT',directOrInferred:'DIRECT',paymentEvidenceType:'CRM_MIGRATED_DIRECT',
+    paymentOrigin:'CRM_MIGRATED_DIRECT_PAYMENT',evidenceType:'DIRECT_PAYMENT_REPORTED_CRM',
+    evidenceId:primary[0],sourceRef:text(receipt.sourceRef,500),evidenceAsOfDate:source.cutoff,
+    paidDate,fechaPago:paidDate};
+  if(text(receipt.formaPago,180))facts.paymentMethod=text(receipt.formaPago,180);
+  // Existing historical facts may be absent, but a source bridge must not
+  // replace a different origin, method or evidence identifier already stored.
+  if(['paymentOrigin','paymentEvidenceType','evidenceType','evidenceId','evidenceAsOfDate','paymentMethod'].some(key=>
+      text(receipt[key],500)&&text(receipt[key],500)!==text(facts[key],500))||
+      ['metodo','metodoPago'].some(key=>text(receipt[key],180)&&text(receipt[key],180)!==text(facts.paymentMethod,180)))hold();
+  return{facts,proof:{version:1,contract:source.contract,sourceBundleSha256:receipt.sourceBundleSha256,
+    primarySourceRef:primary[0],primarySourceSha256:source.primarySha256,sourceRefsI65:stable(refs),sourceRef:receipt.sourceRef,
+    sourceKey:sha(authz.tenantId+'|'+receipt.sourceBundleSha256+'|'+primary[0]),
+    originalOperationalState:receipt.estadoOperativo,fechaPagoReportada:paidDate,
+    evidenceAsOfDate:source.cutoff,policyId:policy.id,receiptId,amount:receiptAmount(receipt),
+    currency:text(receipt.moneda,12).toUpperCase(),newCollection:false}};
+}
+
+// Recover a lost acknowledgement without replaying a financial command.
+async function readPaymentDocumentCommit(authz, data, payload, previewOnly) {
+  const receiptId = id(payload.receiptId, 'receiptId');
+  const requestId = id(data.requestId, 'requestId');
+  const operation = payload.originalOperation;
+  const fields = ['invoiceDocumentRef', 'paymentSupportDocumentRef'].filter(key => text(payload[key], 500));
+  if (!fields.length || !['apply_payment', 'reconcile_payment'].includes(operation))
+    throw new HttpsError('invalid-argument', 'PAYMENT_DOCUMENT_READBACK_INPUT_REQUIRED');
+  const eventId = 'payevt_' + sha(authz.tenantId + '|' + receiptId + '|' + requestId).slice(0, 28);
+  const unavailable = () => new HttpsError('failed-precondition', 'PAYMENT_DOCUMENT_COMMIT_NOT_CONFIRMED');
+  return db.runTransaction(async tx => {
+    const [request, event] = await Promise.all([
+      tx.get(requestRef(authz.tenantId, requestId, previewOnly)),
+      tx.get(eventRef(authz.tenantId, eventId, previewOnly))
+    ]);
+    const row = request.data() || {}, audit = event.data() || {}, result = row.result || {};
+    if (!request.exists || !event.exists || row.status !== 'committed' || row.operation !== operation ||
+        row.eventId !== eventId || audit.operation !== operation || audit.eventId !== eventId ||
+        audit.tenantId !== authz.tenantId || audit.requestId !== requestId || audit.receiptId !== receiptId ||
+        audit.actor?.uid !== authz.actor.uid || audit.actor?.activeRole !== authz.actor.activeRole ||
+        !row.payloadDigest || audit.payloadDigest !== row.payloadDigest || audit.resultDigest !== digest(result) ||
+        result.ok !== true || result.operation !== operation || result.receiptId !== receiptId || audit.cobroId !== result.cobroId)
+      throw unavailable();
+    const ref = (collection, key) => tenantData(authz.tenantId, collection).doc(id(key, collection));
+    const [receipt, payment, policy] = await Promise.all([
+      tx.get(ref('recibosEsperados', receiptId)), tx.get(ref('cobros', result.cobroId)), tx.get(ref('polizas', result.policyId))
+    ]);
+    if (!receipt.exists || !payment.exists || !policy.exists) throw unavailable();
+    const customer = result.clientId, r = receipt.data(), c = payment.data(), p = policy.data();
+    assertPaymentCountryScope(authz, p, r);
+    if (!customer || [r,c,p].some(value => value.tenantId && value.tenantId !== authz.tenantId) ||
+        (r.clienteId || p.clienteId) !== customer || (p.clienteId && p.clienteId !== customer) ||
+        c.clienteId !== customer || r.polizaId !== result.policyId || c.polizaId !== result.policyId ||
+        r.cobroId !== result.cobroId || c.reciboId !== receiptId ||
+        fields.some(key => {
+          const proof = audit.documentRefs?.[key] || (key === 'invoiceDocumentRef' ? audit.applicationEvidence?.invoiceDocumentRef : audit.applicationEvidence?.reportedPaymentSupportDocumentRef);
+          const matches = record => record[key] === payload[key] || (key === 'paymentSupportDocumentRef' && record.applicationEvidence?.reportedPaymentSupportDocumentRef === payload[key]);
+          return proof !== payload[key] || !matches(r) || !matches(c);
+        })) throw unavailable();
+    if (previewOnly && (authz.tenantId !== 'alianzas-soluciones' || !previewSyntheticId(receiptId) ||
+        !previewSyntheticId(result.policyId) || !previewSyntheticId(customer) || [r,c,p].some(v => v.__syntheticQa !== true))) throw unavailable();
+    return { confirmed: true, requestId, result };
+  });
+}
+
 async function applyPayment(authz, data, payload, operationName = 'apply_payment', previewOnly = false) {
   const receiptId = id(payload.receiptId || payload.reciboId, 'reciboId');
   const source = paymentSource(payload.sourceType || payload.fuentePago || 'manual');
@@ -586,12 +696,35 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const receiptPaid = norm(receipt.estado) === 'pagado' || /^PAID_/.test(text(receipt.paymentState, 80).toUpperCase());
     if (receiptPaid && existingCobro && !cobroPaid)
       throw new HttpsError('failed-precondition', 'PAYMENT_RECEIPT_COBRO_STATE_CONFLICT: el recibo pagado y el cobro vinculado requieren revisión.');
-    const existingPaid = cobroPaid || (receiptPaid && !existingCobro);
     const applicationEvidenceSource = ['insurer_invoice', 'insurer_statement', 'commission_statement'].includes(source);
+    let historicalSiga=null;
+    const sigaReported=norm(receipt.fuenteAutoridad)==='siga'&&norm(receipt.estadoOperativo)==='pago reportado';
+    if(sigaReported&&!receiptPaid&&!cobroPaid){
+      if(operationName!=='reconcile_payment'||!applicationEvidenceSource)
+        throw new HttpsError('failed-precondition','PAYMENT_SIGA_REPORTED_REQUIRES_RECONCILIATION');
+      if(existingCobro||activePortfolioRows.length)
+        throw new HttpsError('failed-precondition','PAYMENT_SIGA_EXISTING_LEDGER_REQUIRES_REVIEW');
+      historicalSiga=historicalSigaPaymentFacts(authz,policy,receipt,receiptId);
+      if(!applicationDate||!invoiceNumber)
+        throw new HttpsError('failed-precondition','PAYMENT_SIGA_APPLICATION_EVIDENCE_REQUIRED');
+      if(paidDate&&paidDate!==historicalSiga.facts.paidDate)
+        throw new HttpsError('failed-precondition','PAYMENT_SIGA_ORIGINAL_PAID_DATE_IMMUTABLE');
+      const [aliasCobros,aliasPortfolio,sourcePayments]=await Promise.all([
+        tx.get(tenantData(authz.tenantId,'cobros').where('receiptId','==',receiptId)),
+        tx.get(tenantData(authz.tenantId,'carteraPrimas').where('receiptId','==',receiptId)),
+        tx.get(tenantData(authz.tenantId,'cobros').where('historicalPaymentEvidence.sourceKey','==',historicalSiga.proof.sourceKey))
+      ]);
+      if(!aliasCobros.empty||aliasPortfolio.docs.some(doc=>activePortfolio(doc.data()||{}))||!sourcePayments.empty)
+        throw new HttpsError('failed-precondition','PAYMENT_SIGA_EXISTING_LEDGER_REQUIRES_REVIEW');
+    }
+    // Derived facts come exclusively from the verified canonical source row.
+    // Keep the original receipt untouched until the single transaction commits.
+    const paymentReceipt=historicalSiga?Object.assign({},receipt,historicalSiga.facts):receipt;
+    const existingPaid = cobroPaid || (receiptPaid && !existingCobro) || !!historicalSiga;
     // An imported/confirmed paid receipt may predate the physical cobro row.
     // Only the explicit insurer-application operation may link that history;
     // never accept it as a second payment or as an automatic inference.
-    const legacyPaidReceiptReconciliation = !existingCobro && receiptPaid && operationName === 'reconcile_payment';
+    const legacyPaidReceiptReconciliation = !existingCobro && (receiptPaid || !!historicalSiga) && operationName === 'reconcile_payment';
     const enrichment = applicationEvidenceSource && (cobroPaid || legacyPaidReceiptReconciliation);
     if (existingPaid && !enrichment) throw new HttpsError('failed-precondition', 'PAYMENT_ALREADY_APPLIED: no se puede registrar de nuevo el mismo recibo.');
     if (!existingPaid && activePortfolioRows.length !== 1)
@@ -642,7 +775,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       throw new HttpsError('failed-precondition', 'PAYMENT_DETERMINISTIC_COBRO_ID_CONFLICT: revisar relación del recibo.');
     const beforeCobro = cobroDoc ? (cobroDoc.data() || {}) : {};
     const advisorReported = advisorReportPending(receipt);
-    const existingPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago || (existingPaid ? (receipt.paidDate || receipt.fechaPago) : ''), 32);
+    const existingPaidDate = text(beforeCobro.paidDate || beforeCobro.fechaPago || (existingPaid ? (paymentReceipt.paidDate || paymentReceipt.fechaPago) : ''), 32);
     const receiptPaidDate = text(receipt.paidDate || receipt.fechaPago,32);
     if (enrichment && (receipt.paidDate && receipt.fechaPago && receipt.paidDate !== receipt.fechaPago ||
         receiptPaidDate && existingPaidDate && receiptPaidDate !== existingPaidDate))
@@ -654,14 +787,14 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     const finalPaidDate = enrichment ? (existingPaidDate || (payload.actualPaidDateEvidence === true ? paidDate : '')) : (paidDate || reportPaidDate || existingPaidDate);
     const finalApplicationDate = applicationDate || existingApplicationDate;
     const finalInvoiceDate = invoiceDate || text(beforeCobro.invoiceDate || (existingPaid ? receipt.invoiceDate : ''), 32);
-    const existingPaymentMethod = text(beforeCobro.paymentMethod || beforeCobro.metodo || beforeCobro.metodoPago || (existingPaid ? (receipt.paymentMethod || receipt.metodo || receipt.metodoPago) : ''),180);
+    const existingPaymentMethod = text(beforeCobro.paymentMethod || beforeCobro.metodo || beforeCobro.metodoPago || (existingPaid ? (paymentReceipt.paymentMethod || paymentReceipt.metodo || paymentReceipt.metodoPago) : ''),180);
     const finalPaymentMethod = enrichment ? existingPaymentMethod : (paymentMethod || (advisorReported ? text(receipt.metodoPago || receipt.paymentMethod,180) : '') || existingPaymentMethod);
     const existingPaymentSupportDocumentRef = text(beforeCobro.paymentSupportDocumentRef || beforeCobro.soportePagoRef || (existingPaid ? (receipt.paymentSupportDocumentRef || receipt.soportePagoRef) : ''),500);
     const finalPaymentSupportDocumentRef = enrichment ? existingPaymentSupportDocumentRef : (paymentSupportDocumentRef || (advisorReported ? text(receipt.paymentSupportDocumentRef || receipt.soportePagoRef,500) : '') || existingPaymentSupportDocumentRef);
     const isApplicationEnrichment = existingPaid && applicationEvidenceSource;
-    const existingPaymentState = text(beforeCobro.paymentState || (existingPaid ? receipt.paymentState : ''), 80);
-    const existingDirectOrInferred = text(beforeCobro.directOrInferred || (existingPaid ? receipt.directOrInferred : '') || (existingPaymentState === 'PAID_INFERRED' ? 'INFERRED' : ''), 80);
-    const existingPaymentEvidenceType = text(beforeCobro.paymentEvidenceType || (existingPaid ? receipt.paymentEvidenceType : ''), 120);
+    const existingPaymentState = text(beforeCobro.paymentState || (existingPaid ? paymentReceipt.paymentState : ''), 80);
+    const existingDirectOrInferred = text(beforeCobro.directOrInferred || (existingPaid ? paymentReceipt.directOrInferred : '') || (existingPaymentState === 'PAID_INFERRED' ? 'INFERRED' : ''), 80);
+    const existingPaymentEvidenceType = text(beforeCobro.paymentEvidenceType || (existingPaid ? paymentReceipt.paymentEvidenceType : ''), 120);
     const priorInferenceProvenance = beforeCobro.inferenceProvenance || (existingPaid && receipt.inferenceProvenance) || (existingPaymentState === 'PAID_INFERRED' || existingDirectOrInferred === 'INFERRED' ? {
       evidenceType: text(beforeCobro.evidenceType || receipt.evidenceType || beforeCobro.paymentEvidenceType || receipt.paymentEvidenceType, 120),
       evidenceId: text(beforeCobro.evidenceId || receipt.evidenceId || beforeCobro.sourceRef || receipt.sourceRef, 500),
@@ -711,7 +844,8 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     if (invoiceNumber) shared.invoiceNumber = invoiceNumber;
     if (invoiceDocumentRef) shared.invoiceDocumentRef = invoiceDocumentRef;
     if (enrichment) {
-      preserveRecordedPayment(shared, cobroPaid ? beforeCobro : receipt);
+      preserveRecordedPayment(shared, cobroPaid ? beforeCobro : paymentReceipt);
+      if(historicalSiga)shared.historicalPaymentEvidence=historicalSiga.proof;
       shared.applicationAmount = documentedAmount;
       shared.applicationEvidence = { sourceType:source,evidenceId,sourceRef:text(payload.sourceRef || payload.documentRef || applicationEvidenceRef,500),
         evidenceType:applicationEvidenceType,evidenceAsOfDate,invoiceNumber,invoiceDocumentRef,
@@ -746,7 +880,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
     if (finalPaymentMethod) cobro.metodo = finalPaymentMethod;
     if (invoiceNumber) cobro.numeroFactura = invoiceNumber;
 
-    const receiptPaymentState = advisorReported
+    const receiptPaymentState = historicalSiga ? 'pagado' : advisorReported
       ? 'pago_reportado_asesor_aplicado'
       : (isApplicationEnrichment && text(receipt.estadoOperativo, 120)
         ? text(receipt.estadoOperativo, 120)
@@ -766,7 +900,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       if (source === 'client_reported') receiptPatch.fechaPagoReportada = finalPaidDate;
     }
     if (finalPaymentMethod) receiptPatch.metodoPago = finalPaymentMethod;
-    if (enrichment) preserveRecordedPayment(receiptPatch, receipt);
+    if (enrichment) preserveRecordedPayment(receiptPatch, paymentReceipt);
     if (invoiceNumber) receiptPatch.numeroFactura = invoiceNumber;
 
     tx.set(cobroRef, cobro, { merge: true });
@@ -814,6 +948,7 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       applicationState,
       amount,
       ...(enrichment ? { applicationAmount:documentedAmount,documentaryAmountVariance:applicationVariance,paymentAmountComparison:shared.paymentAmountComparison } : {}),
+      ...(historicalSiga ? {historicalPaymentLinked:true,historicalPaymentSourceKey:historicalSiga.proof.sourceKey} : {}),
       paymentFactsDigest: digest(recordedPaymentFacts(cobro)),
       paidDate: finalPaidDate || '',
       inferredEffectiveDate: shared.inferredEffectiveDate || '',
@@ -838,7 +973,9 @@ async function applyPayment(authz, data, payload, operationName = 'apply_payment
       cobroId,
       payloadDigest: digest(reqPayload),
       resultDigest: digest(committed),
-      ...(enrichment ? { recordedPaymentBefore:{amount,sourceCollection:cobroPaid?'cobros':'recibosEsperados',sourceId:cobroPaid?cobroId:receiptId,facts:recordedPaymentFacts(cobroPaid?beforeCobro:receipt)},
+      ...(invoiceDocumentRef || paymentSupportDocumentRef ? {documentRefs:{invoiceDocumentRef,paymentSupportDocumentRef}} : {}),
+      ...(enrichment ? { recordedPaymentBefore:{amount,sourceCollection:cobroPaid?'cobros':'recibosEsperados',sourceId:cobroPaid?cobroId:receiptId,facts:recordedPaymentFacts(cobroPaid?beforeCobro:receipt),
+        ...(historicalSiga?{historicalSource:historicalSiga.proof,verifiedHistoricalFacts:historicalSiga.facts}:{})},
         recordedPaymentAfter:{amount,facts:recordedPaymentFacts(cobro)},applicationEvidence:shared.applicationEvidence,
         documentaryAmountVariance:applicationVariance,paymentAmountComparison:shared.paymentAmountComparison } : {}),
       createdAt: technicalNow
@@ -1534,7 +1671,7 @@ async function executePreview(request) {
   if(op==='preview_proposal_application')return execute(request,true);
   if(['resolve_proposal_application','apply_proposal_application'].includes(op)&&syntheticProposalRun(data.tenantId,payload))
     return execute(request,true);
-  if (!['preview_policy','apply_payment','reconcile_payment'].includes(op) || !previewSyntheticId(targetId))
+  if (!['preview_policy','apply_payment','reconcile_payment','read_payment_document_commit'].includes(op) || !previewSyntheticId(targetId))
     throw new HttpsError('permission-denied', 'Preview de Cobros solo admite pagos y lectura de fixtures sintéticas autorizadas.');
   if (text(data.tenantId,180)!=='alianzas-soluciones')
     throw new HttpsError('permission-denied','PREVIEW_PAYMENT_TENANT_DENIED');
@@ -1555,6 +1692,7 @@ async function execute(request, previewOnly = false) {
   const authz = await authorize(request, operation);
   const payload = data.payload && typeof data.payload === 'object' ? data.payload : {};
 
+  if (operation === 'read_payment_document_commit') return readPaymentDocumentCommit(authz, data, payload, previewOnly);
   if (operation === 'intake_source_run') return intakeSourceRun(authz,data,payload,previewOnly===true);
   if (operation === 'preview_policy') return previewPolicy(authz, payload);
   if (operation === 'preview_proposal_application') return proposalApplication(authz,data,payload,false,previewOnly);

@@ -285,3 +285,21 @@ test('resume distinguishes a missing claim, an active worker, and a compensated 
   await assert.rejects(()=>n.observeOperationalClaim(p,'preview',io),/TERMINAL_HOLD_BINDING/);
   await assert.rejects(()=>n.observeOperationalClaim(p,'preview',{...io,findClaim:async name=>name.endsWith('hold.json')?null:ref}),/READBACK_PENDING/);
 });
+
+test('a functional package is independent of the Make service and retains both financial owners',()=>{
+  const contract=require('./gravicentra-i6-6-frontend-preview-authority.cjs'),c=contract.historicalPaymentUnit;
+  const binding=JSON.parse(fs.readFileSync(path.join(root,'artifacts/orbit360-recovery/release-control/I6_6_SCOPED_FUNCTION_RELEASE.json')));
+  const cp=JSON.parse(fs.readFileSync(path.join(root,n.C.control))),current={...cp[cp.currentExecutionDecisionPointer],functionalEpoch:binding.releaseEpoch};
+  const source={current,readBlob:file=>binding.sourcePins[file]};
+  const candidate={executionProvider:n.C.provider,providerBinding:binding};
+  assert.equal(n.validateBinding(candidate,source),binding);
+  assert.ok(!binding.dependencies.includes('make')&&binding.owners.includes('functions/payment-inference-engine.js'));
+  for(const mutate of [b=>b.dependencies.splice(b.dependencies.indexOf('firestore'),1),b=>delete b.sourcePins['functions/payment-inference-engine.js'],
+    b=>{b.targets.live='orbit360OpsLeadsCommand'},b=>{b.scope='FRONTEND_ONLY'},b=>b.releaseEpoch++]){
+    const bad=structuredClone(binding);mutate(bad);assert.throws(()=>n.validateBinding({...candidate,providerBinding:bad},source));
+  }
+  const latest={i66ScopedFunctionRelease:{accepted:{epoch:1,revision:'new-revision',sourcePins:{'functions/cobros-reconciliation-domain.js':'b'.repeat(40)}}}};
+  assert.throws(()=>n.assertCompositeFresh({sourceSha:'a'.repeat(40)},latest,()=> 'c'.repeat(40)),/SUPERSEDED_FUNCTIONAL_SOURCE/);
+  assert.throws(()=>n.assertCompositeFresh({sourceSha:'a'.repeat(40)},latest,()=> 'b'.repeat(40)),/SUPERSEDED_FUNCTIONAL_PREDECESSOR/);
+  assert.doesNotThrow(()=>n.assertCompositeFresh({sourceSha:'a'.repeat(40),scopedPredecessor:{epoch:1,revision:'new-revision'}},latest,()=> 'b'.repeat(40)));
+});
