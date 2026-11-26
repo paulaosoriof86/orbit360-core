@@ -599,6 +599,12 @@ async function observeOperationalClaim(p, phase, io) {
     outcome:build.status,code:hold.code,hold:holdRef};
 }
 
+function missingOperationalClaim(stderr,name) {
+  const message=String(stderr||'').trim();
+  const encoded='gs://'+C.bucket+'/'+encodeURIComponent(name);
+  return message.split(/\r?\n/).some(line=>line==='ERROR: (gcloud.storage.objects.describe) '+encoded+' not found: 404.')||
+    /HTTPError 404|status.?=.?404|NOT_FOUND|matched no objects/i.test(message);
+}
 function operationalClaimReader(out) {
   const io=gcloudReadIo();
   return {...io,
@@ -608,7 +614,7 @@ function operationalClaimReader(out) {
         {encoding:'utf8',maxBuffer:4*1024*1024});
       if(call.status!==0){
         // A permissions or transport error must never be interpreted as an unused claim.
-        if(/HTTPError 404|status.?=.?404|NOT_FOUND|matched no objects/i.test(call.stderr||''))return null;
+        if(missingOperationalClaim(call.stderr,name))return null;
         throw Error('I66_OPERATIONAL_CLAIM_PROVIDER_UNAVAILABLE');
       }
       const meta=JSON.parse(call.stdout),generation=String(meta.generation);
@@ -996,5 +1002,5 @@ async function main(args=process.argv.slice(2)){
   if(args[0]==='verify-runtime'&&args.length===2){const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=g.candidateForPhase(json(g.CONTROL),args[1]);return verifyRuntimeAuthority(p,{phase:args[1],action:'worker'});}
   throw Error('I66_NATIVE_OPERATIONAL_USE_BIND_PREPARE_WORKER_VERIFY');
 }
-module.exports={readFunctionSnapshot,checkServingSnapshot,verifyScopedHosting,readFunctionalPackage,scopedPhysical,assertCompositeFresh,scopedCandidate,packageFunctionalUnit,functionalBuildConfig,observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
+module.exports={missingOperationalClaim,readFunctionSnapshot,checkServingSnapshot,verifyScopedHosting,readFunctionalPackage,scopedPhysical,assertCompositeFresh,scopedCandidate,packageFunctionalUnit,functionalBuildConfig,observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(error=>{console.error(String(error.message||'I66_NATIVE_OPERATIONAL_HOLD').split('\n')[0]);process.exitCode=1;});

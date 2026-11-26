@@ -303,3 +303,12 @@ test('a functional package is independent of the Make service and retains both f
   assert.throws(()=>n.assertCompositeFresh({sourceSha:'a'.repeat(40)},latest,()=> 'b'.repeat(40)),/SUPERSEDED_FUNCTIONAL_PREDECESSOR/);
   assert.doesNotThrow(()=>n.assertCompositeFresh({sourceSha:'a'.repeat(40),scopedPredecessor:{epoch:1,revision:'new-revision'}},latest,()=> 'b'.repeat(40)));
 });
+
+test('Cloud SDK identifies a missing claim by its exact encoded object and 404',()=>{
+  const name='i66/functional/test/preview-claim.json';
+  const message='ERROR: (gcloud.storage.objects.describe) gs://'+n.C.bucket+'/'+encodeURIComponent(name)+' not found: 404.';
+  assert.equal(n.missingOperationalClaim(message,name),true);
+  assert.equal(n.missingOperationalClaim(message,'i66/functional/test/live-claim.json'),false);
+  assert.equal(n.missingOperationalClaim(message.replace('404','403'),name),false);
+  assert.equal(n.missingOperationalClaim('UNAVAILABLE',name),false);
+});
