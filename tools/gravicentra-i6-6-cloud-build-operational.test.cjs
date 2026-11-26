@@ -179,7 +179,7 @@ test('historical admission fixture permits only its recorded predecessor and suc
   const file='tools/gravicentra-i6-6-composite-preview-admission.test.cjs';
   const receipt=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/I6_6_ASSIGNED_ROLES_HISTORICAL_FIXTURE_PROVIDER_QA_20261125.json','utf8'));
   const revision=receipt.tests.find(test=>test.path===file);
-  const bytes=fs.readFileSync(file);
+  const bytes=execFileSync('git',['cat-file','blob',revision.gitBlobSha]);
   assert.equal(pkg.blob(bytes),revision.gitBlobSha);
   mechanism.files[file]={beforeBlob:revision.replaces.priorGitBlobSha,blob:revision.gitBlobSha,sha256:pkg.sha(bytes)};
   assert.equal(n.validateMechanism(mechanism,mechanism.sourceSha),mechanism);

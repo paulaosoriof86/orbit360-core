@@ -41,6 +41,11 @@ const MECHANISM_PATHS=Object.freeze([
   'tools/gravicentra-i66-frontend-control.test.cjs',
   'tools/gravicentra-i6-6-cloud-build-signed-cas.cjs','tools/gravicentra-i6-6-cloud-build-signed-cas.test.cjs',
   'tools/gravicentra-i6-6-native-promotion-artifact-binding.test.cjs',
+  'tools/gravicentra-i6-6-cloud-build-source-admission.cjs','tools/gravicentra-i6-6-cloud-build-source-admission.test.cjs',
+  'tools/gravicentra-i6-6-native-predecessor-backup.test.cjs',
+  'tools/gravicentra-i6-6-native-hosting-continuation.test.cjs','tools/gravicentra-i6-6-native-committed-channel.test.cjs',
+  'tools/gravicentra-i6-6-cloud-build-compensated-retry.cjs','tools/gravicentra-i6-6-cloud-build-compensated-retry.test.cjs',
+  'tools/gravicentra-i6-6-compensated-retry-runtime.test.cjs',
   'tools/gravicentra-i6-6-carlos-paula-live-synthetic-ops-leads-uat-adc.test.cjs'
 ]);
 const PRODUCT_PATHS=Object.freeze(['functions','orbit360-platform','firebase.json','firestore.rules','storage.rules','database.rules.json',pkg.C.builder,':(exclude)orbit360-platform/docs/recovery/orbit360-recovery-state-v1.json']);
@@ -60,6 +65,17 @@ function artifactRef(value){
   need(m[1].startsWith('gs://'+C.bucket+'/i66/'),'PRIVATE_EVIDENCE_BUCKET');
   const tail=m[1].slice(('gs://'+C.bucket+'/i66/').length);need(/^[A-Za-z0-9_./-]+$/.test(tail)&&!tail.split('/').some(s=>!s||s==='.'||s==='..'),'EVIDENCE_NAME');
   return {uri:m[1],generation:m[2]};
+}
+function validatePreviousLive(backup,current){
+  equal(backup.executionProvider,current.executionProvider,'PREVIOUS_PROVIDER_DRIFT');
+  for(const [field,key] of Object.entries({sourceSha:'sourceSha',buildId:'buildId',artifactId:'artifactId',artifactDigest:'artifactDigest',buildRunId:'previewRunId',liveRunId:'liveCloneRunId',hostingVersion:'liveHostingVersion'}))equal(backup[field],current[key],'PREVIOUS_IDENTITY_'+field);
+  need(sha40(backup.sourceSha)&&/^sha256:[a-f0-9]{64}$/.test(backup.artifactDigest||''),'PREVIOUS_SOURCE_DIGEST');
+  executionId(backup,backup.buildRunId,'PREVIOUS_BUILD');executionId(backup,backup.liveRunId,'PREVIOUS_LIVE');
+  if(native(backup))preview.artifactIdentity(backup.sourceSha,backup.buildRunId,backup.artifactId,backup.artifactDigest);
+  else need(Number.isSafeInteger(backup.artifactId)&&backup.artifactId>0,'PREVIOUS_ACTIONS_ARTIFACT');
+  need(new RegExp('^gi-i66-'+backup.sourceSha.slice(0,12)+'-[a-f0-9]{12}$').test(backup.buildId||''),'PREVIOUS_BUILD_MARKER');
+  need(/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/.test(backup.hostingVersion||''),'PREVIOUS_HOSTING_VERSION');
+  return backup;
 }
 function validateMechanism(m,sourceSha){
   equal(Object.keys(m||{}).sort(),['schema','sourceSha','commit','files'].sort(),'MECHANISM_KEYS');
@@ -84,7 +100,7 @@ function validateBinding(p,physical){
     return scopeOwner().validateFunctionalUnitSuccessor(p.providerBinding,physical.current,physical.readBlob);
   }
   need(native(p),'EXPLICIT_CLOUD_PROVIDER');const b=p.providerBinding;
-  equal(Object.keys(b||{}).sort(),['schema','requestVersion','mechanism','hostingPlan','hostingBuildId','hostingProof','hostingVersion'].sort(),'BINDING_KEYS');
+  equal(Object.keys(b||{}).sort(),['schema','requestVersion','mechanism','hostingPlan','hostingBuildId','hostingProof','hostingVersion',...(b?.compensatedRetry===undefined?[]:['compensatedRetry'])].sort(),'BINDING_KEYS');
   equal(b.schema,C.bindingSchema,'BINDING_SCHEMA');preview.validatePlan(b.hostingPlan);
   equal(b.requestVersion,b.hostingPlan.requestVersion,'BINDING_REQUEST');need(uuid(b.hostingBuildId),'HOSTING_EXECUTION_UUID');preview.objectRef(b.hostingProof);
   equal(b.hostingProof.uri,'gs://'+C.bucket+'/'+preview.prefix(b.hostingPlan,b.hostingBuildId)+preview.F.proof,'HOSTING_PROOF_PATH');
@@ -94,6 +110,7 @@ function validateBinding(p,physical){
     [h.sourceSha,h.packageBuildId,a.uri+'#'+a.generation,'sha256:'+a.sha256,preview.C.channel,preview.C.origin],'PACKAGE_AND_PREVIEW_EXACT_BINDING');
   preview.artifactIdentity(p.sourceSha,p.buildRunId,p.artifactId,p.artifactDigest);validateMechanism(b.mechanism,p.sourceSha);
   equal(p.expectedSiteFileCount,224,'SITE_FILES');equal(p.makeIngressComposite,true,'FIVE_FUNCTION_COMPOSITE');
+  require('./gravicentra-i6-6-cloud-build-compensated-retry.cjs').validateReference(b.compensatedRetry,p,'preview');
   return b;
 }
 function verifyPinnedOwners(p,{head='HEAD',cwd=process.cwd(),gitRead,readFile=fs.readFileSync}={}){
@@ -168,9 +185,10 @@ function configFor(p){validatePlan(p);return {
   options:{logging:'GCS_ONLY',sourceProvenanceHash:['SHA256'],machineType:'E2_STANDARD_2'},
   substitutions:{_I66_PROVIDER:C.provider,_I66_AUTHORITY_HEAD:p.authorityHead,_I66_PLAN_SHA256:digest(p)},
   tags:['i66-operational-'+p.phase,'i66-request-'+p.requestVersion],artifacts:{objects:{location:'gs://'+C.bucket+'/'+prefix(p,'$BUILD_ID'),paths:Object.values(F)}}};}
-function validateBuild(p,b,{finished=true}={}){
+function validateBuild(p,b,{finished=true,failed=false}={}){
+  need(!failed||finished,'FAILED_BUILD_MUST_BE_FINISHED');
   validatePlan(p);need(uuid(b.id),'BUILD_UUID');need([C.projectId,C.projectNumber].some(n=>b.name==='projects/'+n+'/locations/'+C.region+'/builds/'+b.id),'BUILD_RESOURCE');
-  equal(b.projectId,C.projectId,'BUILD_PROJECT');equal(b.status,finished?'SUCCESS':'WORKING','BUILD_STATUS');const c=configFor(p);
+  equal(b.projectId,C.projectId,'BUILD_PROJECT');equal(b.status,failed?'FAILURE':finished?'SUCCESS':'WORKING','BUILD_STATUS');const c=configFor(p);
   for(const k of ['serviceAccount','timeout','logsBucket','substitutions','tags'])equal(b[k],c[k],'BUILD_'+k);
   for(const k of ['logging','sourceProvenanceHash','machineType'])equal(b.options?.[k],c.options[k],'OPTIONS_'+k);
   for(const k of ['env','volumes','secretEnv'])need(!b.options?.[k]?.length,'NO_GLOBAL_OVERRIDE');
@@ -183,10 +201,10 @@ function validateBuild(p,b,{finished=true}={}){
     if(i===0)need(JSON.stringify(s.args)===JSON.stringify(e.args)||JSON.stringify(s.args)===JSON.stringify(['-euo','pipefail','-c',SDK_SCRIPT]),'SDK_STEP_EXACT_ARGS');else equal(s.args,e.args,'STEP_args');
     if(e.env){const expanded=e.env.map(x=>x.replace(/\$([A-Z_][A-Z0-9_]*)/g,(m,k)=>k==='BUILD_ID'?b.id:c.substitutions[k]??m));need(JSON.stringify(s.env)===JSON.stringify(e.env)||JSON.stringify(s.env)===JSON.stringify(expanded),'STEP_ENV');}else need(!s.env?.length,'SDK_NO_EXTRA_ENV');
     need(!s.allowFailure&&!s.allowExitCodes?.length&&!s.secretEnv?.length&&!s.script&&!s.dir&&!s.volumes?.length,'NO_STEP_BYPASS');
-    if(finished){equal(s.status,'SUCCESS','REAL_STEP_SUCCESS');need(Date.parse(s.timing?.startTime)>=Date.parse(b.startTime)&&Date.parse(s.timing?.endTime)>=Date.parse(s.timing?.startTime)&&Date.parse(s.timing?.endTime)<=Date.parse(b.finishTime),'REAL_STEP_TIMING');}}
+    if(finished){equal(s.status,failed&&i===1?'FAILURE':'SUCCESS','REAL_STEP_SUCCESS');need(Date.parse(s.timing?.startTime)>=Date.parse(b.startTime)&&Date.parse(s.timing?.endTime)>=Date.parse(s.timing?.startTime)&&Date.parse(s.timing?.endTime)<=Date.parse(b.finishTime),'REAL_STEP_TIMING');}}
   equal(Object.keys(b.artifacts||{}),['objects'],'NATIVE_ARTIFACTS_ONLY');need([c.artifacts.objects.location,c.artifacts.objects.location.replace('$BUILD_ID',b.id)].includes(b.artifacts.objects.location),'ARTIFACT_LOCATION');equal(b.artifacts.objects.paths,Object.values(F),'EXACT_ARTIFACT_SET');
   need(Number.isFinite(Date.parse(b.startTime))&&Number.isFinite(Date.parse(b.createTime)),'REAL_START');
-  if(finished){need(Date.parse(b.finishTime)>=Date.parse(b.startTime),'REAL_FINISH');equal(b.results?.buildStepImages?.length,2,'TWO_IMAGE_DIGESTS');need(b.results.buildStepImages.every(x=>/^sha256:[a-f0-9]{64}$/.test(x)),'IMMUTABLE_STEP_IMAGES');equal(Number(b.results.numArtifacts),Object.keys(F).length,'ALL_ARTIFACTS');const uri='gs://'+C.bucket+'/'+prefix(p,b.id)+'artifacts-'+b.id+'.json';need(b.results.artifactManifest===uri||/^#[1-9][0-9]{0,24}$/.test(String(b.results.artifactManifest).slice(uri.length))&&b.results.artifactManifest.startsWith(uri),'ARTIFACT_MANIFEST');}
+  if(finished){need(Date.parse(b.finishTime)>=Date.parse(b.startTime),'REAL_FINISH');equal(b.results?.buildStepImages?.length,2,'TWO_IMAGE_DIGESTS');need(b.results.buildStepImages.every(x=>/^sha256:[a-f0-9]{64}$/.test(x)),'IMMUTABLE_STEP_IMAGES');if(!failed){equal(Number(b.results.numArtifacts),Object.keys(F).length,'ALL_ARTIFACTS');const uri='gs://'+C.bucket+'/'+prefix(p,b.id)+'artifacts-'+b.id+'.json';need(b.results.artifactManifest===uri||/^#[1-9][0-9]{0,24}$/.test(String(b.results.artifactManifest).slice(uri.length))&&b.results.artifactManifest.startsWith(uri),'ARTIFACT_MANIFEST');}}
   return b;
 }
 async function sdkHeaders({verifyIdentity=()=>auth.verifyCloudBuildRuntime(),requestContext={}}={}){
@@ -344,7 +362,7 @@ async function admitRuntime(p,phase){
   const runtime=await verifyRuntimeAuthority(p,{phase,action:'admit'}),root=fs.mkdtempSync(path.join(process.env.RUNNER_TEMP||os.tmpdir(),'i66-native-admission-'));
   const io=await preview.cloudIo(await sdkHeaders()),e=await preview.readPackage(p.providerBinding.hostingPlan,io,path.join(root,'package'));
   validatePackageMetadata(p,e.build,{...e.objects[pkg.F.archive],sha256:sha(e.files[pkg.F.archive])});
-  const h=preview.verify(p.providerBinding.hostingPlan,p.providerBinding.hostingBuildId,path.join(root,'hosting'));
+  const h=await preview.verify(p.providerBinding.hostingPlan,p.providerBinding.hostingBuildId,path.join(root,'hosting'));
   equal(h.proof,p.providerBinding.hostingProof,'HOSTING_PROVIDER_PROOF');equal(h.hostingVersion,p.providerBinding.hostingVersion,'HOSTING_PROVIDER_VERSION');
   if(phase==='live')await readPreviewAcceptance(p,io,path.join(root,'signed-preview'));
   return {...runtime,package:e,hosting:h};
@@ -354,13 +372,22 @@ async function packageTarForBinding(binding){
   const p=g.candidateForPhase(control,control.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'?'live':'preview');validateBinding(p);
   await verifyRuntimeAuthority(p,{phase:control.status==='OPERATIONAL_EXACT_LIVE_PROMOTION_AUTHORIZED'?'live':'preview',action:'verify-preview'});
   const temp=fs.mkdtempSync(path.join(process.env.RUNNER_TEMP||os.tmpdir(),'i66-native-hosting-bytes-')),io=await preview.cloudIo(await sdkHeaders());
-  if(provider(binding)){
+  return packageTarForCandidate(p,binding,io,temp);
+}
+async function packageTarForCandidate(p,binding,io,temp,{verifyNative=require('./gravicentra-i6-6-cloud-build-source-admission.cjs').verifyCurrentArtifact,readPackage=preview.readPackage}={}){
+  const same=(a,b)=>['sourceSha','buildId','buildRunId','artifactId','artifactDigest','executionProvider'].every(key=>a[key]===b[key]);
+  if(same(binding,p)){
     for(const key of ['sourceSha','buildId','buildRunId','artifactId','artifactDigest'])equal(binding[key],p[key],'HOSTING_SAME_CANDIDATE');
-    const e=await preview.readPackage(p.providerBinding.hostingPlan,io,path.join(temp,'current'));return e.files[pkg.F.archive];
+    const e=await readPackage(p.providerBinding.hostingPlan,io,path.join(temp,'current'));return e.files[pkg.F.archive];
   }
+  need(same(binding,p.currentLive),'EXACT_PREVIOUS_PROVIDER_AND_PACKAGE');
   for(const key of ['sourceSha','buildId','buildRunId','artifactId','artifactDigest'])equal(binding[key],p.currentLive[key],'EXACT_PREVIOUS_LIVE_BACKUP');
+  if(provider(binding)){
+    const out=path.join(temp,'previous');await verifyNative(binding,{io,out});
+    const archive=fs.readFileSync(path.join(out,pkg.F.archive));equal(sha(archive),binding.artifactDigest.slice(7),'PREVIOUS_NATIVE_TAR_DIGEST');return archive;
+  }
   const ref=p.providerBinding.hostingPlan.imports.live,data=(await io.object(ref)).data;
-  const dir=path.join(temp,'previous');preview.unpackHistorical(data,dir,'live');return fs.readFileSync(path.join(dir,pkg.F.archive));
+  const dir=path.join(temp,'previous');preview.unpackHistorical(data,dir,'live',{expectedBytes:ref.bytes});return fs.readFileSync(path.join(dir,pkg.F.archive));
 }
 async function signedCasIo(runtime,{storage}={}){
   need(runtime.executionProvider===C.provider&&uuid(runtime.buildId)&&runtime.phase==='live','SIGNED_CAS_REAL_LIVE_RUNTIME');
@@ -401,6 +428,12 @@ async function validateOperationalProof(plan,build,e,io){
   equal(proof.realCustomerWrites,0,'NO_REAL_CUSTOMER_WRITES');equal(proof.realFinancialWrites,0,'NO_REAL_FINANCIAL_WRITES');equal(proof.fullI66ProductionAccepted,false,'NO_FULL_SCOPE_OVERCLAIM');
   const claimRef=proof.claim;preview.objectRef(claimRef);equal(claimRef.uri,'gs://'+C.bucket+'/'+lockName(p,plan.phase),'EXACT_OPERATIONAL_CLAIM');
   const claim=await io.object(claimRef);pkg.validateObjectTime(build,claim.meta);const c=JSON.parse(claim.data);equal(c,{schema:'GI_I66_NATIVE_OPERATIONAL_CLAIM_V1',executionProvider:C.provider,buildId:build.id,phase:plan.phase,sourceSha:p.sourceSha,artifactId:p.artifactId,artifactDigest:p.artifactDigest,authorityHead:plan.authorityHead,planSha256:digest(plan),candidateSha256:plan.candidateSha256},'ACTUAL_OPERATIONAL_CLAIM');
+  if(p.providerBinding.compensatedRetry&&plan.phase==='preview'){
+    preview.objectRef(proof.compensatedRetry);equal(proof.compensatedRetry.uri,'gs://'+C.bucket+'/i66/operational-attempts/'+build.id+'/before-'+RETRY_READBACK,'RETRY_RETAINED_PROOF_PATH');
+    const retained=await io.object(proof.compensatedRetry);pkg.validateObjectTime(build,retained.meta);
+    validateRetryReadback(p,plan.phase,JSON.parse(retained.data),{buildId:build.id,authorityHead:plan.authorityHead});
+    need(Date.parse(retained.meta.timeCreated)<=Date.parse(claim.meta.timeCreated),'RETRY_PROOF_PRECEDES_NEW_CLAIM');
+  }else need(proof.compensatedRetry===undefined,'NO_UNREQUESTED_RETRY_PROOF');
   need(Date.parse(claim.meta.timeCreated)<=Date.parse(proof.checks.deploy.startedAt),'CLAIM_BEFORE_DEPLOY');
   const logName='i66/cloud-build-logs/log-'+build.id+'.txt',meta=await io.metadata(logName),log=await io.bytes(logName,String(meta.generation));equal([meta.bucket,meta.name],[C.bucket,logName],'NATIVE_EXECUTION_LOG');
   const marker='I66_NATIVE_OPERATIONAL_READY_FOR_PROVIDER_RETENTION ',lines=log.toString('utf8').split(/\r?\n/).filter(x=>x.includes(marker));equal(lines.length,1,'UNIQUE_PROVIDER_LOG_MARKER');
@@ -417,7 +450,50 @@ async function readFinancialPreview(qa,target,{releaseScope,parentAuthorityBlob}
   const report=JSON.parse(file);require('./gravicentra-i66-frontend-promotion-owner.cjs').validateFinancialReport(report,target,'preview',{authorityBlob:qa.previewReadOnlyAuthorityBlob,releaseScope,parentAuthorityBlob});
   equal([report.workflowHeadSha,report.frontendQaBefore.runId],[plan.authorityHead,b.id],'FINANCIAL_ACTUAL_EXECUTOR');return report;
 }
-function lockName(p,phase){need(PHASES.includes(phase),'CLAIM_PHASE');return 'i66/operational-locks/request-'+p.providerBinding.requestVersion+'-'+phase+'-'+p.sourceSha+'-'+p.artifactDigest.slice(7)+'.json';}
+function lockName(p,phase){need(PHASES.includes(phase),'CLAIM_PHASE');const retry=require('./gravicentra-i6-6-cloud-build-compensated-retry.cjs');return retry.retryLockName(retry.originalLockName(p,phase),phase==='preview'?p.providerBinding.compensatedRetry:undefined);}
+const RETRY_READBACK='gi-i66-compensated-retry-readback.json';
+function validateRetryReadback(p,phase,report,{buildId,authorityHead}={}){
+  const retry=require('./gravicentra-i6-6-cloud-build-compensated-retry.cjs'),ref=p.providerBinding?.compensatedRetry;
+  if(!ref||phase!=='preview'){need(report===undefined||report===null,'UNREQUESTED_RETRY_PROOF');return null;}
+  retry.validateReference(ref,p,phase);need(report&&typeof report==='object','RETRY_READBACK_REQUIRED');
+  equal([report.schema,report.status,report.phase],['GI_I66_COMPENSATED_RETRY_VERIFIED_V1','EXACT_COMPENSATED_PREVIEW_RETRY_READBACK_VERIFIED',phase],'RETRY_READBACK_STATUS');
+  for(const k of ['priorBuildId','priorClaim','hold','admission'])equal(report[k],ref[k],'RETRY_READBACK_'+k);
+  need(uuid(report.currentBuildId)&&report.currentBuildId!==ref.priorBuildId&&sha40(report.authorityHead)&&sha64(report.priorPlanSha256),'RETRY_READBACK_EXECUTION');
+  if(buildId!==undefined)equal(report.currentBuildId,buildId,'RETRY_READBACK_BUILD');if(authorityHead!==undefined)equal(report.authorityHead,authorityHead,'RETRY_READBACK_AUTHORITY');
+  equal(report.retryClaimName,lockName(p,phase),'RETRY_READBACK_CLAIM');need(Number.isFinite(Date.parse(report.verifiedAtUtc)),'RETRY_READBACK_TIME');
+  equal([report.productSourceChanges,report.rebuilds,report.claimWrites,report.businessWrites,report.livePromotion],[0,0,0,0,false],'RETRY_READBACK_NO_SCOPE_EXPANSION');
+  const before=report.verifiedCurrentBefore;equal(Object.keys(before||{}).sort(),['configurationDigest','function','traffic'],'RETRY_READBACK_PREIMAGE');need(sha64(before.configurationDigest),'RETRY_READBACK_CLOSED_DIGEST');
+  retry.validateFunction(before.function,p);retry.validateTraffic(before.traffic,before.function);return report;
+}
+function readRetryReadback(p,phase,{directory=process.env.RUNNER_TEMP,env=process.env}={}){
+  if(!p.providerBinding?.compensatedRetry||phase!=='preview')return null;
+  need(typeof directory==='string'&&directory.length>0,'RETRY_READBACK_DIRECTORY');
+  need(uuid(env.GRAVICENTRA_CLOUD_BUILD_ID)&&sha40(env.I66_NATIVE_AUTHORITY_HEAD),'RETRY_READBACK_EXECUTOR_IDENTITY');
+  return validateRetryReadback(p,phase,json(path.join(directory,RETRY_READBACK)),{buildId:env.GRAVICENTRA_CLOUD_BUILD_ID,authorityHead:env.I66_NATIVE_AUTHORITY_HEAD});
+}
+async function currentRetryState({p,phase},{db,auth:client}={}){
+  if(!db||!client){
+    const {GoogleAuth}=require('google-auth-library');client=await new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform'],projectId:C.projectId}).getClient();
+    const {getApps,initializeApp,applicationDefault}=require('firebase-admin/app'),{getFirestore}=require('firebase-admin/firestore');
+    db=getFirestore(getApps()[0]||initializeApp({credential:applicationDefault(),projectId:C.projectId}));
+  }
+  const owner=require('./gravicentra-i66-make-lead-protected-executor.cjs'),support=require('../functions/product-lead-ingress-owner-support');
+  const grant=await support.grantRef(db,phase==='preview').get();need(grant.exists,'RETRY_CURRENT_CLOSED_GRANT_REQUIRED');
+  const fn=await owner.deployedFunction(client,p,phase),traffic=await owner.deployedTraffic(client,p,phase,fn);
+  const current=await support.grantRef(db,phase==='preview').get();need(current.exists,'RETRY_CURRENT_CLOSED_GRANT_REQUIRED');equal(current.data(),grant.data(),'RETRY_GRANT_CHANGED_DURING_READBACK');
+  return {observedAtUtc:new Date().toISOString(),configuration:grant.data(),function:fn,traffic};
+}
+async function verifyRetryRuntime(p,phase,{runtime,io,cwd=process.cwd(),readCurrentState=currentRetryState}={}){
+  if(!p.providerBinding?.compensatedRetry||phase!=='preview')return null;
+  runtime=runtime||await verifyRuntimeAuthority(p,{phase,action:'worker',cwd});io=io||await preview.cloudIo(await sdkHeaders());
+  const result=await require('./gravicentra-i6-6-cloud-build-compensated-retry.cjs').verifyCompensatedRetry(p,phase,io,{
+    currentBuildId:runtime.buildId,authorityHead:runtime.plan.authorityHead,
+    readGitBytes:(commit,file)=>gitBytes(cwd,commit,file),
+    verifyAdmissionAncestry:(commit,head)=>{git(cwd,'merge-base','--is-ancestor',commit,head);return true;},
+    validateFailedBuild:(plan,build)=>validateBuild(plan,build,{finished:true,failed:true}),
+    readPriorCandidate:plan=>candidateAt(plan,cwd),readCurrentState});
+  return validateRetryReadback(p,phase,result,{buildId:runtime.buildId,authorityHead:runtime.plan.authorityHead});
+}
 const ENV_OUTPUTS=Object.freeze(['I66_PACKAGE_ROOT','I66_ROLE_PREVIEW_FIREBASE_CONFIG','I66_LIVE_FIREBASE_CONFIG','I66_ROLE_ROLLBACK_HOSTING_VERSION']);
 function consumeNativeEnv(file,env){
   const rows=fs.existsSync(file)?fs.readFileSync(file,'utf8').split('\n').filter(Boolean):[];
@@ -518,9 +594,11 @@ async function worker(plan){
     if(plan.phase==='live'&&control.i66ScopedFunctionRelease?.providerStages?.PACKAGE_CERTIFIED)
       await protectOverlappingLiveDeploy(p,plan.phase,control,JSON.parse(gitBytes(cwd,head,UNIT_FILE)));
   };
+  branchGuard(p,plan,cwd);let io=await preview.cloudIo(await sdkHeaders());
+  const retryReadback=await verifyRetryRuntime(p,plan.phase,{runtime,io,cwd}),retainedBefore={};
+  if(retryReadback){write(path.join(temp,RETRY_READBACK),retryReadback);retainedBefore[RETRY_READBACK]=await io.retain('i66/operational-attempts/'+identity.buildId+'/before-'+RETRY_READBACK,fs.readFileSync(path.join(temp,RETRY_READBACK)),'application/json');}
   await protectLive();const claimValue={schema:'GI_I66_NATIVE_OPERATIONAL_CLAIM_V1',executionProvider:C.provider,buildId:identity.buildId,phase:plan.phase,sourceSha:p.sourceSha,artifactId:p.artifactId,artifactDigest:p.artifactDigest,authorityHead:plan.authorityHead,planSha256:digest(plan),candidateSha256:plan.candidateSha256};
-  let io=await preview.cloudIo(await sdkHeaders());const claim=await io.retain(lockName(p,plan.phase),Buffer.from(JSON.stringify(claimValue)+'\n'),'application/json');
-  const retainedBefore={};
+  const claim=await io.retain(lockName(p,plan.phase),Buffer.from(JSON.stringify(claimValue)+'\n'),'application/json');
   try{
   for(const file of [beforeName,...(plan.phase==='preview'?['gi-role-live-before.sha']:['gi-role-live-old-revisions.tsv','gi-role-live-before-hosting.json','gi-make-live-snapshot-trigger.json'])]){
     const bytes=fs.readFileSync(path.join(temp,file));retainedBefore[file]=await io.retain('i66/operational-attempts/'+identity.buildId+'/before-'+file,bytes);
@@ -568,7 +646,7 @@ async function worker(plan){
     execFileSync('tar',['-czf',path.join(cwd,F.evidence),'-C',evidence,'.'],{stdio:'pipe'});
     const proof={schema:C.proofSchema,executionProvider:C.provider,phase:plan.phase,status:plan.phase==='preview'?'SIGNED_PREVIEW_AND_FINANCIAL48_PASS_LIVE_PENDING':'COMMITTED_SAME_ARTIFACT_SIGNED_LIVE_AND_FINANCIAL48_PASS',
       buildId:identity.buildId,sourceSha:p.sourceSha,authorityHead:plan.authorityHead,mechanismSha:plan.mechanismSha,planSha256:digest(plan),packageBuildId:p.buildRunId,artifactId:p.artifactId,artifactDigest:p.artifactDigest,
-      claim,checks,financial:{stageCount:48,reportSha256:sha(fs.readFileSync(path.join(cwd,F.financial))),execution:plan.phase==='preview'?'EXACT_READONLY_DRIVER':'COMPOSITE_VERIFIED_TRANSACTION'},
+      claim,checks,...(retryReadback?{compensatedRetry:retainedBefore[RETRY_READBACK]}:{}),financial:{stageCount:48,reportSha256:sha(fs.readFileSync(path.join(cwd,F.financial))),execution:plan.phase==='preview'?'EXACT_READONLY_DRIVER':'COMPOSITE_VERIFIED_TRANSACTION'},
       realCustomerWrites:0,realFinancialWrites:0,fullI66ProductionAccepted:false,...(committed?{committed}:{}),
       fileHashes:Object.fromEntries(Object.values(F).filter(n=>n!==F.proof).map(n=>[n,sha(fs.readFileSync(path.join(cwd,n)))]))};
     write(path.join(cwd,F.proof),proof);console.log('I66_NATIVE_OPERATIONAL_READY_FOR_PROVIDER_RETENTION '+JSON.stringify({buildId:identity.buildId,phase:plan.phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,planSha256:digest(plan),status:proof.status}));return proof;
@@ -1572,5 +1650,5 @@ async function main(args=process.argv.slice(2)){
   if(args[0]==='verify-runtime'&&args.length===2){const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=g.candidateForPhase(json(g.CONTROL),args[1]);return verifyRuntimeAuthority(p,{phase:args[1],action:'worker'});}
   throw Error('I66_NATIVE_OPERATIONAL_USE_BIND_PREPARE_WORKER_VERIFY');
 }
-module.exports={recoverDirectRollback,protectOverlappingLiveDeploy,directRollbackRequest,verifyRestoredRoute,validateDirectRollbackOwnership,FUNCTIONAL_JOURNEY,FUNCTIONAL_JOURNEY_PINS,validateFunctionalJourneyPlan,functionalJourneyConfig,validateFunctionalJourneyBuild,verifyFunctionalJourneyPins,functionalUiHosting,makeFunctionalJourneyPlan,functionalJourneyTargets,functionalServerTime,functionalMemberValue,functionalJourneyMember,validateFunctionalJourneyWitness,captureFunctionalJourneyWitness,validateFunctionalJourneyReport,functionalJourneyCleanupProof,functionalCleanupAbsent,validateFunctionalJourneyRetryEvidence,verifyPreviousFunctionalJourney,acquireFunctionalJourneyClaim,functionalJourneyWorker,adoptedFunctionalJourney,validateRetainedFunctionalJourney,verifyFunctionalJourneyCleanup,acceptRetainedFunctionalJourney,runFunctionalJourneys,missingOperationalClaim,readFunctionSnapshot,checkServingSnapshot,verifyScopedHosting,readFunctionalPackage,scopedPhysical,assertCompositeFresh,scopedCandidate,packageFunctionalUnit,functionalBuildConfig,observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
+module.exports={recoverDirectRollback,protectOverlappingLiveDeploy,directRollbackRequest,verifyRestoredRoute,validateDirectRollbackOwnership,FUNCTIONAL_JOURNEY,FUNCTIONAL_JOURNEY_PINS,validateFunctionalJourneyPlan,functionalJourneyConfig,validateFunctionalJourneyBuild,verifyFunctionalJourneyPins,functionalUiHosting,makeFunctionalJourneyPlan,functionalJourneyTargets,functionalServerTime,functionalMemberValue,functionalJourneyMember,validateFunctionalJourneyWitness,captureFunctionalJourneyWitness,validateFunctionalJourneyReport,functionalJourneyCleanupProof,functionalCleanupAbsent,validateFunctionalJourneyRetryEvidence,verifyPreviousFunctionalJourney,acquireFunctionalJourneyClaim,functionalJourneyWorker,adoptedFunctionalJourney,validateRetainedFunctionalJourney,verifyFunctionalJourneyCleanup,acceptRetainedFunctionalJourney,runFunctionalJourneys,missingOperationalClaim,readFunctionSnapshot,checkServingSnapshot,verifyScopedHosting,readFunctionalPackage,scopedPhysical,assertCompositeFresh,scopedCandidate,packageFunctionalUnit,functionalBuildConfig,observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main,validatePreviousLive,packageTarForCandidate,RETRY_READBACK,validateRetryReadback,readRetryReadback,currentRetryState,verifyRetryRuntime};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(error=>{console.error(String(error.message||'I66_NATIVE_OPERATIONAL_HOLD').split('\n')[0]);process.exitCode=1;});

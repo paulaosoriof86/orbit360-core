@@ -155,6 +155,8 @@ const PINNED_OWNER_PATHS = Object.freeze([
   'tools/gravicentra-i66-greenapi-provider-readiness.test.cjs',
   'tools/gravicentra-i66-make-lead-protected-executor.cjs',
   'tools/gravicentra-i66-make-lead-protected-executor.test.cjs',
+  'tools/gravicentra-i6-6-cloud-build-compensated-retry.cjs','tools/gravicentra-i6-6-cloud-build-compensated-retry.test.cjs',
+  'tools/gravicentra-i6-6-compensated-retry-runtime.test.cjs',
   'tools/gravicentra-i66-make-firebase-project-iam-guard.cjs',
   'tools/gravicentra-i66-make-lead-ingress.test.cjs',
   'tools/gravicentra-i6-6-make-lead-ingress-release.test.cjs',
@@ -379,7 +381,7 @@ function candidateForPhase(control,phase) {
     assert.equal(backup[field],current[source],'I66_OPERATIONAL_LIVE_BACKUP_DRIFT_'+field);
   checkSha(backup.sourceSha,'I66_OPERATIONAL_BACKUP_SOURCE');
   checkDigest(backup.artifactDigest,'I66_OPERATIONAL_BACKUP_DIGEST');
-  for(const id of ['artifactId','buildRunId','liveRunId'])checkId(backup[id],'I66_OPERATIONAL_BACKUP_'+id);
+  nativeOwner.validatePreviousLive(backup,current);
   assert.match(String(backup.buildId||''),new RegExp('^gi-i66-'+backup.sourceSha.slice(0,12)+'-'));
   assert.match(String(backup.hostingVersion||''),/^sites\/ays-orbit-360-lab\/versions\/[A-Za-z0-9_-]+$/);
   assert.notEqual(p.sourceSha,backup.sourceSha,'I66_OPERATIONAL_ALREADY_LIVE_SOURCE');

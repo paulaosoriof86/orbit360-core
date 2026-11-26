@@ -8,6 +8,7 @@ const repository='paulaosoriof86/orbit360-core',branch='recovery/fase-a-clean-20
 const repoUrl='https://api.github.com/repos/'+repository+'/';
 const nativeProvider=()=>process.env.GRAVICENTRA_BUILD_PROVIDER==='CLOUD_BUILD';
 const nativeOwner=()=>require('./gravicentra-i6-6-cloud-build-operational.cjs');
+function releaseProviderIdentity(binding){return nativeOwner().provider(binding)?{executionProvider:'CLOUD_BUILD'}:{};}
 const executionHead=()=>nativeProvider()?process.env.I66_NATIVE_AUTHORITY_HEAD:process.env.GITHUB_SHA;
 const runId=nativeProvider()?process.env.GRAVICENTRA_CLOUD_BUILD_ID:Number(process.env.GITHUB_RUN_ID);
 async function assertExecution(phase,action,p){
@@ -589,7 +590,7 @@ async function run(){
   // Resume an interrupted release using its frozen version and previous backup,
   // even when the physical LIVE channel already points to the target.
   async function makeBinding(base,prior){
-    const v={sourceSha:base.sourceSha,sourceTree:git('rev-parse',base.sourceSha+'^{tree}'),manifestBlob:blobAt(base.sourceSha,P.manifest),
+    const v={...releaseProviderIdentity(base),sourceSha:base.sourceSha,sourceTree:git('rev-parse',base.sourceSha+'^{tree}'),manifestBlob:blobAt(base.sourceSha,P.manifest),
       compositionBlob:blobAt(base.sourceSha,P.composition),artifactId:base.artifactId,artifactDigest:base.artifactDigest,buildId:base.buildId,
       buildRunId:base.buildRunId||base.previewRunId,previewUrl:base.previewUrl||'',previewChannel:base.previewChannel||'',previewUiRunId:base.previewUiRunId||null,
       hostingVersion:prior?base.liveHostingVersion:await provider.current(base.previewChannel)};
@@ -748,7 +749,7 @@ async function runCompositeAcceptance(){
   const request=existing?.request||{schema:'GI_I66_FRONTEND_PROMOTION_V1',gate:'I6.6',scope:'COMPOSITE',generation,
     approvalBlob,guardBlob:blobAt(boot,P.guard),previousReceiptBlob:previous.receiptGitBlobSha,candidate,
     ...(needsFinancial?{financialQa:financialBinding}:{}),
-    previous:{sourceSha:previous.sourceSha,sourceTree:previous.sourceTree,manifestBlob:previous.manifestBlob,
+    previous:{...releaseProviderIdentity(previous),sourceSha:previous.sourceSha,sourceTree:previous.sourceTree,manifestBlob:previous.manifestBlob,
       compositionBlob:previous.compositionBlob,artifactId:previous.artifactId,artifactDigest:previous.artifactDigest,
       buildId:previous.buildId,buildRunId:previous.buildRunId,previewUrl:previous.previewUrl,
       hostingVersion:previous.hostingVersion,files:previous.hostedFilesEachOrigin},
@@ -924,6 +925,6 @@ if(require.main===module){
   const execution=dispatchReleaseAction(process.argv[2]);
   execution.catch(e=>{console.error('I66_FRONTEND_PROMOTION_HOLD '+String(e.message).split('\n')[0].slice(0,150)+(transportCode(e)?' TRANSPORT_CODE='+transportCode(e):''));process.exitCode=1;});
 }
-module.exports={nextCompositeGeneration,assertCompositeRollbackAllowed,FINANCIAL_SCOPE,financialQaPaths,financialQaOwnerSelection,assertFinancialComposition,financialTarget,
+module.exports={releaseProviderIdentity,nextCompositeGeneration,assertCompositeRollbackAllowed,FINANCIAL_SCOPE,financialQaPaths,financialQaOwnerSelection,assertFinancialComposition,financialTarget,
   validateFinancialAuthority,resolveFinancialQa,validateFinancialReport,validateFinancialPhasePair,compositeFinancialBinding,
   validateCompositeFinancialParent,dispatchReleaseAction,transportCode,runReleaseChild,commitWithReadback};

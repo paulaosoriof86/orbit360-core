@@ -1,7 +1,8 @@
 'use strict';
 // Native execution may request the existing signed expected-head commit through
-// its trusted operator. This module never writes GitHub or weakens its signature
-// gate. Runtime/provider authority must already have been verified by the owner.
+// its trusted operator. The worker handoff never writes GitHub or weakens its
+// signature gate. The explicit operator CLI below consumes that exact handoff
+// outside Cloud Build, using the operator's existing gh/gcloud authentication.
 const assert=require('node:assert/strict'),crypto=require('node:crypto');
 const {requestJson}=require('./gravicentra-i6-6-cloud-build-package.cjs');
 const C=Object.freeze({repository:'paulaosoriof86/orbit360-core',branch:'recovery/fase-a-clean-20260831',
@@ -172,4 +173,135 @@ async function requestSignedCas(input){
   }
   fail('SIGNED_COMMIT_NOT_OBSERVED');
 }
-module.exports={C,metadataPath,validateInput,hashTree,treeMap,preparePacket,verifyCommit,retainedReference,requestSignedCas};
+const PACKET_LIMIT=32*1024*1024;
+const operatorUsage='[inspect|apply] <gs://retained-request.json#generation> <sha256> (default: inspect)';
+function operatorReference(uri,hash){
+  need(typeof uri==='string'&&typeof hash==='string'&&/^[a-f0-9]{64}$/.test(hash),'OPERATOR_REFERENCE');
+  const prefix='gs://'+C.bucket+'/i66/signed-cas/';need(uri.startsWith(prefix),'OPERATOR_PRIVATE_BUCKET');
+  const match=/^([a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})\/([a-f0-9]{64})\.json#([1-9][0-9]{0,24})$/.exec(uri.slice(prefix.length));
+  need(match,'OPERATOR_EXACT_GENERATION');same(match[2],hash,'OPERATOR_REFERENCE_HASH');
+  const name='i66/signed-cas/'+match[1]+'/'+hash+'.json';
+  return {uri:'gs://'+C.bucket+'/'+name,bucket:C.bucket,name,generation:match[3],sha256:hash,buildId:match[1]};
+}
+function parseOperatorArgs(args){
+  need(Array.isArray(args)&&args.every(x=>typeof x==='string'),'OPERATOR_USAGE');
+  const values=[...args],mode=['inspect','apply'].includes(values[0])?values.shift():'inspect';
+  need(values.length===2,'OPERATOR_USAGE');return {mode,reference:operatorReference(values[0],values[1])};
+}
+function operatorContext(env){
+  for(const key of ['GRAVICENTRA_BUILD_PROVIDER','GRAVICENTRA_CLOUD_BUILD_ID','I66_NATIVE_AUTHORITY_HEAD','I66_NATIVE_PLAN_SHA256'])
+    need(!env[key],'OPERATOR_OUTSIDE_CLOUD_BUILD');
+}
+function parseOperatorJson(bytes,code){
+  try{return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes));}catch{fail(code);}
+}
+function operatorPacket(reference,object){
+  const meta=object?.metadata,bytes=object?.bytes;
+  same([meta?.bucket,meta?.name,String(meta?.generation)],[reference.bucket,reference.name,reference.generation],'OPERATOR_OBJECT_IDENTITY');
+  need(Buffer.isBuffer(bytes)&&bytes.length>0&&bytes.length<=PACKET_LIMIT,'OPERATOR_PACKET_SIZE');
+  same(Number(meta?.size),bytes.length,'OPERATOR_OBJECT_SIZE');same(sha256(bytes),reference.sha256,'OPERATOR_OBJECT_HASH');
+  const packet=parseOperatorJson(bytes,'OPERATOR_PACKET_JSON');
+  need(packet&&typeof packet==='object'&&!Array.isArray(packet),'OPERATOR_PACKET_OBJECT');
+  same(Object.keys(packet).sort(),['schema','provider','repository','branch','expectedHead','expectedBaseTree','expectedTree','headline','execution','allowedPaths','changedPaths','entries'].sort(),'OPERATOR_PACKET_FIELDS');
+  same([packet.schema,packet.provider,packet.repository,packet.branch],[C.schema,C.provider,C.repository,C.branch],'OPERATOR_PACKET_SCOPE');
+  need(bytes.equals(Buffer.from(serial(packet))),'OPERATOR_PACKET_CANONICAL');
+  need(hash40(packet.expectedBaseTree)&&hash40(packet.expectedTree),'OPERATOR_PACKET_TREES');
+  need(Array.isArray(packet.entries)&&packet.entries.length>0&&packet.entries.length<=64,'OPERATOR_ENTRY_COUNT');
+  const entries=Object.create(null);
+  for(const entry of packet.entries){
+    need(entry&&typeof entry==='object'&&!Array.isArray(entry),'OPERATOR_ENTRY');
+    same(Object.keys(entry).sort(),['path','baseBlobSha','newBlobSha','sha256','bytes','content'].sort(),'OPERATOR_ENTRY_FIELDS');
+    need(metadataPath(entry.path)&&!Object.hasOwn(entries,entry.path),'OPERATOR_ENTRY_PATH');
+    need(entry.baseBlobSha===null||hash40(entry.baseBlobSha),'OPERATOR_ENTRY_PREIMAGE');
+    need(typeof entry.content==='string','OPERATOR_ENTRY_CONTENT');const content=Buffer.from(entry.content);
+    need(content.length<=8*1024*1024,'OPERATOR_ENTRY_SIZE');
+    same([entry.bytes,entry.newBlobSha,entry.sha256],[content.length,gitBlob(content),sha256(content)],'OPERATOR_ENTRY_HASHES');
+    const value=parseOperatorJson(content,'OPERATOR_ENTRY_JSON');
+    need(content.equals(Buffer.from(serial(value))),'OPERATOR_ENTRY_CANONICAL');entries[entry.path]=value;
+  }
+  const input={head:packet.expectedHead,headline:packet.headline,entries,allowedPaths:packet.allowedPaths,execution:packet.execution};
+  validateInput(input);same(packet.execution.buildId,reference.buildId,'OPERATOR_EXECUTION_UUID');
+  same(packet.execution.phase,'live','OPERATOR_LIVE_HANDOFF');
+  return {input,bytes};
+}
+function validateOperatorBuild(execution,build){
+  const native=require('./gravicentra-i6-6-cloud-build-operational.cjs');
+  need(['WORKING','SUCCESS'].includes(build?.status),'OPERATOR_BUILD_NOT_ACTIVE_OR_SUCCESSFUL');
+  const plan=native.planFromBuild(build);native.validateBuild(plan,build,{finished:build.status==='SUCCESS'});
+  same([build.id,plan.phase,plan.sourceSha,plan.authorityHead],
+    [execution.buildId,'live',execution.sourceSha,execution.authorityHead],'OPERATOR_EXACT_EXECUTION');
+  return plan;
+}
+function operatorMutation(prepared){
+  return {query:'mutation($input:CreateCommitOnBranchInput!){createCommitOnBranch(input:$input){commit{oid}}}',
+    variables:{input:{branch:{repositoryNameWithOwner:C.repository,branchName:C.branch},expectedHeadOid:prepared.packet.expectedHead,
+      message:{headline:prepared.packet.headline},fileChanges:{additions:prepared.packet.entries.map(entry=>({path:entry.path,contents:Buffer.from(entry.content).toString('base64')}))}}}};
+}
+function operatorCliIo({exec=require('node:child_process').execFileSync}={}){
+  const native=require('./gravicentra-i6-6-cloud-build-operational.cjs');
+  const run=(command,args,code,input)=>{try{return Buffer.from(exec(command,args,{input,stdio:['pipe','pipe','pipe'],timeout:60000,maxBuffer:64*1024*1024}));}catch{fail(code);}};
+  const google=(args,code)=>parseOperatorJson(run('gcloud',[...args,'--project='+native.C.projectId,'--format=json'],code),code);
+  return {
+    async readObjectExact(ref){
+      const uri=ref.uri+'#'+ref.generation,metadata=google(['storage','objects','describe',uri,'--raw'],'OPERATOR_GCS_METADATA');
+      same([metadata.bucket,metadata.name,String(metadata.generation)],[ref.bucket,ref.name,ref.generation],'OPERATOR_OBJECT_IDENTITY');
+      const size=Number(metadata.size);need(Number.isSafeInteger(size)&&size>0&&size<=PACKET_LIMIT,'OPERATOR_PACKET_SIZE');
+      return {metadata,bytes:run('gcloud',['storage','cat',uri,'--project='+native.C.projectId],'OPERATOR_GCS_BYTES')};
+    },
+    async readBuild(id){need(/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id),'OPERATOR_BUILD_UUID');
+      return google(['builds','describe',id,'--region='+native.C.region],'OPERATOR_BUILD_READ');},
+    async getJson(url){
+      need(url===branchUrl||url.startsWith(api)&&/^(?:commits\/[a-f0-9]{40}|git\/trees\/[a-f0-9]{40}\?recursive=1)$/.test(url.slice(api.length)),'OPERATOR_GITHUB_READ_SCOPE');
+      return parseOperatorJson(run('gh',['api',url.slice('https://api.github.com/'.length),'--hostname','github.com','--method','GET'],'OPERATOR_GITHUB_READ'),'OPERATOR_GITHUB_JSON');
+    },
+    async createCommit(payload){
+      // Only gh receives its existing authentication. No token, shell command,
+      // request body or provider error output is printed or passed in argv.
+      return parseOperatorJson(run('gh',['api','graphql','--hostname','github.com','--method','POST','--input','-'],
+        'OPERATOR_GRAPHQL_RESPONSE_UNCONFIRMED',Buffer.from(JSON.stringify(payload))),'OPERATOR_GRAPHQL_RESPONSE_JSON');
+    }
+  };
+}
+async function operateSignedCas(reference,{mode='inspect',io,env=process.env}={}){
+  need(['inspect','apply'].includes(mode),'OPERATOR_MODE');operatorContext(env);
+  same(reference,operatorReference(reference?.uri+'#'+reference?.generation,reference?.sha256),'OPERATOR_REFERENCE_FIELDS');
+  io=io||operatorCliIo();const decoded=operatorPacket(reference,await io.readObjectExact(reference)),input=decoded.input;
+  const build=await io.readBuild(input.execution.buildId);validateOperatorBuild(input.execution,build);
+  const base=await io.getJson(api+'commits/'+input.head);
+  need(base?.sha===input.head&&hash40(base.commit?.tree?.sha),'BASE_COMMIT');
+  const tree=await io.getJson(api+'git/trees/'+base.commit.tree.sha+'?recursive=1'),prepared=preparePacket(input,base,tree);
+  need(prepared.bytes.equals(decoded.bytes),'OPERATOR_RECONSTRUCTED_PACKET');
+  same([prepared.uri,prepared.sha256],[reference.uri,reference.sha256],'OPERATOR_RECONSTRUCTED_REFERENCE');
+  const readHead=async()=>{const ref=await io.getJson(branchUrl);need(ref?.ref==='refs/heads/'+C.branch&&ref?.object?.type==='commit'&&hash40(ref.object.sha),'EXACT_BRANCH_REF');return ref.object.sha;};
+  const observe=async head=>{const sha=verifyCommit(prepared,await io.getJson(api+'commits/'+head));
+    same(sha,head,'OBSERVED_COMMIT_ID');same(await readHead(),sha,'BRANCH_MOVED_DURING_READBACK');return sha;};
+  const summary=(status,head,writeAttempts)=>({mode,status,reference,execution:input.execution,expectedHead:input.head,
+    expectedTree:prepared.packet.expectedTree,changedPaths:prepared.packet.changedPaths,branchHead:head,writeAttempts});
+  const initial=await readHead();
+  if(initial!==input.head)return summary('EXACT_SIGNED_COMMIT_ALREADY_PRESENT',await observe(initial),0);
+  need(build.status==='WORKING','OPERATOR_COMPLETED_BUILD_WITHOUT_COMMIT');
+  if(mode==='inspect')return summary('INSPECTED_PENDING_NO_WRITE',initial,0);
+  // A fresh provider read and branch read precede the one conditional write.
+  // SUCCESS permits only adoption above, never a new commit for a stale packet.
+  const currentBuild=await io.readBuild(input.execution.buildId);validateOperatorBuild(input.execution,currentBuild);
+  const currentHead=await readHead();
+  if(currentHead!==input.head)return summary('EXACT_SIGNED_COMMIT_ALREADY_PRESENT',await observe(currentHead),0);
+  need(currentBuild.status==='WORKING','OPERATOR_NEW_COMMIT_REQUIRES_WORKING_BUILD');
+  let acknowledged;
+  try{const response=await io.createCommit(operatorMutation(prepared)),oid=response?.data?.createCommitOnBranch?.commit?.oid;
+    if(!response?.errors?.length&&hash40(oid))acknowledged=oid;
+  }catch{/* The independent readback decides; this function never repeats POST. */}
+  const after=await readHead();need(after!==input.head,'OPERATOR_WRITE_UNCONFIRMED_NO_RETRY');
+  const observed=await observe(after);if(acknowledged)same(observed,acknowledged,'OPERATOR_RETURNED_COMMIT_MISMATCH');
+  return summary(acknowledged?'SIGNED_COMMIT_APPLIED':'EXACT_SIGNED_COMMIT_RECOVERED',observed,1);
+}
+async function operatorMain(args=process.argv.slice(2),{io,env=process.env,emit=value=>console.log(JSON.stringify(value))}={}){
+  const {mode,reference}=parseOperatorArgs(args),result=await operateSignedCas(reference,{mode,io,env});emit(result);return result;
+}
+if(require.main===module)operatorMain().catch(error=>{
+  const code=/^I66_(?:SIGNED_CAS_HOLD|NATIVE_OPERATIONAL)_[A-Z0-9_]+/.exec(String(error?.message));
+  console.error(code?code[0]:'I66_SIGNED_CAS_HOLD_OPERATOR_FAILED');
+  if(code?.[0]==='I66_SIGNED_CAS_HOLD_OPERATOR_USAGE')console.error(operatorUsage);process.exitCode=1;
+});
+module.exports={C,metadataPath,validateInput,hashTree,treeMap,preparePacket,verifyCommit,retainedReference,requestSignedCas,
+  operatorReference,parseOperatorArgs,operatorPacket,validateOperatorBuild,operatorMutation,operatorCliIo,operateSignedCas,operatorMain};

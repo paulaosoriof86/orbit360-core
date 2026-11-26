@@ -45,8 +45,72 @@ function original(p=plan()){
   const jobs={jobs:[{name:'gate',run_id:run.id,status:'completed',conclusion:'failure',steps:[]},{name:'immutable-package',run_id:run.id,status:'completed',conclusion:'skipped',steps:[]}]};
   return {run,jobs,artifacts:{total_count:0,artifacts:[]}};
 }
-function proofFixture(){
-  const p=plan(),b=build(p),files=Object.fromEntries(Object.values(F).map(n=>[n,Buffer.from('synthetic '+n+'\n')]));
+function packageRequestTransitionFixture(previous,version,{native=false}={}){
+  const sourceSha='1'.repeat(40),mechanismSha='2'.repeat(40),repo=path.join(os.tmpdir(),'i66-package-sequence-synthetic');
+  const request={version,sourceQaHead:'3'.repeat(40),sourceQaRunId:101,guardRunId:102,manifestBlob:'4'.repeat(40)};
+  if(native){delete request.sourceQaRunId;delete request.guardRunId;request.nativeSourceQa=nativeReference(request.sourceQaHead);}
+  const transport={frontendPreviewRequest:request},files=new Map();
+  for(const file of owner.mechanismPaths({schema:native?C.nativePlanSchema:C.planSchema}))files.set(path.join(repo,file),Buffer.from('synthetic mechanism '+file));
+  const ownerPath=path.join(__dirname,'gravicentra-i6-6-cloud-build-package.cjs'),loaded=new Module(ownerPath,module);
+  const originalRequire=loaded.require.bind(loaded),reads=[];
+  const gitRead=(command,args,options)=>{
+    assert.equal(command,'git');assert.equal(options.cwd,repo);reads.push(args);
+    let value;
+    if(args[0]==='status'||args[0]==='merge-base'||args[0]==='diff')value='';
+    else if(args.join(' ')==='rev-parse HEAD')value=mechanismSha;
+    else if(args.join(' ')==='rev-parse '+mechanismSha+':'+C.manifest)value=request.manifestBlob;
+    else if(args.join(' ')==='rev-parse '+sourceSha+'^{tree}')value='5'.repeat(40);
+    else if(args.join(' ')==='rev-parse '+sourceSha+':'+C.builder)value='6'.repeat(40);
+    else if(args[0]==='show'){
+      const ref=args[1];
+      if(ref===sourceSha+':'+C.transport||ref===mechanismSha+':'+C.transport)value=JSON.stringify(transport)+'\n';
+      else if(ref===sourceSha+'^:'+C.transport)value=JSON.stringify(previous)+'\n';
+      else if(ref===sourceSha+':'+C.workflow)value=workflow;
+      else if(ref.startsWith(mechanismSha+':'))value=files.get(path.join(repo,ref.slice(mechanismSha.length+1)));
+    }
+    assert.notEqual(value,undefined,'UNEXPECTED_SEQUENCE_GIT_READ:'+args.join(' '));
+    return options.encoding?String(value):Buffer.from(value);
+  };
+  loaded.filename=ownerPath;loaded.paths=Module._nodeModulePaths(__dirname);
+  loaded.require=name=>name==='node:child_process'?{...originalRequire(name),execFileSync:gitRead}:
+    name==='node:fs'?{...fs,readFileSync:file=>{assert.ok(files.has(file),'UNEXPECTED_SEQUENCE_FILE_READ:'+file);return files.get(file);}}:originalRequire(name);
+  loaded._compile(fs.readFileSync(ownerPath,'utf8'),ownerPath);
+  return {request,transport,reads,sourceSha,mechanismSha,run:()=>loaded.exports.makePlan(repo,{sourceSha,mechanismSha,...(native?{}:{githubRunId:123,githubAttempt:1})})};
+}
+function packageConsumedTransport(){
+  const sourceSha='7'.repeat(40),artifactDigest='sha256:'+'8'.repeat(64);
+  const receiptPath='artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00004_RECEIPT.json';
+  return {frontendReleaseSequence:4,lastConsumedFrontendPreviewRequest:{version:35,sourceQaHead:'9'.repeat(40)},
+    lastConsumedFrontendRelease:{generation:4,previewRequestVersion:35,sourceSha,artifactDigest,receiptPath},
+    currentPhysicalHostingRelease:{executionProvider:'CLOUD_BUILD',sourceSha,artifactDigest,receipt:receiptPath}};
+}
+test('package planner advances consumed35 to36 using the same admission sequence without changing witnesses',()=>{
+  const previous=packageConsumedTransport(),before=JSON.stringify(previous),f=packageRequestTransitionFixture(previous,36);
+  const requestBefore=JSON.stringify(f.request),p=f.run();
+  assert.equal(p.requestVersion,36);assert.equal(p.sourceSha,f.sourceSha);assert.equal(p.mechanismSha,f.mechanismSha);
+  assert.deepEqual(p.sourceQa,{headSha:f.request.sourceQaHead,runId:101,guardRunId:102});
+  assert.equal(p.transportBlob,owner.blob(JSON.stringify(f.transport)+'\n'));assert.equal(p.requestSha256,owner.digest(f.request));
+  assert.equal(p.noDeploy,true);assert.equal(p.fullI66ProductionAccepted,false);assert.equal(p.realBusinessWrites,0);
+  assert.equal(JSON.stringify(previous),before);assert.equal(JSON.stringify(f.request),requestBefore);
+});
+test('package planner preserves initial1 and active request increments and rejects no-op or skipped source',()=>{
+  assert.equal(packageRequestTransitionFixture({},1).run().requestVersion,1);
+  assert.equal(packageRequestTransitionFixture({frontendPreviewRequest:{version:34}},35).run().requestVersion,35);
+  for(const [previous,version] of [[{},2],[{frontendPreviewRequest:{version:34}},36]])
+    assert.throws(packageRequestTransitionFixture(previous,version).run,/PREVIEW_REQUEST_VERSION_DRIFT/);
+  const previous={},f=packageRequestTransitionFixture(previous,35);previous.frontendPreviewRequest=copy(f.request);
+  assert.throws(f.run,/SOURCE_IS_NOT_REQUEST_TRANSITION/);
+});
+test('package planner rejects consumed replay, skipped request and conflicting LIVE predecessor',()=>{
+  assert.throws(packageRequestTransitionFixture(packageConsumedTransport(),35).run,/PREVIEW_CONSUMED_REQUEST_REPLAY/);
+  assert.throws(packageRequestTransitionFixture(packageConsumedTransport(),37).run,/PREVIEW_REQUEST_VERSION_DRIFT/);
+  const previous=packageConsumedTransport();previous.currentPhysicalHostingRelease.artifactDigest='sha256:'+'0'.repeat(64);
+  assert.throws(packageRequestTransitionFixture(previous,36).run,/PREVIEW_CONSUMED_PHYSICAL_RELEASE_DRIFT_artifactDigest/);
+  delete previous.lastConsumedFrontendPreviewRequest;delete previous.lastConsumedFrontendRelease;
+  assert.throws(packageRequestTransitionFixture(previous,1).run,/PREVIEW_CONSUMED_REQUEST_PAIR_REQUIRED/);
+});
+function proofFixture(p=plan()){
+  const b=build(p),files=Object.fromEntries(Object.values(F).map(n=>[n,Buffer.from('synthetic '+n+'\n')]));
   files[F.archive]=Buffer.from('synthetic archive bytes; NOT A REAL RELEASE');
   const archiveSha256=owner.sha(files[F.archive]);
   files[F.digest]=Buffer.from(archiveSha256+'  /workspace/gi-i66-exact-package.tar.gz\n');
@@ -57,7 +121,7 @@ function proofFixture(){
     const file=name==='archive'?F.build:F[name];
     checks[name]={status:'PASS',exitCode:0,startedAt:started,endedAt:'2026-11-25T12:04:00.000Z',file,logSha256:owner.sha(files[file])};
     if(N[name])checks[name].signedBlockSha256=p.blocks[name];
-    if(name==='mechanism')checks[name].tests=[{path:C.test,...p.pins[C.test]},{path:C.brandingTest,...p.pins[C.brandingTest]}];
+    if(name==='mechanism')checks[name].tests=owner.mechanismTests(p).map(file=>({path:file,...p.pins[file]}));
   }
   const proof={schema:C.proofSchema,provider:C.provider,scope:C.scope,buildId:b.id,planSha256:owner.digest(p),sourceSha:p.sourceSha,
     mechanismSha:p.mechanismSha,sourceTreeSha:p.sourceTreeSha,serviceAccount:C.serviceAccount,requestVersion:p.requestVersion,
@@ -353,4 +417,64 @@ test('metadata retry still requires Google header and exact runtime identity; to
   assert.equal(denied.calls.length,1);assert.deepEqual(denied.pauses,[]);
   const wrong=requestHarness([{...responses[0],text:async()=> 'wrong-project'}]);
   await assert.rejects(owner.workerIdentity(env,wrong.context),/METADATA_PROJECT/);assert.equal(wrong.calls.length,1);
+});
+
+function nativeReference(headSha='1'.repeat(40)){
+  return{schema:'GI_I66_NATIVE_SOURCE_QA_REFERENCE_V1',executionProvider:'CLOUD_BUILD',buildId:'22345678-1234-4234-8234-123456789036',sourceQaHead:headSha,
+    mechanismSha:'a'.repeat(40),planSha256:'8'.repeat(64),receiptPath:'artifacts/orbit360-recovery/release-control/I6_6_NATIVE_SOURCE_QA_TEST.json',
+    receiptBlob:'9'.repeat(40),receiptSha256:'0'.repeat(64)};
+}
+function nativePackagePlan(){
+  const p=plan();p.schema=C.nativePlanSchema;p.requestVersion=36;
+  p.sourceQa={executionProvider:C.provider,headSha:p.sourceQa.headSha,reference:nativeReference(p.sourceQa.headSha)};
+  p.pins=Object.fromEntries(owner.mechanismPaths(p).map(file=>[file,{blob:'2'.repeat(40),sha256:'3'.repeat(64)}]));
+  delete p.unexecutedGithubBuild;return p;
+}
+function nativeProofFixture(){
+  const p=nativePackagePlan(),f=proofFixture(p),ref=p.sourceQa.reference;
+  const sourceQa={schema:'GI_I66_NATIVE_SOURCE_QA_RECEIPT_V1',executionProvider:C.provider,status:'SOURCE_QA_AND_GUARD_VERIFIED_PREVIEW_LIVE_PENDING',
+    buildId:ref.buildId,sourceQaHead:ref.sourceQaHead,mechanismSha:ref.mechanismSha,planSha256:ref.planSha256,
+    retainedReceipt:{path:ref.receiptPath,gitBlobSha:ref.receiptBlob,sha256:ref.receiptSha256},
+    noDeploy:true,realBusinessWrites:0,fullI66ProductionAccepted:false,cloudBuild:{status:'SUCCESS'},manifest:{generation:'1'},log:{sha256:'1'.repeat(64)},objects:{proof:{generation:'2'}}};
+  const currentArtifact={executionProvider:'GITHUB_ACTIONS',artifactId:100,artifactDigest:'sha256:'+'2'.repeat(64),sourceSha:'3'.repeat(40),buildId:'gi-existing'};
+  const admission={eligible:true,sourceSha:p.sourceSha,apiReads:[{suffix:'artifacts/100'}],
+    markers:['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app'].map(origin=>({origin,value:{sourceSha:currentArtifact.sourceSha,buildId:'gi-existing'}})),providerEvidence:{sourceQa,currentArtifact}};
+  const sync=()=>{f.files[F.admission]=Buffer.from(JSON.stringify(admission));f.proof.checks.admission.logSha256=owner.sha(f.files[F.admission]);f.files[F.proof]=Buffer.from(JSON.stringify(f.proof));
+    for(const [name,bytes] of Object.entries(f.files))f.objects[name].size=String(bytes.length);};sync();return{...f,admission,sync};
+}
+test('native package preparation advances consumed35 without a failed Actions run and pins the real admission owners',()=>{
+  const f=packageRequestTransitionFixture(packageConsumedTransport(),36,{native:true}),p=f.run();
+  assert.equal(p.schema,C.nativePlanSchema);assert.equal(p.requestVersion,36);assert.equal(p.sourceQa.executionProvider,'CLOUD_BUILD');
+  assert.deepEqual(p.sourceQa.reference,f.request.nativeSourceQa);assert.equal(Object.hasOwn(p,'unexecutedGithubBuild'),false);
+  assert.equal(Object.hasOwn(p.sourceQa,'runId'),false);assert.equal(Object.hasOwn(p.sourceQa,'guardRunId'),false);
+  for(const file of owner.NATIVE_ADMISSION_PATHS)assert.ok(p.pins[file]);
+  assert.ok(owner.mechanismTests(p).includes('tools/gravicentra-i6-6-native-preview-admission.test.cjs'));
+});
+test('native plan and provider build retain same package boundaries without Actions identity fiction',()=>{
+  const p=nativePackagePlan();assert.equal(owner.validatePlan(p),p);assert.equal(owner.validateBuild(p,build(p)).status,'SUCCESS');
+  const cfg=owner.configFor(p);assert.equal(cfg.steps.length,1);assert.equal(cfg.steps[0].entrypoint,'node');
+  assert.ok(!JSON.stringify(cfg).includes('unexecutedGithubBuild'));assert.equal(cfg.tags[1],'i66-request-36');
+});
+for(const [name,mutate] of [
+  ['native declaration for frozen35',p=>p.requestVersion=35],['fake Actions failure',p=>p.unexecutedGithubBuild={runId:7,attempt:1}],
+  ['Actions QA ID',p=>p.sourceQa.runId=7],['unknown provider',p=>p.sourceQa.executionProvider='OTHER'],
+  ['missing admission owner',p=>delete p.pins[C.admission]],['missing native test',p=>delete p.pins['tools/gravicentra-i6-6-native-preview-admission.test.cjs']],
+  ['mismatched source QA',p=>p.sourceQa.headSha='f'.repeat(40)],['different native receipt scope',p=>p.sourceQa.reference.receiptPath='README.md']
+])test('native package plan refuses '+name,()=>{const p=nativePackagePlan();mutate(p);assert.throws(()=>owner.validatePlan(p));});
+test('native worker proof uses verified source receipt plus both LIVE markers instead of counting Actions reads',()=>{
+  const f=nativeProofFixture();assert.equal(f.admission.apiReads.length,1);assert.equal(owner.validateWorkerProof(f.p,f.b,f.proof,f.files,f.objects),true);
+  Object.assign(f.admission.providerEvidence.currentArtifact,{executionProvider:'CLOUD_BUILD',cloudBuild:{status:'SUCCESS'},artifact:{generation:'4'},manifest:{generation:'5'},log:{sha256:'6'.repeat(64)}});
+  f.admission.apiReads=[];f.sync();assert.equal(owner.validateWorkerProof(f.p,f.b,f.proof,f.files,f.objects),true);
+});
+for(const [name,mutate] of [
+  ['missing source evidence',f=>delete f.admission.providerEvidence.sourceQa],['source provider failed',f=>f.admission.providerEvidence.sourceQa.cloudBuild.status='FAILURE'],
+  ['receipt digest changed',f=>f.admission.providerEvidence.sourceQa.retainedReceipt.sha256='5'.repeat(64)],
+  ['different source build',f=>f.admission.providerEvidence.sourceQa.buildId='32345678-1234-4234-8234-123456789036'],
+  ['one LIVE origin twice',f=>f.admission.markers[1].origin=f.admission.markers[0].origin],
+  ['physical marker changed',f=>f.admission.markers[0].value.sourceSha='0'.repeat(40)],
+  ['missing current artifact evidence',f=>delete f.admission.providerEvidence.currentArtifact],
+  ['unknown artifact provider',f=>f.admission.providerEvidence.currentArtifact.executionProvider='OTHER'],
+  ['native current artifact without provider proof',f=>f.admission.providerEvidence.currentArtifact.executionProvider='CLOUD_BUILD']
+])test('native package cannot claim verified admission after '+name,()=>{
+  const f=nativeProofFixture();mutate(f);f.sync();assert.throws(()=>owner.validateWorkerProof(f.p,f.b,f.proof,f.files,f.objects));
 });

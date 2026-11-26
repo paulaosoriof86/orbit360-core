@@ -39,6 +39,7 @@ const SAFE_FAILURE_CODES=new Set([
   'INGRESS_PROBE_CONFIG_PREIMAGE_CHANGED','INGRESS_PROBE_QUEUE_AND_RESULT_REQUIRED','INGRESS_PROJECT_IAM_CHANGED_DURING_DEPLOY',
   'INGRESS_PROTECTED_ACTION_UNKNOWN','INGRESS_QUEUE_AUTHENTIC_CREATE_TIME_REQUIRED','INGRESS_READBACK_GRANT_REVISION_CHANGED',
   'INGRESS_READBACK_GRANT_SOURCE_CHANGED','INGRESS_REAL_ACTIVATION_REQUIRES_COMMITTED_RELEASE','INGRESS_REAL_PROOF_REQUIRES_COMMITTED_RELEASE',
+  'INGRESS_RETRY_EXISTING_TRIGGER_REQUIRED','INGRESS_RETRY_FUNCTION_PREIMAGE_CHANGED','INGRESS_RETRY_TRAFFIC_PREIMAGE_CHANGED',
   'INGRESS_REJECTION_MUST_BE_EXACT_WRONG_NONCE_ONLY','INGRESS_REJECT_CHANGED_CANONICAL_POSTIMAGE','INGRESS_REJECT_MUST_FOLLOW_CANONICAL_SNAPSHOT',
   'INGRESS_REPLAY_CHANGED_CANONICAL_POSTIMAGE','INGRESS_REPLAY_MUST_FOLLOW_CANONICAL_SNAPSHOT','INGRESS_ROLLBACK_CONFIG_MISSING',
   'INGRESS_ROLLBACK_CONFIG_POSTIMAGE_CHANGED','INGRESS_ROLLBACK_UNVERIFIED','INGRESS_RULES_SOURCE_PIN',
@@ -282,15 +283,32 @@ function sameTriggerConfiguration(before,after){
   const view=fn=>Object.fromEntries(Object.entries(fn||{}).filter(([key])=>!['revision','configurationDigest'].includes(key)));
   assert.deepEqual(view(after),view(before),'INGRESS_TRIGGER_NON_REVISION_CONFIGURATION_CHANGED');
 }
-async function snapshotTrigger({auth,p,phase}){
+function retryPreimage(p,phase,report){
+  const value=require('./gravicentra-i6-6-cloud-build-operational.cjs').validateRetryReadback(p,phase,report);
+  return value?.verifiedCurrentBefore||null;
+}
+function closedPreimageDigest(p,phase,report){return retryPreimage(p,phase,report)?.configurationDigest||p.makeIngress.closedConfiguration?.[phase]?.expectedDigest;}
+function validateSnapshotPreimage(p,phase,snapshot,report){
+  const before=p.makeIngress.targetBefore[phase],retry=retryPreimage(p,phase,report);
+  assert.equal(snapshot.previousState,before.state);
+  if(retry){
+    assert.equal(before.state,'EXISTING_APPROVED','INGRESS_RETRY_EXISTING_TRIGGER_REQUIRED');
+    assert.deepEqual(snapshot.function,retry.function,'INGRESS_RETRY_FUNCTION_PREIMAGE_CHANGED');
+    assert.deepEqual(validateTrafficProof(snapshot.traffic,snapshot.function,phase),validateTrafficProof(retry.traffic,retry.function,phase),'INGRESS_RETRY_TRAFFIC_PREIMAGE_CHANGED');
+    assert.ok(BigInt(snapshot.traffic.generation)>=BigInt(retry.traffic.generation),'INGRESS_TRAFFIC_GENERATION_REGRESSED');
+  }else if(before.state!=='ABSENT'){
+    assert.equal(snapshot.function?.revision,before.revision);assert.equal(snapshot.function?.configurationDigest,before.configurationDigest,'INGRESS_TRIGGER_PREIMAGE_CONFIGURATION_CHANGED');
+  }
+  return snapshot;
+}
+async function snapshotTrigger({auth,p,phase,retryReadback}){
   const actual=await optionalFunction(auth,p,phase),before=p.makeIngress.targetBefore[phase];
   if(before.state==='ABSENT')assert.equal(actual,null,'INGRESS_TRIGGER_PREIMAGE_NOT_ABSENT');
-  else{assert.ok(actual,'INGRESS_TRIGGER_PREIMAGE_MISSING');assert.equal(actual.revision,before.revision);
-    assert.equal(actual.configurationDigest,before.configurationDigest,'INGRESS_TRIGGER_PREIMAGE_CONFIGURATION_CHANGED');}
-  return{schema:'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
-    previousState:before.state,function:actual,traffic:actual?await deployedTraffic(auth,p,phase,actual):null};
+  else assert.ok(actual,'INGRESS_TRIGGER_PREIMAGE_MISSING');
+  return validateSnapshotPreimage(p,phase,{schema:'GI_I66_MAKE_TRIGGER_SNAPSHOT_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
+    previousState:before.state,function:actual,traffic:actual?await deployedTraffic(auth,p,phase,actual):null},retryReadback);
 }
-async function requireClosedTrafficGrant({db,p,phase},expected=p.makeIngress.closedConfiguration?.[phase]?.expectedDigest){
+async function requireClosedTrafficGrant({db,p,phase,retryReadback},expected=closedPreimageDigest(p,phase,retryReadback)){
   assert.ok(db&&typeof db.collection==='function','INGRESS_TRAFFIC_GRANT_READER_REQUIRED');
   assert.ok(expected==='ABSENT'||sha64(expected),'INGRESS_TRAFFIC_GRANT_AUTHORITY_REQUIRED');
   const grant=await support.grantRef(db,phase==='preview').get(),row=grant.exists?grant.data():null;
@@ -299,7 +317,7 @@ async function requireClosedTrafficGrant({db,p,phase},expected=p.makeIngress.clo
   if(grant.exists)assert.ok(row.state==='CLOSED'&&row.enabled===false,'INGRESS_TRAFFIC_GRANT_MUST_BE_CLOSED');
   return{exists:grant.exists,digest,state:grant.exists?'CLOSED':'ABSENT'};
 }
-async function captureTrigger({db,auth,p,phase,snapshot,retainDiagnostic=()=>{},retainPostimage=()=>{},
+async function captureTrigger({db,auth,p,phase,snapshot,retryReadback,retainDiagnostic=()=>{},retainPostimage=()=>{},
   pause=ms=>new Promise(resolve=>setTimeout(resolve,ms))}){
   const diagnostic={schema:'GI_I66_MAKE_TRIGGER_CAPTURE_DIAGNOSTIC_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
     status:'OBSERVED_NOT_ACCEPTED',stage:'START',observations:[],routing:{attempted:false,trafficWrites:0},
@@ -324,10 +342,8 @@ async function captureTrigger({db,auth,p,phase,snapshot,retainDiagnostic=()=>{},
     if(snapshot.traffic)assert.equal(traffic.serviceUid,snapshot.traffic.serviceUid,'INGRESS_TRAFFIC_SERVICE_RECREATED');
     if(traffic.targets[0].revision!==fn.revision){
       diagnostic.stage='EXACT_PREVIOUS_TRAFFIC_CAS';retain();
-      const before=p.makeIngress.targetBefore[phase];
       assert.equal(snapshot.previousState,'EXISTING_APPROVED','INGRESS_TRAFFIC_ALIGNMENT_EXISTING_PREIMAGE_REQUIRED');
-      assert.equal(before.state,snapshot.previousState);assert.equal(snapshot.function?.revision,before.revision);
-      assert.equal(snapshot.function?.configurationDigest,before.configurationDigest);
+      validateSnapshotPreimage(p,phase,snapshot,retryReadback);
       sameTriggerConfiguration(snapshot.function,fn);
       assert.deepEqual(validateTrafficProof(traffic,fn,phase),validateTrafficProof(snapshot.traffic,snapshot.function,phase),
         'INGRESS_TRAFFIC_ALIGNMENT_PREIMAGE_CHANGED');
@@ -341,7 +357,7 @@ async function captureTrigger({db,auth,p,phase,snapshot,retainDiagnostic=()=>{},
       // The earlier predeploy check cannot authorize a later routing write.
       // This fresh read is the final awaited operation before the resourceVersion PUT.
       diagnostic.stage='CLOSED_GRANT_PRE_PUT';retain();
-      const closedGrantBefore=await requireClosedTrafficGrant({db,p,phase});
+      const closedGrantBefore=await requireClosedTrafficGrant({db,p,phase,retryReadback});
       diagnostic.routing={attempted:true,trafficWrites:null,beforeDigest:traffic.observationDigest,closedGrantBefore,
         etagSha256:sha256(observed.etag),resourceVersionSha256:fresh.v1Proof.resourceVersionSha256,
         templateSha256:fresh.v1Proof.templateSha256,targetRevision:fn.revision,percent:100,requestSha256:c.digest(data)};
@@ -381,7 +397,7 @@ async function captureTrigger({db,auth,p,phase,snapshot,retainDiagnostic=()=>{},
       diagnostic.routing.trafficWrites=1;diagnostic.routing.afterDigest=traffic.observationDigest;
       retainPostimage(postimage(fn,traffic,'OBSERVED_NOT_ACCEPTED',observed.v1Proof));
       diagnostic.stage='CLOSED_GRANT_POST_READ';retain();
-      const closedGrantAfter=await requireClosedTrafficGrant({db,p,phase});
+      const closedGrantAfter=await requireClosedTrafficGrant({db,p,phase,retryReadback});
       assert.deepEqual(closedGrantAfter,closedGrantBefore,'INGRESS_TRAFFIC_GRANT_PREIMAGE_CHANGED');
       diagnostic.routing.closedGrantAfter=closedGrantAfter;
     }
@@ -549,8 +565,8 @@ async function runtimeServices(sourceClient,principal,requireFrom){
     assert.ok(v?.payload?.data&&v.payload.data.length<=8000);return JSON.parse(Buffer.from(v.payload.data).toString('utf8'));}finally{await client.close();}};
   return{runtime,secret,capabilities,readSecret};
 }
-async function beforeDeploy({db,auth,p,phase,requireFrom,privateFile,authorityBlob}){
-  const grant=await support.grantRef(db,phase==='preview').get(),expected=p.makeIngress.closedConfiguration[phase].expectedDigest;
+async function beforeDeploy({db,auth,p,phase,requireFrom,privateFile,authorityBlob,retryReadback}){
+  const grant=await support.grantRef(db,phase==='preview').get(),expected=closedPreimageDigest(p,phase,retryReadback);
   assert.equal(grant.exists?c.digest(grant.data()):'ABSENT',expected,'INGRESS_PREDEPLOY_CONFIG_PREIMAGE_CHANGED');
   if(grant.exists)assert.ok(grant.data().state==='CLOSED'&&grant.data().enabled===false,'INGRESS_PREDEPLOY_MUST_BE_CLOSED');
   const services=await runtimeServices(auth,p.makeIngress.runtimeAccess.principal,requireFrom);
@@ -587,12 +603,13 @@ async function closeForRollback({db,p,phase,deployment,expectedDigest,authorityB
   return config.transition({db,action:'CLOSE',previewOnly:phase==='preview',expectedDigest,
     authority:configAuthority(p,phase,fn,authorityBlob)});
 }
-async function initializeClosed({db,auth,p,phase,authorityBlob,eventarcBefore,nowMs=Date.now()}){
+async function initializeClosed({db,auth,p,phase,authorityBlob,eventarcBefore,retryReadback,nowMs=Date.now()}){
   const projectIamReadback=await verifyProjectIamUnchanged(auth,eventarcBefore);
   const fn=await deployedFunction(auth,p,phase),rules=await deployedRules(auth,p),spec=p.makeIngress.closedConfiguration?.[phase];
   assert.ok(spec&&(spec.expectedDigest==='ABSENT'||sha64(spec.expectedDigest))&&sha64(spec.nonce),'INGRESS_CLOSED_CONFIG_AUTHORITY_REQUIRED');
-  const result=await config.transition({db,action:spec.expectedDigest==='ABSENT'?'INITIALIZE_CLOSED':'PREPARE_CLOSED',previewOnly:phase==='preview',
-    expectedDigest:spec.expectedDigest,authority:configAuthority(p,phase,{...fn,...rules},authorityBlob),nonce:spec.nonce,nowMs});
+  const expectedDigest=closedPreimageDigest(p,phase,retryReadback);
+  const result=await config.transition({db,action:expectedDigest==='ABSENT'?'INITIALIZE_CLOSED':'PREPARE_CLOSED',previewOnly:phase==='preview',
+    expectedDigest,authority:configAuthority(p,phase,{...fn,...rules},authorityBlob),nonce:spec.nonce,nowMs});
   return{schema:'GI_I66_MAKE_CLOSED_DEPLOYMENT_RECEIPT_V1',status:'CLOSED_PENDING_AUTH_CONTEXT_PROBE',phase,
     sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,authorityBlob,function:fn,rules,projectIamReadback,config:result,
     canonicalLeadWrites:0,externalMessagesSent:0,a13RealLeadAccepted:false};
@@ -826,7 +843,7 @@ async function waitConfiguration({db,auth,p,phase,requireFrom,stopAtProbe=false,
   }
   throw Object.assign(Error('INGRESS_CONFIGURATION_PROOF_PENDING'),{code:'INGRESS_CONFIGURATION_PROOF_PENDING'});
 }
-async function rollback({db,auth,p,phase,requireFrom,authorityBlob,directory=process.env.RUNNER_TEMP,deleteFunction,restorePreviousRevision}){
+async function rollback({db,auth,p,phase,requireFrom,authorityBlob,retryReadback,directory=process.env.RUNNER_TEMP,deleteFunction,restorePreviousRevision}){
   const readOptional=name=>{const file=path.join(directory,name);return fs.existsSync(file)?JSON.parse(fs.readFileSync(file)):null;};
   const deployment=readOptional(`gi-make-${phase}-initialize-closed.json`),progress=readOptional(`gi-make-${phase}-last-operation.json`);
   const report={schema:'GI_I66_MAKE_RELEASE_COMPENSATION_V1',phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,
@@ -843,7 +860,7 @@ async function rollback({db,auth,p,phase,requireFrom,authorityBlob,directory=pro
   if(!report.failures.length){
     const snapshot=readOptional(`gi-make-${phase}-snapshot-trigger.json`),postimage=readOptional(`gi-make-${phase}-capture-trigger.json`);
     try{report.trigger=snapshot?await rollbackCreatedTrigger({db,auth,p,phase,snapshot,postimage,deleteFunction,restorePreviousRevision,observe,
-      rollbackClosedDigest:report.configuration?.afterDigest||p.makeIngress.closedConfiguration?.[phase]?.expectedDigest}):
+      rollbackClosedDigest:report.configuration?.afterDigest||closedPreimageDigest(p,phase,retryReadback)}):
       {status:'NO_TRIGGER_MUTATION_STARTED',functionDeletes:0};}catch(error){failed('TRIGGER_ROLLBACK_UNVERIFIED',error);}
     if(phase==='live'){
       const saved=readOptional('gi-make-secret-iam-private.json');
@@ -870,6 +887,7 @@ async function main(){
   const [action,phase]=process.argv.slice(2);assert.ok(['before-deploy','snapshot-trigger','capture-trigger','initialize-closed','operate','wait-probe','wait-config','rollback'].includes(action));
   const control=JSON.parse(fs.readFileSync(g.CONTROL)),p=resolveCandidate(control,phase,action==='operate');
   await verifyExecutionRuntime(p,{phase,action});
+  const retryReadback=require('./gravicentra-i6-6-cloud-build-operational.cjs').readRetryReadback(p,phase);
   scope.verifySourcePins(p);
   if(p.executionProvider!=='CLOUD_BUILD')assert.equal(execFileSync('git',['diff','--name-only',p.sourceSha,'HEAD','--',...g.PINNED_OWNER_PATHS],{encoding:'utf8'}).trim(),'',
     'INGRESS_CHECKOUT_SOURCE_OR_QA_CHANGED');
@@ -880,15 +898,15 @@ async function main(){
   const app=getApps()[0]||initializeApp({credential:applicationDefault(),projectId:PROJECT}),db=getFirestore(app);
   const authorityBlob=execFileSync('git',['rev-parse','HEAD:'+g.CONTROL],{encoding:'utf8'}).trim();
   let report;
-  if(action==='before-deploy')report=await beforeDeploy({db,auth,p,phase,requireFrom,authorityBlob,
+  if(action==='before-deploy')report=await beforeDeploy({db,auth,p,phase,requireFrom,authorityBlob,retryReadback,
     privateFile:path.join(process.env.RUNNER_TEMP,'gi-make-secret-iam-private.json')});
-  else if(action==='snapshot-trigger')report=await snapshotTrigger({auth,p,phase});
-  else if(action==='capture-trigger')report=await captureTrigger({db,auth,p,phase,
+  else if(action==='snapshot-trigger')report=await snapshotTrigger({auth,p,phase,retryReadback});
+  else if(action==='capture-trigger')report=await captureTrigger({db,auth,p,phase,retryReadback,
     snapshot:JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP,`gi-make-${phase}-snapshot-trigger.json`))),
     ...captureRecorders(process.env.RUNNER_TEMP,phase)});
-  else if(action==='rollback')report=await rollback({db,auth,p,phase,requireFrom,authorityBlob,deleteFunction:async target=>{
+  else if(action==='rollback')report=await rollback({db,auth,p,phase,requireFrom,authorityBlob,retryReadback,deleteFunction:async target=>{
     execFileSync('gcloud',['functions','delete',target.name,'--gen2','--region',target.region,'--project',PROJECT,'--quiet'],{stdio:'pipe',timeout:180000});}});
-  else if(action==='initialize-closed')report=await initializeClosed({db,auth,p,phase,authorityBlob,
+  else if(action==='initialize-closed')report=await initializeClosed({db,auth,p,phase,authorityBlob,retryReadback,
     eventarcBefore:JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP,`gi-make-${phase}-before-deploy.json`))).eventarcReadiness});
   else if(action==='wait-config'||action==='wait-probe')report=await waitConfiguration({db,auth,p,phase,requireFrom,stopAtProbe:action==='wait-probe'});
   else{
@@ -913,7 +931,7 @@ async function main(){
 if(require.main===module)main().catch(error=>{console.error(safeFailureCode(error));process.exitCode=1;});
 module.exports={trafficV1Url,trafficV1Preimage,trafficV1Data,trafficV1Request,fnProjection,requireOperation,resolveCandidate,readBoundJson,verifyMakeExecution,deployedRules,deployedFunction,
   trafficServiceResource,trafficRevision,trafficProjection,validateTrafficProof,deployedTraffic,safeFailureCode,safeRoutingObservation,captureRecorders,
-  optionalFunction,snapshotTrigger,captureTrigger,rollbackCreatedTrigger,closeForRollback,rollback,
+  optionalFunction,retryPreimage,closedPreimageDigest,validateSnapshotPreimage,requireClosedTrafficGrant,snapshotTrigger,captureTrigger,rollbackCreatedTrigger,closeForRollback,rollback,
   proveCurrentDeployment,configAuthority,verifyProbeReadback,runtimeServices,beforeDeploy,initializeClosed,operate,
   verifyProjectIamUnchanged,validateProjectIamReadback,
   proofContext,canonicalRefs,snapshotRefs,readResult,inspectCanonical,captureOrVerify,nativeExecution,verifyExecutionRuntime,refreshAuthority,waitConfiguration};

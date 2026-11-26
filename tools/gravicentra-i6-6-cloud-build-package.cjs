@@ -26,7 +26,7 @@ const C=Object.freeze({
   control:'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json',
   image:'node:22-bookworm',stepId:'i66-package-gates-and-build',
   scope:'PACKAGE_ONLY_PREVIEW_LIVE_AND_BACKEND_PENDING',
-  planSchema:'GI_I66_CLOUD_BUILD_PACKAGE_PLAN_V1',proofSchema:'GI_I66_CLOUD_BUILD_PACKAGE_WORKER_V1',
+  planSchema:'GI_I66_CLOUD_BUILD_PACKAGE_PLAN_V1',nativePlanSchema:'GI_I66_CLOUD_BUILD_PACKAGE_PLAN_V2',proofSchema:'GI_I66_CLOUD_BUILD_PACKAGE_WORKER_V1',
   receiptSchema:'GI_I66_CLOUD_BUILD_IMMUTABLE_PACKAGE_RECEIPT_V1'
 });
 const N=Object.freeze({
@@ -83,29 +83,82 @@ function runtimeBlocks(blocks){
   for(const text of Object.values(out))need(!/\$\{?GITHUB_/.test(text),'NO_GITHUB_RUNTIME_IMPERSONATION');
   return out;
 }
+const NATIVE_ADMISSION_PATHS=Object.freeze([
+  C.admission,'tools/gravicentra-i6-6-cloud-build-source-admission.cjs',
+  'tools/gravicentra-i6-6-cloud-build-source-admission.test.cjs',
+  'tools/gravicentra-i6-6-native-preview-admission.test.cjs'
+]);
+function nativePlan(p){return p.schema===C.nativePlanSchema;}
+function mechanismPaths(p){return [C.tool,C.test,C.branding,C.brandingTest,...(nativePlan(p)?NATIVE_ADMISSION_PATHS:[])];}
+function mechanismTests(p){return [C.test,C.brandingTest,...(nativePlan(p)?NATIVE_ADMISSION_PATHS.filter(file=>file.endsWith('.test.cjs')):[])];}
 function validatePlan(p){
-  equal(p.schema,C.planSchema,'PLAN_SCHEMA');equal(p.provider,C.provider,'PROVIDER');equal(p.scope,C.scope,'PACKAGE_ONLY');
+  need(p.schema===C.planSchema||nativePlan(p),'PLAN_SCHEMA');equal(p.provider,C.provider,'PROVIDER');equal(p.scope,C.scope,'PACKAGE_ONLY');
   equal(p.repository,C.repository,'REPOSITORY');equal(p.branch,C.branch,'BRANCH');
   equal(p.projectId,C.projectId,'PROJECT');equal(p.projectNumber,C.projectNumber,'PROJECT_NUMBER');
   equal(p.region,C.region,'REGION');equal(p.serviceAccount,C.serviceAccount,'SERVICE_ACCOUNT');equal(p.bucket,C.bucket,'BUCKET');
   need(sha40(p.mechanismSha)&&sha40(p.sourceSha)&&sha40(p.sourceTreeSha),'EXACT_GIT_SOURCES_REQUIRED');
   need(Number.isSafeInteger(p.requestVersion)&&p.requestVersion>0,'REQUEST_VERSION');
   need(sha40(p.transportBlob)&&sha40(p.manifestBlob)&&sha64(p.requestSha256),'SEALED_REQUEST');
-  equal(Object.keys(p.sourceQa||{}).sort(),['guardRunId','headSha','runId'],'SOURCE_QA_KEYS');
-  need(sha40(p.sourceQa.headSha)&&Number.isSafeInteger(p.sourceQa.runId)&&p.sourceQa.runId>0&&Number.isSafeInteger(p.sourceQa.guardRunId)&&p.sourceQa.guardRunId>0,'SOURCE_QA');
-  equal(Object.keys(p.pins||{}).sort(),[C.tool,C.test,C.branding,C.brandingTest].sort(),'MECHANISM_PIN_SCOPE');
+  if(nativePlan(p)){
+    equal(Object.keys(p.sourceQa||{}).sort(),['executionProvider','headSha','reference'],'NATIVE_SOURCE_QA_KEYS');
+    equal(p.sourceQa.executionProvider,C.provider,'NATIVE_SOURCE_QA_PROVIDER');
+    require('./gravicentra-i6-6-cloud-build-source-admission.cjs').nativeSourceQaReference({
+      version:p.requestVersion,sourceQaHead:p.sourceQa.headSha,nativeSourceQa:p.sourceQa.reference});
+  }else{
+    equal(Object.keys(p.sourceQa||{}).sort(),['guardRunId','headSha','runId'],'SOURCE_QA_KEYS');
+    need(sha40(p.sourceQa.headSha)&&Number.isSafeInteger(p.sourceQa.runId)&&p.sourceQa.runId>0&&Number.isSafeInteger(p.sourceQa.guardRunId)&&p.sourceQa.guardRunId>0,'SOURCE_QA');
+  }
+  equal(Object.keys(p.pins||{}).sort(),mechanismPaths(p).sort(),'MECHANISM_PIN_SCOPE');
   for(const pin of Object.values(p.pins)){need(sha40(pin.blob)&&sha64(pin.sha256),'MECHANISM_PIN');equal(Object.keys(pin).sort(),['blob','sha256'],'MECHANISM_PIN_KEYS');}
   need(sha40(p.workflowBlob)&&sha64(p.workflowSha256)&&sha40(p.builderBlob),'ORIGINAL_WORKFLOW_BUILDER_PINS');
   equal(Object.keys(p.blocks||{}).sort(),Object.keys(N).sort(),'EXACT_GATE_BLOCKS');
   for(const value of Object.values(p.blocks))need(sha64(value),'GATE_BLOCK_PIN');
-  const old=p.unexecutedGithubBuild;
-  equal(Object.keys(old||{}).sort(),['attempt','runId'],'GITHUB_FAILURE_BINDING_KEYS');
-  need(Number.isSafeInteger(old.runId)&&old.runId>0&&Number.isSafeInteger(old.attempt)&&old.attempt>0,'GITHUB_FAILURE_BINDING');
+  if(!nativePlan(p)){
+    const old=p.unexecutedGithubBuild;
+    equal(Object.keys(old||{}).sort(),['attempt','runId'],'GITHUB_FAILURE_BINDING_KEYS');
+    need(Number.isSafeInteger(old.runId)&&old.runId>0&&Number.isSafeInteger(old.attempt)&&old.attempt>0,'GITHUB_FAILURE_BINDING');
+  }
   equal(p.noDeploy,true,'NO_DEPLOY_REQUIRED');equal(p.realBusinessWrites,0,'NO_BUSINESS_WRITE_REQUIRED');
   equal(p.fullI66ProductionAccepted,false,'NO_ACCEPTANCE_CLAIM');
-  equal(Object.keys(p).sort(),['schema','provider','scope','repository','branch','projectId','projectNumber','region','serviceAccount','bucket','mechanismSha','sourceSha','sourceTreeSha','requestVersion','transportBlob','manifestBlob','requestSha256','sourceQa','pins','workflowBlob','workflowSha256','builderBlob','blocks','unexecutedGithubBuild','noDeploy','realBusinessWrites','fullI66ProductionAccepted'].sort(),'PLAN_UNKNOWN_FIELD');
+  equal(Object.keys(p).sort(),['schema','provider','scope','repository','branch','projectId','projectNumber','region','serviceAccount','bucket','mechanismSha','sourceSha','sourceTreeSha','requestVersion','transportBlob','manifestBlob','requestSha256','sourceQa','pins','workflowBlob','workflowSha256','builderBlob','blocks',...(!nativePlan(p)?['unexecutedGithubBuild']:[]),'noDeploy','realBusinessWrites','fullI66ProductionAccepted'].sort(),'PLAN_UNKNOWN_FIELD');
   return p;
 }
+// Shared sequence contract for both the historical request35 mechanism and
+// later source admission. Its checks do not depend on a newer frontend owner.
+function previewRequestTransition(request, previousRequest) {
+  return require('./gravicentra-i6-6-frontend-preview-authority.cjs').previewRequestTransition(request, previousRequest);
+}
+
+// A five-function closure consumes the active request. Its sealed snapshot
+// still owns the next sequence number; it does not become a new request or
+// transfer any product, QA or release acceptance to the successor.
+function previewRequestTransitionFromTransport(request, previous) {
+  if(previous.frontendPreviewRequest||!request)
+    return previewRequestTransition(request,previous.frontendPreviewRequest);
+  const consumed=previous.lastConsumedFrontendPreviewRequest,release=previous.lastConsumedFrontendRelease;
+  if(!consumed&&!release){
+    const versioned=previous.frontendReleaseSequence!==undefined&&previous.frontendReleaseSequence!==0||
+      /I6_6_FRONTEND_E[0-9]+_RECEIPT\.json$/.test(previous.currentPhysicalHostingRelease?.receipt||'');
+    assert.ok(!versioned,'PREVIEW_CONSUMED_REQUEST_PAIR_REQUIRED');
+    return previewRequestTransition(request,undefined);
+  }
+  assert.ok(consumed&&release,'PREVIEW_CONSUMED_REQUEST_PAIR_REQUIRED');
+  assert.ok(Number.isSafeInteger(consumed.version)&&consumed.version>0,'PREVIEW_CONSUMED_REQUEST_VERSION_INVALID');
+  assert.equal(release.previewRequestVersion,consumed.version,'PREVIEW_CONSUMED_REQUEST_VERSION_DRIFT');
+  assert.ok(Number.isSafeInteger(release.generation)&&release.generation>0,'PREVIEW_CONSUMED_RELEASE_GENERATION_INVALID');
+  assert.equal(release.generation,previous.frontendReleaseSequence,'PREVIEW_CONSUMED_RELEASE_GENERATION_DRIFT');
+  assert.match(release.sourceSha||'',/^[a-f0-9]{40}$/,'PREVIEW_CONSUMED_RELEASE_SOURCE_REQUIRED');
+  assert.match(release.artifactDigest||'',/^sha256:[a-f0-9]{64}$/,'PREVIEW_CONSUMED_RELEASE_DIGEST_REQUIRED');
+  assert.equal(release.receiptPath,'artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E'+String(release.generation).padStart(5,'0')+'_RECEIPT.json',
+    'PREVIEW_CONSUMED_RELEASE_RECEIPT_DRIFT');
+  const physical=previous.currentPhysicalHostingRelease;
+  assert.ok(physical,'PREVIEW_CONSUMED_PHYSICAL_RELEASE_REQUIRED');
+  for(const [key,physicalKey] of [['sourceSha','sourceSha'],['artifactDigest','artifactDigest'],['receiptPath','receipt']])
+    assert.equal(release[key],physical[physicalKey],'PREVIEW_CONSUMED_PHYSICAL_RELEASE_DRIFT_'+key);
+  assert.notEqual(request.version,consumed.version,'PREVIEW_CONSUMED_REQUEST_REPLAY');
+  return previewRequestTransition(request,consumed);
+}
+
 function makePlan(repo,{sourceSha,mechanismSha=git(repo,'rev-parse','HEAD'),githubRunId,githubAttempt}){
   need(sha40(sourceSha)&&sha40(mechanismSha),'PLAN_EXACT_SOURCES');
   equal(git(repo,'status','--porcelain','--untracked-files=no'),'','CLEAN_MECHANISM_CHECKOUT_REQUIRED');
@@ -118,18 +171,21 @@ function makePlan(repo,{sourceSha,mechanismSha=git(repo,'rev-parse','HEAD'),gith
   equal(gitBytes(repo,mechanismSha,C.transport),transportBytes,'FROZEN_TRANSPORT_CHANGED');
   equal(git(repo,'rev-parse',mechanismSha+':'+C.manifest),request.manifestBlob,'MANIFEST_CHANGED');
   const previous=JSON.parse(gitBytes(repo,sourceSha+'^',C.transport));
-  equal(request.version,(previous.frontendPreviewRequest?.version||0)+1,'SOURCE_IS_NOT_REQUEST_TRANSITION');
+  need(previewRequestTransitionFromTransport(request,previous),
+    'SOURCE_IS_NOT_REQUEST_TRANSITION');
   const workflow=gitBytes(repo,sourceSha,C.workflow),blocks=workflowBlocks(workflow.toString('utf8'));
   runtimeBlocks(blocks);
-  const pins=Object.fromEntries([C.tool,C.test,C.branding,C.brandingTest].map(p=>{const bytes=gitBytes(repo,mechanismSha,p);equal(fs.readFileSync(path.join(repo,p)),bytes,'MECHANISM_WORKTREE_DRIFT');return[p,{blob:blob(bytes),sha256:sha(bytes)}];}));
-  return validatePlan({schema:C.planSchema,provider:C.provider,scope:C.scope,repository:C.repository,branch:C.branch,
+  const schema=Object.hasOwn(request,'nativeSourceQa')?C.nativePlanSchema:C.planSchema;
+  if(schema===C.nativePlanSchema)need(githubRunId===undefined&&githubAttempt===undefined,'NATIVE_NO_FAILED_ACTIONS_PREREQUISITE');
+  const pins=Object.fromEntries(mechanismPaths({schema}).map(p=>{const bytes=gitBytes(repo,mechanismSha,p);equal(fs.readFileSync(path.join(repo,p)),bytes,'MECHANISM_WORKTREE_DRIFT');return[p,{blob:blob(bytes),sha256:sha(bytes)}];}));
+  return validatePlan({schema,provider:C.provider,scope:C.scope,repository:C.repository,branch:C.branch,
     projectId:C.projectId,projectNumber:C.projectNumber,region:C.region,serviceAccount:C.serviceAccount,bucket:C.bucket,
     mechanismSha,sourceSha,sourceTreeSha:git(repo,'rev-parse',sourceSha+'^{tree}'),requestVersion:request.version,
     transportBlob:blob(transportBytes),manifestBlob:request.manifestBlob,requestSha256:digest(request),
-    sourceQa:{headSha:request.sourceQaHead,runId:request.sourceQaRunId,guardRunId:request.guardRunId},pins,
+    sourceQa:schema===C.nativePlanSchema?{executionProvider:C.provider,headSha:request.sourceQaHead,reference:request.nativeSourceQa}:{headSha:request.sourceQaHead,runId:request.sourceQaRunId,guardRunId:request.guardRunId},pins,
     workflowBlob:blob(workflow),workflowSha256:sha(workflow),builderBlob:git(repo,'rev-parse',sourceSha+':'+C.builder),
     blocks:Object.fromEntries(Object.entries(blocks).map(([k,v])=>[k,sha(v)])),
-    unexecutedGithubBuild:{runId:githubRunId,attempt:githubAttempt},noDeploy:true,realBusinessWrites:0,fullI66ProductionAccepted:false});
+    ...(schema===C.planSchema?{unexecutedGithubBuild:{runId:githubRunId,attempt:githubAttempt}}:{}),noDeploy:true,realBusinessWrites:0,fullI66ProductionAccepted:false});
 }
 function artifactPrefix(p,id){need(uuid(id)||id==='$BUILD_ID','BUILD_UUID');return 'i66/packages/request-'+p.requestVersion+'/'+p.sourceSha+'/'+id+'/';}
 function lockName(p){return 'i66/package-locks/request-'+p.requestVersion+'-'+p.sourceSha+'.json';}
@@ -271,14 +327,29 @@ function validateWorkerProof(p,b,proof,files,objects){
     need(Date.parse(check.endedAt)>=Date.parse(check.startedAt),'REAL_CHECK_TIME_'+name);
     equal(check.logSha256,sha(files[check.file]),'CHECK_LOG_BYTES_'+name);
     if(name!=='admission'&&name!=='mechanism')equal(check.signedBlockSha256,p.blocks[name],'SIGNED_BLOCK_'+name);
-    if(name==='mechanism')equal(check.tests,[{path:C.test,...p.pins[C.test]},{path:C.brandingTest,...p.pins[C.brandingTest]}],'EXACT_MECHANISM_TESTS');
+    if(name==='mechanism')equal(check.tests,mechanismTests(p).map(file=>({path:file,...p.pins[file]})),'EXACT_MECHANISM_TESTS');
   }
   equal(proof.archiveSha256,sha(files[F.archive]),'ARCHIVE_SHA256');
   need(files[F.digest].toString('utf8').startsWith(proof.archiveSha256+'  '),'SHA256_SIDECAR');
   equal(proof.archiveBytes,files[F.archive].length,'ARCHIVE_SIZE');
   for(const marker of ['I66_MANIFEST_EXACT_BUILD_BOUND_INDEX_PWA_AND_TENANT_ICONS_PASS','I66_BUILD_ONE_SOURCE_ONE_ARTIFACT_NO_DEPLOY_PASS'])need(files[F.build].toString('utf8').includes(marker),'EXACT_PACKAGE_LOG_REQUIRED');
   const admission=JSON.parse(files[F.admission]);equal(admission.eligible,true,'ADMISSION_TRUE_REQUIRED');equal(admission.sourceSha,p.sourceSha,'ADMISSION_SOURCE');
-  need(admission.apiReads?.length>=5&&admission.markers?.length===2,'ADMISSION_REAL_READBACKS_REQUIRED');
+  need(admission.markers?.length===2,'ADMISSION_REAL_READBACKS_REQUIRED');
+  if(nativePlan(p)){
+    const evidence=admission.providerEvidence,source=evidence?.sourceQa,ref=p.sourceQa.reference;
+    equal([source?.schema,source?.executionProvider,source?.status,source?.buildId,source?.sourceQaHead,source?.mechanismSha,source?.planSha256],
+      ['GI_I66_NATIVE_SOURCE_QA_RECEIPT_V1',C.provider,'SOURCE_QA_AND_GUARD_VERIFIED_PREVIEW_LIVE_PENDING',ref.buildId,ref.sourceQaHead,ref.mechanismSha,ref.planSha256],'ADMISSION_NATIVE_SOURCE_EVIDENCE');
+    equal(source.retainedReceipt,{path:ref.receiptPath,gitBlobSha:ref.receiptBlob,sha256:ref.receiptSha256},'ADMISSION_NATIVE_RECEIPT_PIN');
+    equal([source.noDeploy,source.realBusinessWrites,source.fullI66ProductionAccepted],[true,0,false],'ADMISSION_NATIVE_SCOPE');
+    need(source.cloudBuild?.status==='SUCCESS'&&source.manifest?.generation&&source.log?.sha256&&Object.keys(source.objects||{}).length>0,'ADMISSION_NATIVE_PROVIDER_READBACKS');
+    const current=evidence.currentArtifact;
+    need(current&&(current.executionProvider==='GITHUB_ACTIONS'||current.executionProvider===C.provider),'ADMISSION_CURRENT_ARTIFACT_EVIDENCE');
+    if(current.executionProvider===C.provider)need(current.cloudBuild?.status==='SUCCESS'&&current.artifact?.generation&&current.manifest&&current.log,'ADMISSION_NATIVE_CURRENT_READBACKS');
+    else need(Number.isSafeInteger(current.artifactId)&&current.artifactId>0&&/^sha256:[a-f0-9]{64}$/.test(current.artifactDigest||'')&&sha40(current.sourceSha),'ADMISSION_ACTIONS_CURRENT_READBACK');
+    equal(admission.markers.map(row=>row.origin),['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app'],'ADMISSION_BOTH_LIVE_ORIGINS');
+    need(typeof current.buildId==='string'&&current.buildId.length>0,'ADMISSION_CURRENT_PRODUCT_BUILD');
+    for(const row of admission.markers)equal([row.value.sourceSha,row.value.buildId],[current.sourceSha,current.buildId],'ADMISSION_CURRENT_LIVE_MARKER');
+  }else need(admission.apiReads?.length>=5,'ADMISSION_REAL_READBACKS_REQUIRED');
   equal(proof.lock.bucket,C.bucket,'BUILD_LOCK_BUCKET');equal(proof.lock.name,lockName(p),'BUILD_LOCK_NAME');need(generation(proof.lock.generation),'BUILD_LOCK_GENERATION');
   for(const [name,meta] of Object.entries(objects)){equal(Number(meta.size),files[name].length,'OBJECT_BYTE_SIZE');validateObjectTime(b,meta);}
   return true;
@@ -403,21 +474,27 @@ async function worker(p){
   const github=async suffix=>{const operation=suffix.includes('/jobs')?'GITHUB_JOBS':suffix.includes('artifacts')?'GITHUB_ARTIFACTS':/^runs\/[0-9]+$/.test(suffix)?'GITHUB_RUN':'GITHUB_ACTIONS_READ';
     const value=await requestJson('https://api.github.com/repos/'+C.repository+'/actions/'+suffix,{headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}},{operation});apiReads.push({suffix,value});return value;};
   const old=p.unexecutedGithubBuild;
-  validateOriginalFailure(p,await github('runs/'+old.runId),await github('runs/'+old.runId+'/attempts/'+old.attempt+'/jobs?per_page=100'),await github('runs/'+old.runId+'/artifacts?per_page=100'));
+  if(old)validateOriginalFailure(p,await github('runs/'+old.runId),await github('runs/'+old.runId+'/attempts/'+old.attempt+'/jobs?per_page=100'),await github('runs/'+old.runId+'/artifacts?per_page=100'));
   const env={...process.env,SOURCE_SHA:p.sourceSha,PROJECT_ID:C.projectId,HOSTING_SITE:C.projectId,TENANT_HINT:'alianzas-soluciones',
     RELEASE_GATE:'I6.6',BUILD_PREFIX:'gi-i66',ENVIRONMENT_REF:'firebase-hosting-preview-i6-6',
     GRAVICENTRA_B4_003_SCOPED_PREVIEW:'true',GRAVICENTRA_B4_003_GOALS_PREVIEW:'true',RUNNER_TEMP:temp,
     I66_BRANDING_READER:path.join(root,C.branding),I66_PACKAGE_SUMMARY:path.join(root,F.summary)};
   const checks={};
   function shell(name,log,append=false){const r=execLogged('bash',['-euo','pipefail','-c',blocks[name]],{cwd:source,env,log:path.join(root,log),append});checks[name]={...r,file:log,signedBlockSha256:p.blocks[name],executedBlockSha256:sha(blocks[name])};}
-  checks.mechanism={...execLogged(process.execPath,['--test',C.test,C.brandingTest],{cwd:root,env,log:path.join(root,F.mechanism)}),
-    file:F.mechanism,tests:[{path:C.test,...p.pins[C.test]},{path:C.brandingTest,...p.pins[C.brandingTest]}]};
+  checks.mechanism={...execLogged(process.execPath,['--test',...mechanismTests(p)],{cwd:root,env,log:path.join(root,F.mechanism)}),
+    file:F.mechanism,tests:mechanismTests(p).map(file=>({path:file,...p.pins[file]}))};
   shell('gate',F.gate);
   const startedAt=new Date().toISOString(),previous=process.cwd();
-  let eligible;
-  try{process.chdir(source);eligible=await require(path.join(source,C.admission)).admitPreview(transport,github,async origin=>{const value=await requestJson(origin+'/__recovery__/build.json',{cache:'no-store'},{operation:'HOSTING_BUILD_MARKER'});markers.push({origin,value});return value;});}finally{process.chdir(previous);}
+  let eligible,providerEvidence,nativeIo;
+  const admissionControl=json(path.join(source,C.control)),currentArtifactNative=admissionControl[admissionControl.currentExecutionDecisionPointer]?.executionProvider===C.provider;
+  if(nativePlan(p)||currentArtifactNative){
+    const native=require(path.join(root,'tools/gravicentra-i6-6-cloud-build-source-admission.cjs')),sdk=path.join(temp,'source-admission-sdk');
+    execFileSync('npm',['install','--prefix',sdk,'--no-save','--package-lock=false','--ignore-scripts','--no-audit','--no-fund','google-auth-library@'+native.C.sdkVersion],{cwd:root,stdio:'inherit'});
+    nativeIo=await native.adcReadIo(require(path.join(sdk,'node_modules/google-auth-library')).GoogleAuth);
+  }
+  try{process.chdir(source);eligible=await require(path.join(source,C.admission)).admitPreview(transport,github,async origin=>{const value=await requestJson(origin+'/__recovery__/build.json',{cache:'no-store'},{operation:'HOSTING_BUILD_MARKER'});markers.push({origin,value});return value;},{io:nativeIo,onEvidence:value=>{providerEvidence=value;}});}finally{process.chdir(previous);}
   equal(eligible,true,'EXISTING_ADMISSION_DENIED');
-  write(path.join(root,F.admission),{provider:C.provider,sourceSha:p.sourceSha,eligible,apiReads,markers});
+  write(path.join(root,F.admission),{provider:C.provider,sourceSha:p.sourceSha,eligible,apiReads,markers,...(nativePlan(p)||currentArtifactNative?{providerEvidence}:{})});
   checks.admission={status:'PASS',exitCode:0,startedAt,endedAt:new Date().toISOString(),file:F.admission};
   shell('source',F.source);
   // Installed versions equal the signed workflow. No service-account key is
@@ -434,7 +511,7 @@ async function worker(p){
   equal(blob(gitBytes(source,beforeBuildHead,C.transport)),p.transportBlob,'CURRENT_REQUEST_CHANGED');
   equal(git(source,'rev-parse',beforeBuildHead+':'+C.manifest),p.manifestBlob,'CURRENT_MANIFEST_CHANGED');
   equal(git(source,'diff','--name-only',p.sourceSha,beforeBuildHead,'--',...roots),'','CONCURRENT_PRODUCT_CHANGED');
-  validateOriginalFailure(p,await github('runs/'+old.runId),await github('runs/'+old.runId+'/attempts/'+old.attempt+'/jobs?per_page=100'),await github('runs/'+old.runId+'/artifacts?per_page=100'));
+  if(old)validateOriginalFailure(p,await github('runs/'+old.runId),await github('runs/'+old.runId+'/attempts/'+old.attempt+'/jobs?per_page=100'),await github('runs/'+old.runId+'/artifacts?per_page=100'));
   // A single immutable object claims this request/source only after QA. A
   // subsequent failed build leaves the claim intact for causal disposition;
   // this executor never deletes a claim or silently builds a second package.
@@ -508,9 +585,15 @@ function main(args=process.argv.slice(2)){
     fs.mkdirSync(out,{recursive:false});write(path.join(out,'plan.json'),p);write(path.join(out,'cloudbuild.json'),configFor(p));
     console.log(JSON.stringify({provider:C.provider,scope:C.scope,planSha256:digest(p),sourceSha:p.sourceSha,mechanismSha:p.mechanismSha,
       command:['gcloud','builds','submit',C.repositoryUrl,'--git-source-revision='+p.mechanismSha,'--region='+C.region,'--project='+C.projectId,'--config='+path.join(out,'cloudbuild.json'),'--gcs-source-staging-dir=gs://'+C.bucket+'/i66/source-staging','--async']}));
+  }else if(command==='prepare-native'){
+    const [sourceSha,out]=rest;need(out&&rest.length===2,'USAGE_PREPARE_NATIVE_SOURCE_OUT');
+    const p=makePlan(process.cwd(),{sourceSha});need(nativePlan(p),'NATIVE_SOURCE_QA_REFERENCE_REQUIRED');
+    fs.mkdirSync(out,{recursive:false});write(path.join(out,'plan.json'),p);write(path.join(out,'cloudbuild.json'),configFor(p));
+    console.log(JSON.stringify({provider:C.provider,scope:C.scope,planSha256:digest(p),sourceSha:p.sourceSha,mechanismSha:p.mechanismSha,
+      command:['gcloud','builds','submit',C.repositoryUrl,'--git-source-revision='+p.mechanismSha,'--region='+C.region,'--project='+C.projectId,'--config='+path.join(out,'cloudbuild.json'),'--gcs-source-staging-dir=gs://'+C.bucket+'/i66/source-staging','--async']}));
   }else if(command==='worker'){need(rest.length===1,'WORKER_PLAN_ARGUMENT');return worker(JSON.parse(rest[0]));}
   else if(command==='verify'){const [planFile,buildId,out]=rest;need(rest.length===3,'USAGE_VERIFY_PLAN_UUID_OUT');console.log(JSON.stringify(verify(json(planFile),buildId,out)));}
-  else throw Error('I66_CLOUD_BUILD_USAGE prepare <sourceSha> <unexecutedGithubRunId> <attempt> <newOutputDirectory> | verify <plan.json> <realBuildUuid> <newOutputDirectory>');
+  else throw Error('I66_CLOUD_BUILD_USAGE prepare <sourceSha> <unexecutedGithubRunId> <attempt> <newOutputDirectory> | prepare-native <sourceSha> <newOutputDirectory> | verify <plan.json> <realBuildUuid> <newOutputDirectory>');
 }
-module.exports={C,N,F,sha,blob,digest,runBlock,workflowBlocks,runtimeBlocks,validatePlan,makePlan,configFor,artifactPrefix,lockName,validateBuild,validateOriginalFailure,validateObject,validateObjectTime,parseArtifactManifest,nativeArtifactMd5,artifactRows,validateWorkerProof,validateExecutionLog,requestCauseCode,providerRequest,requestJson,execLogged,workerIdentity,worker,verify,main};
+module.exports={previewRequestTransition,previewRequestTransitionFromTransport,C,N,F,NATIVE_ADMISSION_PATHS,nativePlan,mechanismPaths,mechanismTests,sha,blob,digest,runBlock,workflowBlocks,runtimeBlocks,validatePlan,makePlan,configFor,artifactPrefix,lockName,validateBuild,validateOriginalFailure,validateObject,validateObjectTime,parseArtifactManifest,nativeArtifactMd5,artifactRows,validateWorkerProof,validateExecutionLog,requestCauseCode,providerRequest,requestJson,execLogged,workerIdentity,worker,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(error=>{console.error(String(error.message||error));process.exitCode=Number.isInteger(error.exitCode)&&error.exitCode>0&&error.exitCode<256?error.exitCode:1;});
