@@ -56,8 +56,8 @@
       "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
       "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
     },
-    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R92.json",
-    "evidenceGitBlobSha": "a3f4b1abef8268dd007fbc7f1fa8e433573f0f82",
+    "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R93.json",
+    "evidenceGitBlobSha": "9cc743fe512e9ea1bb833dc3eafee925ee61026d",
     "activeGate": "I6.6",
     "currentWork": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
     "nextAction": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
@@ -6195,6 +6195,37 @@
         },
         "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R91.json",
         "evidenceGitBlobSha": "ad600c564a41d65f3449315420f0a9f590b622d3",
+        "activeGate": "I6.6",
+        "currentWork": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
+        "nextAction": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
+        "frontendPreviewRequest": {
+          "version": 35,
+          "sourceQaHead": "d5ab4764fe234e5c2c95f05107022c0abae2568b",
+          "sourceQaRunId": 45548703476,
+          "guardRunId": 45548703495
+        }
+      }
+    },
+    {
+      "reason": "ACTIVE_OWNER_PLAN_SUMMARY_SUPERSEDED",
+      "priorGitBlobSha": "4445cbc45a3e6b6888494d026ce8419343196170",
+      "supersededByGeneration": 3,
+      "prior": {
+        "schema": "GI_I66_ACTIVE_OWNER_PLAN_CONTINUATION_V1",
+        "authorityPointer": "artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json#i66OperationalContinuation20261115",
+        "generation": 3,
+        "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+        "latestPhysicalFrontendLiveReceipt": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+        "currentPhysicalFrontend": {
+          "generation": 3,
+          "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+          "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+          "artifactId": 14873426438,
+          "artifactDigest": "sha256:7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+          "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+        },
+        "evidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R92.json",
+        "evidenceGitBlobSha": "a3f4b1abef8268dd007fbc7f1fa8e433573f0f82",
         "activeGate": "I6.6",
         "currentWork": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
         "nextAction": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
