@@ -1,0 +1,114 @@
+{
+  "schema": "GI_I66_SCOPED_HISTORICAL_DRIVER_SOURCE_QA_V1",
+  "recordedAtUtc": "2026-11-26T02:00:25.429769+00:00",
+  "baseSourceSha": "f769fdf387d553eb91ce3ef5ec97d97cecd16eb3",
+  "status": "LOCAL_CAUSAL_SOURCE_PASS_NO_SIGNED_RUNTIME_EXECUTED",
+  "backendPackageSource": "df9f2eb6c1d8ecdec6eb4af0019b38e0de4bc1b3",
+  "backendPackageSha256": "5609a99eb0280ad427aac58ec85319e16388a747911c2e76775913f94556f73e",
+  "protectedUiSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+  "protectedUiPins": [
+    {
+      "path": "orbit360-platform/core/queries.js",
+      "sha256": "0220a34e4ea16379fa730cd7a3054c143e8d78e35c9024ea89a658a044a40ea3",
+      "gitBlobSha": "2ba6edc8a04e7cc6140db2bcad0ee213c17d785a"
+    },
+    {
+      "path": "orbit360-platform/core/cobros-reconciliation-domain-client.js",
+      "sha256": "dca074682bba1af538f2632b1895e51115946e4cc893d36488ca716930c17b72",
+      "gitBlobSha": "1e4b42f2096d6f89de2eae63e98ea5e775db0917"
+    },
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "sha256": "2b44a4208810b616e79678cedf3865e8890cf141bf2baea8728c7c9069a35f07",
+      "gitBlobSha": "b7813be360a778cd199579cc3898a0179f2e3c2a"
+    }
+  ],
+  "files": [
+    {
+      "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+      "beforeSha256": "3e0b02806068af2147562e576dbe8abbfcc80f669dcc747afe677c8f0b9f8867",
+      "beforeGitBlobSha": "9f6eab1278c6b4fb935e423dd52db2330441b772",
+      "sha256": "bcbd2cb08431c4aa9ec4d85ad7e37ebc96996ccb71269a2a7dbcb4f8422f1673",
+      "gitBlobSha": "9623d0c001a6ed8cebec46a7f41d8c924885b8be",
+      "sizeBytes": 91876,
+      "v1Sha256": "39d87a07e3c0e5f11b5e0d7c9395a5d1ee8f40e5b8b1b879469f8f4f655e15b2",
+      "v1GitBlobSha": "ecfab87c718a5a618b57a984a3c14eb07e1c6ce1"
+    },
+    {
+      "path": "tools/gravicentra-i66-scoped-historical-signed-driver.test.cjs",
+      "beforeSha256": null,
+      "beforeGitBlobSha": null,
+      "sha256": "69f3343d1b57c73753a55ad12880c8d04062cb0a8133f4f290d6d8e0bbaa2c91",
+      "gitBlobSha": "5a301d0e290dd4295fb827603cd3ad79d9fe5eb2",
+      "sizeBytes": 14697,
+      "v1Sha256": "03e184c95575cb957a5b2df53b94457024fa33397221fa5fe3e9a27af3562076",
+      "v1GitBlobSha": "e71f0fd964ab96b2221203b3aeddbd2e474d5112"
+    }
+  ],
+  "historicalMainByteUnchanged": true,
+  "sourceTestFiles": [
+    "tools/gravicentra-i66-scoped-historical-signed-driver.test.cjs",
+    "tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs"
+  ],
+  "testCommand": "I66_SCOPED_JOURNEY_UI_ROOT=<snapshot>/e3-ui-fixture node --test --test-reporter=tap tools/gravicentra-i66-scoped-historical-signed-driver.test.cjs tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs",
+  "tests": 26,
+  "passed": 26,
+  "failed": 0,
+  "causalTests": 10,
+  "existingRegressionTests": 16,
+  "testOutputSha256": "b04465201b133defc6d56e4f12cbb99c90b95c5767e39f2c92adf605195b7df3",
+  "testOutputUtf8": "TAP version 13\n# {\"status\":\"PASS\",\"checks\":26,\"scope\":\"SIGNED_UAT_OFFLINE_GUARDS_ONLY\",\"cloudWrites\":0}\n# Subtest: documentary binding admits only the historical receipt or its closed published successor\nok 1 - documentary binding admits only the historical receipt or its closed published successor\n  ---\n  duration_ms: 2.158465\n  type: 'test'\n  ...\n# Subtest: build markers keep their independent historical and financial binding without reading an out-of-scope control\nok 2 - build markers keep their independent historical and financial binding without reading an out-of-scope control\n  ---\n  duration_ms: 13.061218\n  type: 'test'\n  ...\n# Subtest: documentary fixtures use only the existing Preview synthetic prefix, exact sources and no real recipient\nok 3 - documentary fixtures use only the existing Preview synthetic prefix, exact sources and no real recipient\n  ---\n  duration_ms: 0.832173\n  type: 'test'\n  ...\n# Subtest: documentary response observer rejects another actor, receipt, request, endpoint, operation or amount\nok 4 - documentary response observer rejects another actor, receipt, request, endpoint, operation or amount\n  ---\n  duration_ms: 0.692819\n  type: 'test'\n  ...\n# Subtest: documentary candidate binding rejects malformed or widened metadata x=>delete x.receiptBlob\nok 5 - documentary candidate binding rejects malformed or widened metadata x=>delete x.receiptBlob\n  ---\n  duration_ms: 0.437524\n  type: 'test'\n  ...\n# Subtest: documentary candidate binding rejects malformed or widened metadata x=>{x.receiptPath='private/raw.json';}\nok 6 - documentary candidate binding rejects malformed or widened metadata x=>{x.receiptPath='private/raw.json';}\n  ---\n  duration_ms: 0.18365\n  type: 'test'\n  ...\n# Subtest: documentary candidate binding rejects malformed or widened metadata x=>{x.profile='other';}\nok 7 - documentary candidate binding rejects malformed or widened metadata x=>{x.profile='other';}\n  ---\n  duration_ms: 0.573193\n  type: 'test'\n  ...\n# Subtest: documentary candidate binding rejects malformed or widened metadata x=>{x.allowRealPayments=true;}\nok 8 - documentary candidate binding rejects malformed or widened metadata x=>{x.allowRealPayments=true;}\n  ---\n  duration_ms: 0.308083\n  type: 'test'\n  ...\n# Subtest: documentary UI orchestration PREVIEW historical executes actual command builder and callable, then reload/replay/CAS restore\nok 9 - documentary UI orchestration PREVIEW historical executes actual command builder and callable, then reload/replay/CAS restore\n  ---\n  duration_ms: 34.773906\n  type: 'test'\n  ...\n# Subtest: documentary UI orchestration PREVIEW successor executes actual command builder and callable, then reload/replay/CAS restore\nok 10 - documentary UI orchestration PREVIEW successor executes actual command builder and callable, then reload/replay/CAS restore\n  ---\n  duration_ms: 17.32618\n  type: 'test'\n  ...\n# Subtest: documentary UI orchestration LIVE historical executes actual command builder and callable, then reload/replay/CAS restore\nok 11 - documentary UI orchestration LIVE historical executes actual command builder and callable, then reload/replay/CAS restore\n  ---\n  duration_ms: 19.07998\n  type: 'test'\n  ...\n# Subtest: documentary UI orchestration LIVE successor executes actual command builder and callable, then reload/replay/CAS restore\nok 12 - documentary UI orchestration LIVE successor executes actual command builder and callable, then reload/replay/CAS restore\n  ---\n  duration_ms: 9.96078\n  type: 'test'\n  ...\n# Subtest: uncertain UI response cannot clean while a server writer may still commit or claim PASS\nok 13 - uncertain UI response cannot clean while a server writer may still commit or claim PASS\n  ---\n  duration_ms: 6.856083\n  type: 'test'\n  ...\n# Subtest: same replay values with a changed exact update version fail even if the payment count is one\nok 14 - same replay values with a changed exact update version fail even if the payment count is one\n  ---\n  duration_ms: 11.588157\n  type: 'test'\n  ...\n# Subtest: an existing payment linked through either receipt alias holds before any fixture or payment write and is retained\nok 15 - an existing payment linked through either receipt alias holds before any fixture or payment write and is retained\n  ---\n  duration_ms: 4.197773\n  type: 'test'\n  ...\n# Subtest: restore guard rejects a foreign actor or changed financial identity before deletion\nok 16 - restore guard rejects a foreign actor or changed financial identity before deletion\n  ---\n  duration_ms: 0.783622\n  type: 'test'\n  ...\n# Subtest: scoped historical preview direccion actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup\nok 17 - scoped historical preview direccion actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup\n  ---\n  duration_ms: 92.582767\n  type: 'test'\n  ...\n# Subtest: scoped historical preview operativo actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup\nok 18 - scoped historical preview operativo actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup\n  ---\n  duration_ms: 39.857872\n  type: 'test'\n  ...\n# Subtest: scoped historical live direccion actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup\nok 19 - scoped historical live direccion actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup\n  ---\n  duration_ms: 31.385367\n  type: 'test'\n  ...\n# Subtest: scoped historical live operativo actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup\nok 20 - scoped historical live operativo actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup\n  ---\n  duration_ms: 18.89671\n  type: 'test'\n  ...\n# Subtest: scoped identity consumes deployed df9 package and retained hosting, independent of old composite transport source\nok 21 - scoped identity consumes deployed df9 package and retained hosting, independent of old composite transport source\n  ---\n  duration_ms: 12.328621\n  type: 'test'\n  ...\n# Subtest: uncertain acknowledgement retains owned synthetic data and cannot claim completed cleanup\nok 22 - uncertain acknowledgement retains owned synthetic data and cannot claim completed cleanup\n  ---\n  duration_ms: 23.371122\n  type: 'test'\n  ...\n# Subtest: claim denial holds before any fixture write; later readback witness HOLD cleans proven completed synthetic writes\nok 23 - claim denial holds before any fixture write; later readback witness HOLD cleans proven completed synthetic writes\n  ---\n  duration_ms: 62.831764\n  type: 'test'\n  ...\n# Subtest: replay that changes a same-value record version is detected\nok 24 - replay that changes a same-value record version is detected\n  ---\n  duration_ms: 28.618076\n  type: 'test'\n  ...\n# Subtest: an unexpected duplicate request is caught inside the journey and retains namespace while unsettled\nok 25 - an unexpected duplicate request is caught inside the journey and retains namespace while unsettled\n  ---\n  duration_ms: 24.348479\n  type: 'test'\n  ...\n# Subtest: the current E3 Preview origin requires its protected identity and cannot substitute the retained35 channel\nok 26 - the current E3 Preview origin requires its protected identity and cannot substitute the retained35 channel\n  ---\n  duration_ms: 25.467794\n  type: 'test'\n  ...\n1..26\n# tests 26\n# suites 0\n# pass 26\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 502.404343\n",
+  "producerInterface": {
+    "export": "runScopedHistoricalPaymentJourneys",
+    "parameters": [
+      "phase",
+      "origin",
+      "binding",
+      "facts",
+      "hosting",
+      "uiHosting",
+      "revision",
+      "onServerReadback"
+    ],
+    "phaseValues": [
+      "preview",
+      "live"
+    ],
+    "uiHostingBasis": "SCOPED_HOSTING_PREDECESSOR",
+    "previewOrigin": "CP.i66FrontendReleaseHead.previewUrl only; physical E3 readback confirmed by parent",
+    "callback": "onServerReadback({journey,before,after}) returns {status:\"PASS\", ...witness}; callback runs before exact CAS cleanup and does not accept a release",
+    "journeySchema": "GI_I66_SCOPED_HISTORICAL_PAYMENT_JOURNEYS_V1",
+    "roleOrder": [
+      "Dirección",
+      "Operativo"
+    ],
+    "physicalCobroDocuments": [
+      0,
+      1
+    ],
+    "logicalHistoricalPayments": [
+      1,
+      1
+    ],
+    "originalPaymentBasis": "VERIFIED_HISTORICAL_RECEIPT",
+    "cleanupTargets": "[{collection:\"data/<collection>/items\"|\"previewReconciliationRequests\"|\"previewReconciliationEvents\"|\"reconciliationRequests\"|\"reconciliationEvents\",id}]"
+  },
+  "knownBoundary": "Producer/consumer owned by make_retry_operator must authenticate provider execution, verify deployment/source/package/hosting, retain and read canonical witnesses before cleanup, then confirm cleanup and build success before acceptance. The driver does not publish stage acceptance.",
+  "calendarDriverSnapshotIncluded": false,
+  "backendChanges": 0,
+  "authOwnerChanges": 0,
+  "historicalMainChanges": 0,
+  "realDataWrites": 0,
+  "deployments": 0,
+  "remoteGitWrites": 0,
+  "previewAccepted": false,
+  "liveAccepted": false,
+  "preWriteClaimHook": {
+    "name": "io.beforeFixtureWrite",
+    "position": "After fixture/source absence preflight, before the first fixture create",
+    "awaited": true,
+    "payload": "{receiptId,targets:[{collection:\"data/<collection>/items\",id}]}",
+    "consumer": "Existing scoped producer acquires the claim; no change to credentials or runtime package",
+    "negativeProof": "CLAIM_NOT_ACQUIRED causes zero fixture writes, zero callable requests and zero cleanup deletes"
+  }
+}

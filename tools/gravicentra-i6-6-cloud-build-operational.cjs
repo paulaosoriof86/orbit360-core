@@ -917,9 +917,349 @@ function firestoreFields(values){
   };
   return Object.fromEntries(Object.entries(values).map(([k,v])=>[k,decode(v)]));
 }
+// Producer and retained canonical witness for the already certified scoped
+// historical-payment unit. This does not build or deploy any product bytes.
+const FUNCTIONAL_JOURNEY=Object.freeze({
+  planSchema:'GI_I66_SCOPED_FUNCTION_JOURNEY_PLAN_V1',reportSchema:'GI_I66_SCOPED_FUNCTION_ROLE_JOURNEYS_V1',
+  witnessSchema:'GI_I66_SCOPED_FUNCTION_SERVER_WITNESS_V1',driver:'tools/gravicentra-i6-6-proposal-application-signed-uat.cjs',
+  test:'tools/gravicentra-i66-scoped-historical-journeys.test.cjs',driverTest:'tools/gravicentra-i66-scoped-historical-signed-driver.test.cjs',
+  step:'i66-scoped-historical-signed-journeys',tenant:'alianzas-soluciones'
+});
+const FUNCTIONAL_JOURNEY_PINS=Object.freeze([C.tool,FUNCTIONAL_JOURNEY.driver,FUNCTIONAL_JOURNEY.test,FUNCTIONAL_JOURNEY.driverTest,
+  'tools/gravicentra-i66-signed-qa-runtime-auth.cjs','tools/gravicentra-i66-signed-qa-runtime-auth.test.cjs',
+  'tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs']);
+const normalizedRole=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function functionalJourneyPrefix(p){return 'i66/functional/'+p.binding.unit+'/'+p.facts.sourceSha+'/'+p.facts.buildId+'/';}
+function validateFunctionalJourneyPlan(p){
+  equal(Object.keys(p||{}).sort(),['schema','phase','authorityHead','binding','facts','deployment','deploymentCreatedAt','snapshot','hosting','uiHosting','origin','pins','previousAttempt'].sort(),'JOURNEY_PLAN_KEYS');
+  equal(p.schema,FUNCTIONAL_JOURNEY.planSchema,'JOURNEY_PLAN_SCHEMA');need(PHASES.includes(p.phase)&&sha40(p.authorityHead),'JOURNEY_PLAN_IDENTITY');
+  equal([p.binding.schema,p.binding.unit,p.binding.scope],['GI_I66_SCOPED_FUNCTION_PACKAGE_V1','documented-historical-payment','BACKEND_CALLABLE'],'JOURNEY_EXISTING_UNIT');
+  equal(p.binding.targets,{preview:'orbit360CobrosReconciliationCommandPreview',live:'orbit360CobrosReconciliationCommand',region:'us-central1'},'JOURNEY_EXISTING_TARGETS');
+  equal(p.binding.roles,['Dirección','Operativo'],'JOURNEY_ASSIGNED_ROLES');
+  need(sha40(p.facts.sourceSha)&&uuid(p.facts.buildId)&&sha64(p.facts.packageSha256)&&sha40(p.facts.bindingBlob),'JOURNEY_CERTIFIED_FACTS');
+  preview.objectRef(p.facts.artifact);equal(p.facts.artifact.sha256,p.facts.packageSha256,'JOURNEY_PACKAGE_DIGEST');
+  need(p.facts.artifact.uri.startsWith('gs://'+C.bucket+'/'+functionalJourneyPrefix(p)),'JOURNEY_PACKAGE_LOCATION');
+  for(const k of Object.keys(p.facts))equal(p.deployment[k],p.facts[k],'JOURNEY_DEPLOYED_'+k);
+  equal([p.deployment.target,p.snapshot.target,p.snapshot.region,p.deployment.revision,p.deployment.trafficPercent],
+    [p.binding.targets[p.phase],p.binding.targets[p.phase],p.binding.targets.region,p.snapshot.revision,100],'JOURNEY_REVISION');
+  need(p.snapshot.revision.startsWith(p.snapshot.target.toLowerCase()+'-')&&sha64(p.snapshot.configurationDigest),'JOURNEY_PHYSICAL_SNAPSHOT');
+  preview.objectRef(p.deployment.receipt);need(Number.isFinite(Date.parse(p.deploymentCreatedAt)),'JOURNEY_DEPLOYMENT_TIME');
+  equal([p.hosting.version,p.hosting.sourceSha,p.hosting.buildId],[p.binding.predecessor.hostingVersion,p.binding.predecessor.sourceSha,p.binding.predecessor.buildId],'JOURNEY_PROTECTED_LIVE_HOSTING');
+  need(sha64(p.hosting.markerSha256)&&sha64(p.uiHosting.markerSha256)&&sha40(p.uiHosting.sourceSha),'JOURNEY_UI_PINS');
+  equal(p.origin,p.uiHosting.origin,'JOURNEY_UI_ORIGIN');
+  equal(p.uiHosting.basis,'SCOPED_HOSTING_PREDECESSOR','JOURNEY_UI_BASIS');
+  if(p.phase==='live')equal([p.origin,p.uiHosting.version,p.uiHosting.sourceSha,p.uiHosting.buildId],['https://app.aysseguros.com',p.hosting.version,p.hosting.sourceSha,p.hosting.buildId],'JOURNEY_LIVE_UI');
+  else need(/^https:\/\/ays-orbit-360-lab--gi-i66-rc-\d+-[a-z0-9]+\.web\.app$/.test(p.origin),'JOURNEY_PREVIEW_UI');
+  equal([p.uiHosting.version,p.uiHosting.sourceSha,p.uiHosting.buildId],[p.hosting.version,p.hosting.sourceSha,p.hosting.buildId],'JOURNEY_PREDECESSOR_UI');
+  equal(Object.keys(p.pins.files).sort(),[...FUNCTIONAL_JOURNEY_PINS].sort(),'JOURNEY_CLOSED_RUNTIME_PINS');
+  for(const pin of Object.values(p.pins.files)){equal(Object.keys(pin).sort(),['blob','sha256'],'JOURNEY_FILE_PIN_KEYS');need(sha40(pin.blob)&&sha64(pin.sha256),'JOURNEY_FILE_PIN');}
+  for(const k of ['control','unit','transport','toolsTree','functionsTree'])need(sha40(p.pins[k]),'JOURNEY_PIN_'+k);
+  equal(p.pins.unit,p.facts.bindingBlob,'JOURNEY_UNIT_PIN');
+  if(p.previousAttempt!==null){equal(Object.keys(p.previousAttempt||{}).sort(),['cursor','claim','hold','executionBuildId'].sort(),'JOURNEY_RETRY_KEYS');for(const k of ['cursor','claim','hold'])preview.objectRef(p.previousAttempt[k]);need(uuid(p.previousAttempt.executionBuildId),'JOURNEY_RETRY_BUILD');}
+  return p;
+}
+function functionalJourneyConfig(p){validateFunctionalJourneyPlan(p);return {
+  steps:[{id:C.sdkStep,name:C.sdkImage,entrypoint:'bash',args:['-euo','pipefail','-c',SDK_PROVIDER_SCRIPT]},
+    {id:FUNCTIONAL_JOURNEY.step,name:C.image,entrypoint:'node',args:[C.tool,'functional-journey-worker',JSON.stringify(p)],env:[
+      'GRAVICENTRA_BUILD_PROVIDER=CLOUD_BUILD','GRAVICENTRA_CLOUD_BUILD_ID=$BUILD_ID','GRAVICENTRA_CLOUD_BUILD_SERVICE_ACCOUNT='+C.serviceAccount,
+      'PROJECT_ID='+C.projectId,'TENANT_HINT='+FUNCTIONAL_JOURNEY.tenant]}],
+  serviceAccount:'projects/'+C.projectId+'/serviceAccounts/'+C.serviceAccount,timeout:'1800s',logsBucket:'gs://'+C.bucket+'/i66/cloud-build-logs',
+  options:{logging:'GCS_ONLY',sourceProvenanceHash:['SHA256'],machineType:'E2_STANDARD_2'},
+  tags:['i66-scoped-journeys-'+p.phase,'i66-package-'+p.facts.buildId]
+};}
+function validateFunctionalJourneyBuild(p,b,{finished=true,terminalFailure=false}={}){
+  const c=functionalJourneyConfig(p);need(uuid(b.id),'JOURNEY_BUILD_UUID');equal(b.projectId,C.projectId,'JOURNEY_PROVIDER_PROJECT');
+  need([C.projectId,C.projectNumber].some(x=>b.name==='projects/'+x+'/locations/'+C.region+'/builds/'+b.id),'JOURNEY_BUILD_RESOURCE');
+  if(terminalFailure){need(!finished&&['FAILURE','TIMEOUT','CANCELLED','EXPIRED','INTERNAL_ERROR'].includes(b.status)&&Date.parse(b.finishTime)>=Date.parse(b.startTime),'JOURNEY_PROVIDER_TERMINAL_FAILURE');}
+  else equal(b.status,finished?'SUCCESS':'WORKING','JOURNEY_PROVIDER_SUCCESS');
+  for(const k of ['serviceAccount','timeout','logsBucket','tags'])equal(b[k],c[k],'JOURNEY_BUILD_'+k);
+  for(const k of ['logging','sourceProvenanceHash','machineType'])equal(b.options?.[k],c.options[k],'JOURNEY_BUILD_OPTION_'+k);
+  for(const k of ['env','secretEnv','volumes'])need(!b.options?.[k]?.length,'JOURNEY_NO_GLOBAL_OVERRIDE');
+  need(!b.options?.pool?.name&&!b.options?.workerPool&&!b.options?.automapSubstitutions&&!b.options?.dynamicSubstitutions,'JOURNEY_NO_EXECUTION_POOL_OVERRIDE');
+  need(!b.secrets?.length&&!b.availableSecrets&&!b.dependencies?.length&&!b.images?.length&&!b.artifacts&&!b.gitConfig&&!b.buildTriggerId&&!Object.keys(b.substitutions||{}).length,'JOURNEY_NO_OTHER_EXECUTION');
+  equal(Object.keys(b.source||{}),['gitSource'],'JOURNEY_GIT_SOURCE');equal([b.source.gitSource.url,b.source.gitSource.revision],[C.repositoryUrl,p.authorityHead],'JOURNEY_RUNTIME_SOURCE');need(!b.source.gitSource.dir,'JOURNEY_ROOT_SOURCE');
+  if(finished||b.sourceProvenance?.resolvedGitSource){equal([b.sourceProvenance?.resolvedGitSource?.url,b.sourceProvenance?.resolvedGitSource?.revision],[C.repositoryUrl,p.authorityHead],'JOURNEY_RESOLVED_SOURCE');need(!b.sourceProvenance.resolvedGitSource.dir,'JOURNEY_RESOLVED_ROOT');}
+  equal(b.steps?.length,2,'JOURNEY_TWO_STEPS');
+  for(let i=0;i<2;i++){const s=b.steps[i],e=c.steps[i];for(const k of ['id','name','entrypoint'])equal(s[k],e[k],'JOURNEY_STEP_'+k);
+    if(i===0)need(JSON.stringify(s.args)===JSON.stringify(e.args)||JSON.stringify(s.args)===JSON.stringify(['-euo','pipefail','-c',SDK_SCRIPT]),'JOURNEY_SDK_SCRIPT');else equal(s.args,e.args,'JOURNEY_STEP_ARGS');
+    if(e.env)need(JSON.stringify(s.env)===JSON.stringify(e.env)||JSON.stringify(s.env)===JSON.stringify(e.env.map(x=>x.replace('$BUILD_ID',b.id))),'JOURNEY_STEP_ENV');else need(!s.env?.length,'JOURNEY_SDK_ENV');
+    need(!s.allowFailure&&!s.allowExitCodes?.length&&!s.script&&!s.dir&&!s.secretEnv?.length&&!s.volumes?.length,'JOURNEY_NO_STEP_BYPASS');
+    if(finished){equal(s.status,'SUCCESS','JOURNEY_STEP_SUCCESS');need(Date.parse(s.timing?.startTime)>=Date.parse(b.startTime)&&Date.parse(s.timing?.endTime)>=Date.parse(s.timing?.startTime)&&Date.parse(s.timing?.endTime)<=Date.parse(b.finishTime),'JOURNEY_STEP_TIMING');}}
+  need(Number.isFinite(Date.parse(b.startTime))&&Number.isFinite(Date.parse(b.createTime)),'JOURNEY_PROVIDER_START');
+  if(finished){need(Date.parse(b.finishTime)>=Date.parse(b.startTime),'JOURNEY_PROVIDER_FINISH');equal(b.results?.buildStepImages?.length,2,'JOURNEY_PROVIDER_IMAGE_COUNT');need(b.results.buildStepImages.every(x=>/^sha256:[a-f0-9]{64}$/.test(x)),'JOURNEY_PROVIDER_IMAGES');}
+  return b;
+}
+function verifyFunctionalJourneyPins(p,cwd=process.cwd()){
+  validateFunctionalJourneyPlan(p);git(cwd,'merge-base','--is-ancestor',p.authorityHead,'HEAD');
+  equal(git(cwd,'rev-parse',p.authorityHead+':'+C.control),p.pins.control,'JOURNEY_ORIGINAL_CONTROL_PIN');
+  equal(git(cwd,'rev-parse',p.authorityHead+':'+C.transport),p.pins.transport,'JOURNEY_ORIGINAL_TRANSPORT_PIN');
+  equal(git(cwd,'rev-parse',p.authorityHead+':'+UNIT_FILE),p.pins.unit,'JOURNEY_ORIGINAL_BINDING_PIN');
+  equal(blob(fs.readFileSync(path.join(cwd,UNIT_FILE))),p.pins.unit,'JOURNEY_CURRENT_BINDING_PIN');
+  equal(json(path.join(cwd,UNIT_FILE)),p.binding,'JOURNEY_CURRENT_BINDING');
+  equal(git(cwd,'rev-parse',p.authorityHead+':tools'),p.pins.toolsTree,'JOURNEY_RUNTIME_TREE_PIN');
+  equal(git(cwd,'rev-parse','HEAD:tools'),p.pins.toolsTree,'JOURNEY_CURRENT_RUNTIME_DEPENDENCIES');
+  equal(git(cwd,'rev-parse',p.facts.sourceSha+':functions'),p.pins.functionsTree,'JOURNEY_PACKAGE_SOURCE_TREE');
+  equal(git(cwd,'rev-parse','HEAD:functions'),p.pins.functionsTree,'JOURNEY_CURRENT_FUNCTION_TREE');
+  for(const [file,pin] of Object.entries(p.pins.files)){
+    const raw=gitBytes(cwd,p.authorityHead,file);equal([blob(raw),sha(raw)],[pin.blob,pin.sha256],'JOURNEY_SEALED_RUNTIME_BYTES');equal(fs.readFileSync(path.join(cwd,file)),raw,'JOURNEY_EXECUTING_RUNTIME_BYTES');
+  }
+  equal(git(cwd,'status','--porcelain','--untracked-files=no'),'','JOURNEY_CLEAN_TRACKED_CHECKOUT');return true;
+}
+async function functionalUiHosting(phase,binding,hosting,control=json(C.control),expected){
+  const origin=phase==='live'?'https://app.aysseguros.com':control.i66FrontendReleaseHead.previewUrl;
+  const r=await fetch(origin+'/__recovery__/build.json',{cache:'no-store',redirect:'error'});need(r.ok,'JOURNEY_UI_MARKER_HTTP');const raw=Buffer.from(await r.arrayBuffer()),marker=JSON.parse(raw);
+  let version=hosting.version;
+  if(phase==='preview'){
+    const match=/--(gi-i66-rc-\d+)-[a-z0-9]+\.web\.app$/.exec(origin);need(match,'JOURNEY_EXISTING_CHANNEL');
+    const token=readGcloud(['auth','print-access-token']).toString().trim();
+    const response=await fetch('https://firebasehosting.googleapis.com/v1beta1/sites/'+C.projectId+'/channels/'+match[1],{headers:{Authorization:'Bearer '+token}});need(response.ok,'JOURNEY_UI_PROVIDER_CHANNEL');const channel=await response.json();
+    equal(channel.url,origin,'JOURNEY_PROVIDER_CHANNEL_URL');version=channel.release?.version?.name;
+    need(Date.parse(channel.expireTime)>Date.now(),'JOURNEY_EXISTING_CHANNEL_UNEXPIRED');
+  }
+  equal([version,marker.buildId,marker.sourceSha],[hosting.version,hosting.buildId,hosting.sourceSha],'JOURNEY_PREDECESSOR_MARKER');
+  const observed={origin,version,buildId:marker.buildId,sourceSha:marker.sourceSha,markerSha256:sha(raw),basis:'SCOPED_HOSTING_PREDECESSOR'};
+  if(expected)equal(observed,expected,'JOURNEY_CURRENT_UI_UNCHANGED');return observed;
+}
+async function makeFunctionalJourneyPlan(phase,buildId,previousAttempt=null){
+  need(PHASES.includes(phase),'JOURNEY_PHASE');const head=checkedBranch(),binding=scopedCandidate(),pack=readFunctionalPackage(buildId),facts=functionalFacts(pack),control=json(C.control);
+  const deployment=control.i66ScopedFunctionRelease.providerStages?.[phase.toUpperCase()+'_DEPLOYED'];need(deployment,'JOURNEY_DEPLOYED_STAGE_REQUIRED');
+  equal(control.i66ScopedFunctionRelease.providerStages.PACKAGE_CERTIFIED,facts,'JOURNEY_SIGNED_PACKAGE');
+  const snapshot=readFunctionSnapshot(binding.targets[phase],binding.targets.region),evidence=await gcloudReadIo().object(deployment.receipt),stored=JSON.parse(evidence.data);
+  equal(stored.after,snapshot,'JOURNEY_DEPLOYMENT_PHYSICAL_READBACK');equal(sha(scopedArchive('gs://'+snapshot.source.bucket+'/'+snapshot.source.object,snapshot.source.generation)),facts.packageSha256,'JOURNEY_DEPLOYED_ARCHIVE');
+  const hosting=await verifyScopedHosting(binding),uiHosting=await functionalUiHosting(phase,binding,hosting,control);
+  const p={schema:FUNCTIONAL_JOURNEY.planSchema,phase,authorityHead:head,binding,facts,previousAttempt,deployment,deploymentCreatedAt:evidence.meta.timeCreated,snapshot,hosting,uiHosting,origin:uiHosting.origin,
+    pins:{control:git(process.cwd(),'rev-parse','HEAD:'+C.control),unit:facts.bindingBlob,transport:git(process.cwd(),'rev-parse','HEAD:'+C.transport),toolsTree:git(process.cwd(),'rev-parse','HEAD:tools'),functionsTree:git(process.cwd(),'rev-parse','HEAD:functions'),
+      files:Object.fromEntries(FUNCTIONAL_JOURNEY_PINS.map(file=>{const raw=fs.readFileSync(file);return[file,{blob:blob(raw),sha256:sha(raw)}];}))}};
+  validateFunctionalJourneyPlan(p);verifyFunctionalJourneyPins(p);checkedBranch();return p;
+}
+function functionalJourneyTargets(phase,j){const prefix=phase==='preview'?'previewReconciliation':'reconciliation';return[
+  {collection:'data/clientes/items',id:j.clientId},{collection:'data/polizas/items',id:j.policyId},{collection:'data/recibosEsperados/items',id:j.receiptId},
+  {collection:'data/cobros/items',id:j.cobroId},{collection:prefix+'Requests',id:j.requestId},{collection:prefix+'Events',id:j.eventId}];}
+function functionalWitnessValue(v){return Array.isArray(v)?v.map(functionalWitnessValue):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,functionalWitnessValue(v[k])])):v;}
+function functionalServerTime(value){
+  if(value&&typeof value==='object'){const seconds=value.seconds??value._seconds,nanos=value.nanoseconds??value._nanoseconds;if(Number.isInteger(seconds)&&Number.isInteger(nanos))return seconds*1000+nanos/1000000;}
+  return Date.parse(value);
+}
+function validateFunctionalJourneyWitness(p,j,w){
+  equal(w?.schema,FUNCTIONAL_JOURNEY.witnessSchema,'JOURNEY_CANONICAL_WITNESS_SCHEMA');equal(w.status,'PASS','JOURNEY_CANONICAL_WITNESS_PASS');
+  const d=w.documents,r=d.receipt,payment=d.payment,a=d.event,request=d.request,result=request.result,proof=payment.historicalPaymentEvidence;
+  equal([j.origin,j.route,j.normalUi,j.reloaded,j.idempotentReplay,j.replayUnchanged,j.newCollection,j.realCustomerWrites],
+    [p.origin,'/#/cobros',true,true,true,true,false,0],'JOURNEY_NORMAL_UI_REPLAY');
+  equal([j.originalPaymentBasis,j.originalPaymentCount,j.afterPaymentCount,j.originalCobroDocumentCount,j.afterCobroDocumentCount],['VERIFIED_HISTORICAL_RECEIPT',1,1,0,1],'JOURNEY_LOGICAL_VERSUS_PHYSICAL_PAYMENT');
+  equal([a.eventId,a.requestId,a.operation,request.operation,request.status,request.eventId,a.receiptId,a.cobroId],
+    [j.eventId,j.requestId,'reconcile_payment','reconcile_payment','committed',j.eventId,j.receiptId,j.cobroId],'JOURNEY_CANONICAL_COMMIT');
+  equal(normalizedRole(a.actor?.activeRole),normalizedRole(j.role),'JOURNEY_CANONICAL_ROLE');need(a.actor?.uid&&sha(a.actor.uid)===j.actorUidSha256,'JOURNEY_CANONICAL_ACTOR');
+  equal([w.actor.uidSha256,w.actor.activeRole],[j.actorUidSha256,normalizedRole(j.role)],'JOURNEY_MEMBER_ROLE');need(sha64(w.actor.memberDigest),'JOURNEY_MEMBER_DIGEST');
+  need(functionalServerTime(a.createdAt)>=Date.parse(p.deploymentCreatedAt)&&Date.parse(w.observedAt)>=functionalServerTime(a.createdAt),'JOURNEY_FRESH_SERVER_AUDIT');
+  equal([r.id,r.cobroId,r.polizaId,r.clienteId,payment.id,payment.reciboId,payment.polizaId,payment.clienteId,result.policyId,result.clientId],
+    [j.receiptId,j.cobroId,j.policyId,j.clientId,j.cobroId,j.receiptId,j.policyId,j.clientId,j.policyId,j.clientId],'JOURNEY_CANONICAL_RELATIONS');
+  equal([r.invoiceNumber,payment.invoiceNumber,r.paidDate,payment.paidDate,payment.monto,result.amount,a.recordedPaymentBefore?.amount,a.recordedPaymentAfter?.amount],
+    [j.invoiceNumber,j.invoiceNumber,j.originalPaidDate,j.originalPaidDate,j.originalAmount,j.originalAmount,j.originalAmount,j.originalAmount],'JOURNEY_ORIGINAL_AMOUNT_DATE_INVOICE');
+  equal([a.recordedPaymentBefore?.sourceCollection,a.recordedPaymentBefore?.sourceId],['recibosEsperados',j.receiptId],'JOURNEY_HISTORICAL_PREIMAGE_SOURCE');
+  need(proof?.contract==='SIGA_I65_PAID_PRIMARY_20260918'&&proof.newCollection===false&&proof.receiptId===j.receiptId&&proof.policyId===j.policyId&&proof.amount===j.originalAmount&&proof.fechaPagoReportada===j.originalPaidDate&&sha64(proof.sourceKey),'JOURNEY_HISTORICAL_PROOF');
+  equal(a.recordedPaymentBefore.historicalSource,proof,'JOURNEY_AUDITED_HISTORICAL_EVIDENCE');equal(proof.sourceKey,j.sourceKey,'JOURNEY_GLOBAL_SOURCE_KEY');equal(result.historicalPaymentLinked,true,'JOURNEY_NO_NEW_REVENUE');
+  equal(w.linkedPaymentIds,[j.cobroId],'JOURNEY_SINGLE_PHYSICAL_DOCUMENT');equal(w.linkedPortfolioIds,[],'JOURNEY_NO_NEW_DEBT');
+  const root='tenants/'+FUNCTIONAL_JOURNEY.tenant+'/',targets=functionalJourneyTargets(p.phase,j),before=w.before,after=w.after;
+  equal(Object.keys(before).sort(),targets.slice(0,4).map(t=>root+t.collection+'/'+t.id).sort(),'JOURNEY_CLOSED_BEFORE');equal(Object.keys(after).sort(),targets.map(t=>root+t.collection+'/'+t.id).sort(),'JOURNEY_CLOSED_AFTER');
+  equal(digest(before),j.beforeDigest,'JOURNEY_CANONICAL_BEFORE_DIGEST');equal(digest(after),j.afterDigest,'JOURNEY_CANONICAL_AFTER_DIGEST');
+  const br=before[root+'data/recibosEsperados/items/'+j.receiptId],bp=before[root+'data/cobros/items/'+j.cobroId];equal(bp,{exists:false,data:null,updateTime:null},'JOURNEY_NO_BEFORE_COBRO');
+  need(br.exists&&br.data.__syntheticQa===true&&!br.data.cobroId&&/^b3004qa_i66_historical_/.test(j.receiptId),'JOURNEY_OWNED_HISTORICAL_FIXTURE');
+  for(const [key,doc] of [['client',d.client],['policy',d.policy]]){const i=key==='client'?0:1,prior=before[root+targets[i].collection+'/'+targets[i].id];need(prior.exists&&prior.data.__syntheticQa===true&&prior.updateTime,'JOURNEY_QA_PARENTS');equal(prior.data,doc,'JOURNEY_PARENTS_UNCHANGED');}
+  for(const key of ['fechaPagoReportada','fechaCorteFuente','sourceBundleSha256','sourceRef','sourceRefsI65','matchQuality','motivosCalidad','primaTotal','primaNeta','formaPago','vigenciaInicio','vigenciaFin','serie'])equal(r[key],br.data[key],'JOURNEY_PRESERVED_HISTORICAL_'+key);
+  equal(sha(FUNCTIONAL_JOURNEY.tenant+'|'+br.data.sourceBundleSha256+'|'+br.data.sourceRefsI65[0]),j.sourceKey,'JOURNEY_DERIVED_HISTORICAL_SOURCE_KEY');
+  equal(j.cobroId,'cob_'+sha(FUNCTIONAL_JOURNEY.tenant+'|receipt|'+j.receiptId).slice(0,28),'JOURNEY_DERIVED_PAYMENT_ID');
+  for(const [i,key] of ['client','policy','receipt','payment','request','event'].entries()){const row=after[root+targets[i].collection+'/'+targets[i].id];need(row.exists&&typeof row.updateTime==='string','JOURNEY_CANONICAL_VERSION');equal(row.data,d[key],'JOURNEY_WITNESS_DOC_'+key);}
+  equal(r.__syntheticQa,true,'JOURNEY_SYNTHETIC_RECEIPT');if(p.phase==='preview')equal(payment.__syntheticQa,true,'JOURNEY_PREVIEW_SYNTHETIC_PAYMENT');
+  return w;
+}
+function functionalMemberValue(v){
+  if(v&&typeof v==='object'&&Number.isInteger(v.seconds)&&Number.isInteger(v.nanoseconds)&&typeof v.toDate==='function')return {$timestamp:v.seconds+':'+String(v.nanoseconds).padStart(9,'0')};
+  if(typeof v==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z$/.test(v)){
+    const seconds=Math.floor(Date.parse(v)/1000),fraction=(/\.(\d+)Z$/.exec(v)?.[1]||'').padEnd(9,'0');if(Number.isFinite(seconds))return {$timestamp:seconds+':'+fraction};
+  }
+  return Array.isArray(v)?v.map(functionalMemberValue):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,functionalMemberValue(x)])):v;
+}
+function functionalJourneyMember(member,role){
+  const r=require('../functions/product-active-role-contract.js').resolveProductActiveRole(member,normalizedRole(role));
+  need(member.active!==false&&member.activo!==false&&['active','activo'].includes(normalizedRole(member.status||member.estado)),'JOURNEY_MEMBER_ACTIVE');
+  need([].concat(member.countries||member.paises||[]).includes('GT'),'JOURNEY_MEMBER_COUNTRY');
+  return {activeRole:r.activeRole,memberDigest:digest(functionalMemberValue(member))};
+}
+async function captureFunctionalJourneyWitness(p,{journey:j,before,after},{db}){
+  const root='tenants/'+FUNCTIONAL_JOURNEY.tenant+'/',targets=functionalJourneyTargets(p.phase,j),rows={};
+  const documents={};for(const [i,t] of targets.entries()){const s=await db.doc(root+t.collection+'/'+t.id).get();need(s.exists&&s.updateTime,'JOURNEY_WORKER_CANONICAL_DOCUMENT');const row={exists:true,data:s.data(),updateTime:s.updateTime.seconds+':'+s.updateTime.nanoseconds};rows[s.ref.path]=row;documents[['client','policy','receipt','payment','request','event'][i]]=row.data;}
+  equal(digest(rows),digest(after),'JOURNEY_CALLBACK_CANONICAL_READBACK');
+  const ids=async(collection,field)=>{const s=await db.collection(root+'data/'+collection+'/items').where(field,'==',j.receiptId).limit(3).get();need(s.size<3,'JOURNEY_BOUNDED_UNIQUENESS');return s.docs.map(d=>d.id).sort();};
+  const payments=[...new Set([...(await ids('cobros','reciboId')),...(await ids('cobros','receiptId'))])].sort(),portfolio=[...new Set([...(await ids('carteraPrimas','reciboId')),...(await ids('carteraPrimas','receiptId'))])].sort();
+  const actor=documents.event.actor,member=await db.doc(root+'members/'+actor.uid).get();need(member.exists,'JOURNEY_ACTOR_MEMBERSHIP');
+  const membership=functionalJourneyMember(member.data(),j.role);
+  const w=functionalWitnessValue({schema:FUNCTIONAL_JOURNEY.witnessSchema,status:'PASS',observedAt:new Date().toISOString(),documents,before,after:rows,linkedPaymentIds:payments,linkedPortfolioIds:portfolio,
+    actor:{uidSha256:sha(actor.uid),...membership}});
+  validateFunctionalJourneyWitness(p,j,w);return w;
+}
+function validateFunctionalJourneyReport(p,report,build){
+  validateFunctionalJourneyBuild(p,build);equal(report.schema,FUNCTIONAL_JOURNEY.reportSchema,'JOURNEY_REPORT_SCHEMA');equal(report.status,'PASS','JOURNEY_REPORT_SUCCESS');equal(report.plan,p,'JOURNEY_RETAINED_PLAN');
+  equal([report.executionProvider,report.executionBuildId,report.phase,report.sourceSha,report.packageBuildId,report.packageSha256,report.bindingBlob,report.revision,report.hostingBuildId],
+    [C.provider,build.id,p.phase,p.facts.sourceSha,p.facts.buildId,p.facts.packageSha256,p.facts.bindingBlob,p.snapshot.revision,p.uiHosting.buildId],'JOURNEY_REPORT_PROVENANCE');
+  equal(report.protectedLiveHosting,p.hosting,'JOURNEY_REPORT_PROTECTED_LIVE');equal(report.uiHosting,p.uiHosting,'JOURNEY_REPORT_UI');
+  equal(report.journeys.map(j=>j.role),p.binding.roles,'JOURNEY_REPORT_ROLES');equal(new Set(report.journeys.map(j=>j.actorUidSha256)).size,2,'JOURNEY_DISTINCT_SIGNED_ACTORS');
+  equal([report.realCustomerWrites,report.authOrMembershipMutations],[0,0],'JOURNEY_NO_REAL_OR_AUTH_MUTATIONS');
+  need(Date.parse(report.startedAt)>=Date.parse(build.startTime)&&Date.parse(report.finishedAt)>=Date.parse(report.startedAt)&&Date.parse(report.finishedAt)<=Date.parse(build.finishTime),'JOURNEY_ACTUAL_EXECUTION_WINDOW');
+  for(const j of report.journeys){equal(j.status,'PASS','JOURNEY_ROLE_SUCCESS');validateFunctionalJourneyWitness(p,j,j.serverReadback);need(Date.parse(j.serverReadback.observedAt)>=Date.parse(report.startedAt)&&Date.parse(j.serverReadback.observedAt)<=Date.parse(report.finishedAt),'JOURNEY_WITNESS_EXECUTION_WINDOW');equal([j.cleanup?.status,j.cleanup?.remaining],['PASS',0],'JOURNEY_ROLE_CLEANUP');equal(j.cleanup.targets,functionalJourneyTargets(p.phase,j),'JOURNEY_ROLE_CLEANUP_TARGETS');}
+  equal([report.cleanup?.status,report.cleanup?.remaining],['PASS',0],'JOURNEY_ALL_CLEANUP');equal(report.cleanup.targets,report.journeys.flatMap(j=>functionalJourneyTargets(p.phase,j)),'JOURNEY_CLOSED_CLEANUP_TARGETS');return report;
+}
+function functionalJourneyCleanupProof(report){
+  const rows=report?.journeys;
+  if(!Array.isArray(rows)||!rows.length)return null;
+  const safe=rows.every(j=>j.cleanup?.status==='PASS'&&j.cleanup.remaining===0&&Array.isArray(j.cleanup.targets));
+  return {status:safe?'PASS':'HOLD',remaining:rows.reduce((sum,j)=>sum+(Number.isSafeInteger(j.cleanup?.remaining)?j.cleanup.remaining:1),0),targets:rows.flatMap(j=>j.cleanup?.targets||[])};
+}
+async function functionalCleanupAbsent(targets,{read=async t=>{
+  const token=readGcloud(['auth','print-access-token']).toString().trim();const stem='https://firestore.googleapis.com/v1/projects/'+C.projectId+'/databases/(default)/documents/tenants/'+FUNCTIONAL_JOURNEY.tenant+'/';
+  return (await fetch(stem+t.collection+'/'+t.id,{headers:{Authorization:'Bearer '+token}})).status;
+}}={}){
+  need(Array.isArray(targets)&&targets.length<=12,'JOURNEY_CLOSED_CLEANUP_LIST');
+  for(const t of targets){need(/^(?:data\/(?:clientes|polizas|recibosEsperados|cobros)\/items|(?:previewReconciliation|reconciliation)(?:Events|Requests))$/.test(t.collection)&&/^[A-Za-z0-9_-]{1,180}$/.test(t.id),'JOURNEY_CLEANUP_PATH');equal(await read(t),404,'JOURNEY_SERVER_CLEANUP_ABSENCE');}
+}
+function validateFunctionalJourneyRetryEvidence(p,prior,build,hold,claim,cursor){
+  need(prior&&p.previousAttempt,'JOURNEY_RETRY_REFERENCE_REQUIRED');equal(prior,p.previousAttempt,'JOURNEY_RETRY_EXACT_PREIMAGE');
+  validateFunctionalJourneyBuild(hold.plan,build,{finished:false,terminalFailure:true});
+  equal([hold.schema,hold.executionBuildId,hold.phase,hold.packageBuildId,hold.accepted],['GI_I66_SCOPED_FUNCTION_JOURNEY_HOLD_V1',build.id,p.phase,p.facts.buildId,false],'JOURNEY_RETRY_TERMINAL_HOLD');
+  equal(hold.plan.facts,p.facts,'JOURNEY_RETRY_SAME_CERTIFIED_PACKAGE');equal(hold.plan.binding,p.binding,'JOURNEY_RETRY_SAME_UNIT');
+  equal(hold.claim,prior.claim,'JOURNEY_RETRY_PRESERVED_CLAIM');equal(hold.planSha256,digest(hold.plan),'JOURNEY_RETRY_OLD_PLAN');
+  equal([claim.executionBuildId,claim.planSha256,claim.packageBuildId,claim.phase,claim.authorityHead],[build.id,digest(hold.plan),p.facts.buildId,p.phase,hold.plan.authorityHead],'JOURNEY_RETRY_ORIGINAL_CLAIM');
+  equal(cursor,{schema:'GI_I66_SCOPED_FUNCTION_JOURNEY_CURSOR_V1',claim:prior.claim,executionBuildId:build.id,planSha256:digest(hold.plan)},'JOURNEY_RETRY_CURSOR');
+  equal([hold.cleanup?.status,hold.cleanup?.remaining],['PASS',0],'JOURNEY_RETRY_PROVEN_CLEANUP');need(Array.isArray(hold.cleanup.targets),'JOURNEY_RETRY_CLEANUP_TARGETS');
+  const partial=hold.partialReport;need(partial&&Array.isArray(partial.journeys)&&partial.journeys.length>0&&partial.journeys.length<=2,'JOURNEY_RETRY_PARTIAL_DRIVER_EVIDENCE');
+  equal(functionalJourneyCleanupProof(partial),hold.cleanup,'JOURNEY_RETRY_CLEANUP_EVIDENCE');
+  for(const j of partial.journeys){need(/^b3004qa_i66_historical_/.test(j.receiptId),'JOURNEY_RETRY_SYNTHETIC_NAMESPACE');const allowed=functionalJourneyTargets(p.phase,j).map(t=>t.collection+'/'+t.id);need(j.cleanup.targets.every(t=>allowed.includes(t.collection+'/'+t.id)),'JOURNEY_RETRY_OWNED_TARGETS');}
+  return true;
+}
+async function verifyPreviousFunctionalJourney(p,io=operationalClaimReader()){
+  const prior=p.previousAttempt;need(prior,'JOURNEY_RETRY_PREIMAGE');const objects=await Promise.all([io.object(prior.cursor),io.object(prior.claim),io.object(prior.hold)]),[cursor,claim,hold]=objects.map(o=>JSON.parse(o.data));
+  const build=await io.api('https://cloudbuild.googleapis.com/v1/projects/'+C.projectId+'/locations/'+C.region+'/builds/'+prior.executionBuildId);
+  validateFunctionalJourneyRetryEvidence(p,prior,build,hold,claim,cursor);for(const o of objects)pkg.validateObjectTime(build,o.meta);
+  git(process.cwd(),'merge-base','--is-ancestor',hold.plan.authorityHead,p.authorityHead);
+  for(const [file,pin] of Object.entries(hold.plan.pins.files)){const raw=gitBytes(process.cwd(),hold.plan.authorityHead,file);equal([blob(raw),sha(raw)],[pin.blob,pin.sha256],'JOURNEY_RETRY_SIGNED_METHOD');}
+  equal(await io.findClaim(functionalJourneyPrefix(p)+p.phase+'-journey-current.json'),prior.cursor,'JOURNEY_RETRY_CURRENT_CURSOR');await functionalCleanupAbsent(hold.cleanup.targets);return prior;
+}
+async function acquireFunctionalJourneyClaim(p,executionBuildId){
+  const base=functionalJourneyPrefix(p),reader=operationalClaimReader(),cursorName=base+p.phase+'-journey-current.json';
+  if(p.previousAttempt)await verifyPreviousFunctionalJourney(p,reader);else equal(await reader.findClaim(cursorName),null,'JOURNEY_EXCLUSIVE_FIRST_ATTEMPT');
+  const claim=await retainedFunctionRecord(base+p.phase+'-journey-claims/'+executionBuildId+'.json',{schema:'GI_I66_SCOPED_FUNCTION_JOURNEY_CLAIM_V1',phase:p.phase,packageBuildId:p.facts.buildId,executionBuildId,authorityHead:p.authorityHead,planSha256:digest(p)});
+  const value={schema:'GI_I66_SCOPED_FUNCTION_JOURNEY_CURSOR_V1',claim,executionBuildId,planSha256:digest(p)},raw=Buffer.from(JSON.stringify(value,null,2)+'\n');
+  const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'i66-scoped-cursor-')),file=path.join(tmp,'cursor.json');
+  try{fs.writeFileSync(file,raw,{mode:0o600});try{readGcloud(['storage','cp',file,'gs://'+C.bucket+'/'+cursorName,'--if-generation-match='+(p.previousAttempt?.cursor.generation||'0'),'--quiet']);}catch(error){const existing=await reader.findClaim(cursorName);if(!existing||existing.sha256!==sha(raw))throw error;}
+    const cursor=await reader.findClaim(cursorName);need(cursor,'JOURNEY_CURSOR_UNCONFIRMED');equal(cursor.sha256,sha(raw),'JOURNEY_EXCLUSIVE_CURSOR_CAS');return {claim,cursor};
+  }catch(error){error.functionalJourneyClaim=claim;throw error;}finally{fs.rmSync(tmp,{recursive:true,force:true});}
+}
+async function functionalJourneyWorker(p){
+  validateFunctionalJourneyPlan(p);equal(process.versions.node.split('.')[0],'22','JOURNEY_NODE22');equal(git(process.cwd(),'rev-parse','HEAD'),p.authorityHead,'JOURNEY_EXECUTING_HEAD');
+  const identity=await auth.verifyCloudBuildRuntime();
+  if(git(process.cwd(),'rev-parse','--is-shallow-repository')==='true')git(process.cwd(),'fetch','--quiet','--no-tags','--unshallow',C.repositoryUrl,'refs/heads/'+C.branch);
+  verifyFunctionalJourneyPins(p);equal(checkedBranch(),p.authorityHead,'JOURNEY_CURRENT_AUTHORITY');
+  process.env.PATH=path.join(process.cwd(),'.i66-provider/google-cloud-sdk/bin')+':'+process.env.PATH;
+  need(Number(String(json('.i66-provider/version.json')['Google Cloud SDK']||'').split('.')[0])>=483,'JOURNEY_GCLOUD_VERSION');
+  validateFunctionalJourneyBuild(p,await gcloudReadIo().api('https://cloudbuild.googleapis.com/v1/projects/'+C.projectId+'/locations/'+C.region+'/builds/'+identity.buildId),{finished:false});
+  const base=functionalJourneyPrefix(p),startedAt=new Date().toISOString();let report,attempt=null;
+  try{
+    const log=path.join(os.tmpdir(),'i66-scoped-journey-'+identity.buildId+'.log');
+    pkg.execLogged('npm',['install','--no-save','--package-lock=false','--ignore-scripts','--no-audit','--no-fund','google-auth-library@10.9.1','firebase-admin@13.4.0','playwright@1.55.0'],{log});
+    pkg.execLogged(process.execPath,['node_modules/playwright/cli.js','install','--with-deps','chromium'],{log,append:true});
+    pkg.execLogged(process.execPath,['--test',FUNCTIONAL_JOURNEY.test,FUNCTIONAL_JOURNEY.driverTest,'tools/gravicentra-i66-signed-qa-runtime-auth.test.cjs'],{log,append:true});
+    equal(functionalFacts(readFunctionalPackage(p.facts.buildId)),p.facts,'JOURNEY_WORKER_CERTIFIED_PACKAGE');
+    equal(readFunctionSnapshot(p.snapshot.target,p.snapshot.region),p.snapshot,'JOURNEY_WORKER_DEPLOYED_REVISION');equal(await verifyScopedHosting(p.binding),p.hosting,'JOURNEY_WORKER_PROTECTED_LIVE');await functionalUiHosting(p.phase,p.binding,p.hosting,json(C.control),p.uiHosting);checkedBranch();
+    const admin=require('firebase-admin');
+    report=await require('./gravicentra-i6-6-proposal-application-signed-uat.cjs').runScopedHistoricalPaymentJourneys({phase:p.phase,origin:p.origin,binding:p.binding,facts:p.facts,hosting:p.hosting,uiHosting:p.uiHosting,revision:p.snapshot.revision,
+      onServerReadback:input=>captureFunctionalJourneyWitness(p,input,{db:admin.firestore()})},{beforeFixtureWrite:async()=>{
+        checkedBranch();equal(readFunctionSnapshot(p.snapshot.target,p.snapshot.region),p.snapshot,'JOURNEY_FIRST_WRITE_REVISION');
+        if(!attempt)attempt=await acquireFunctionalJourneyClaim(p,identity.buildId);
+        else equal(await operationalClaimReader().findClaim(base+p.phase+'-journey-current.json'),attempt.cursor,'JOURNEY_OWN_ACTIVE_ATTEMPT');
+      }});
+    need(attempt,'JOURNEY_ACTUAL_WRITE_CLAIM');equal([report.status,report.cleanup?.status,report.cleanup?.remaining],['PASS','PASS',0],'JOURNEY_DRIVER_AND_CLEANUP_PASS');
+    for(const t of report.cleanup.targets)equal((await admin.firestore().doc('tenants/'+FUNCTIONAL_JOURNEY.tenant+'/'+t.collection+'/'+t.id).get()).exists,false,'JOURNEY_WORKER_CLEANUP_ABSENCE');
+    equal(readFunctionSnapshot(p.snapshot.target,p.snapshot.region),p.snapshot,'JOURNEY_POST_UI_REVISION');equal(await verifyScopedHosting(p.binding),p.hosting,'JOURNEY_POST_UI_PROTECTED_LIVE');await functionalUiHosting(p.phase,p.binding,p.hosting,json(C.control),p.uiHosting);checkedBranch();
+    const result={...report,schema:FUNCTIONAL_JOURNEY.reportSchema,executionProvider:C.provider,executionBuildId:identity.buildId,plan:p,claim:attempt.claim,executionCursor:attempt.cursor,startedAt,finishedAt:new Date().toISOString(),hostingBuildId:p.uiHosting.buildId,protectedLiveHosting:p.hosting,uiHosting:p.uiHosting};
+    const ref=await retainedFunctionRecord(base+p.phase+'-role-journeys/'+identity.buildId+'.json',result);console.log('I66_SCOPED_JOURNEYS_RETAINED_PROVIDER_SUCCESS_PENDING '+JSON.stringify(ref));return ref;
+  }catch(error){
+    const partialReport=error.scopedHistoricalReport||report||null;
+    await retainedFunctionRecord(base+p.phase+'-journey-holds/'+identity.buildId+'.json',{schema:'GI_I66_SCOPED_FUNCTION_JOURNEY_HOLD_V1',phase:p.phase,packageBuildId:p.facts.buildId,executionBuildId:identity.buildId,plan:p,planSha256:digest(p),claim:attempt?.claim||error.functionalJourneyClaim||null,
+      code:String(error.message||'JOURNEY_HOLD').split('\n')[0].slice(0,180),cleanup:functionalJourneyCleanupProof(partialReport),partialReport,accepted:false,businessWriteClaimAcquired:!!attempt});throw error;
+  }
+}
+function adoptedFunctionalJourney(control,binding,phase,buildId,ref){
+  const authority=control.i66ScopedFunctionRelease,stages=authority?.providerStages||{},stage=phase.toUpperCase()+'_VERIFIED',prior=stages[stage];if(!prior)return null;
+  equal(prior.journeys,ref,'JOURNEY_ADOPT_EXACT_PROVIDER_RECEIPT');equal(prior.buildId,buildId,'JOURNEY_ADOPT_EXACT_BUILD');equal(prior.bindingBlob,authority.candidateBlob,'JOURNEY_ADOPT_EXACT_BINDING');
+  for(const k of ['sourceSha','buildId','packageSha256','bindingBlob','artifact'])equal(prior[k],stages.PACKAGE_CERTIFIED[k],'JOURNEY_ADOPT_SAME_PACKAGE');
+  equal([prior.target,prior.revision,prior.trafficPercent,prior.roles],[binding.targets[phase],stages[phase.toUpperCase()+'_DEPLOYED'].revision,100,binding.roles],'JOURNEY_ADOPT_EXACT_STAGE');
+  if(phase==='live')equal([authority.accepted?.epoch,authority.accepted?.target,authority.accepted?.revision,authority.accepted?.sourceSha,authority.accepted?.packageSha256],
+    [binding.releaseEpoch+1,prior.target,prior.revision,prior.sourceSha,prior.packageSha256],'JOURNEY_ADOPT_ACCEPTED_EPOCH');
+  return {status:'NOOP_ALREADY_RECONCILED',stage,buildId,revision:prior.revision,journeys:ref};
+}
+async function validateRetainedFunctionalJourney(p,report,ref,io=gcloudReadIo()){
+  const build=await io.api('https://cloudbuild.googleapis.com/v1/projects/'+C.projectId+'/locations/'+C.region+'/builds/'+report.executionBuildId);validateFunctionalJourneyReport(p,report,build);verifyFunctionalJourneyPins(p);
+  const expected='gs://'+C.bucket+'/'+functionalJourneyPrefix(p)+p.phase+'-role-journeys/'+build.id+'.json';equal(ref.uri,expected,'JOURNEY_CANONICAL_RECEIPT_URI');
+  const retained=await io.object(ref);equal(JSON.parse(retained.data),report,'JOURNEY_RETAINED_REPORT_BYTES');pkg.validateObjectTime(build,retained.meta);
+  const claimObject=await io.object(report.claim);pkg.validateObjectTime(build,claimObject.meta);const claim=JSON.parse(claimObject.data);equal(report.claim.uri,'gs://'+C.bucket+'/'+functionalJourneyPrefix(p)+p.phase+'-journey-claims/'+build.id+'.json','JOURNEY_CLAIM_URI');
+  equal(claim,{schema:'GI_I66_SCOPED_FUNCTION_JOURNEY_CLAIM_V1',phase:p.phase,packageBuildId:p.facts.buildId,executionBuildId:build.id,authorityHead:p.authorityHead,planSha256:digest(p)},'JOURNEY_EXCLUSIVE_EXECUTION_CLAIM');
+  const cursorObject=await io.object(report.executionCursor);pkg.validateObjectTime(build,cursorObject.meta);equal(JSON.parse(cursorObject.data),{schema:'GI_I66_SCOPED_FUNCTION_JOURNEY_CURSOR_V1',claim:report.claim,executionBuildId:build.id,planSha256:digest(p)},'JOURNEY_RETAINED_ACTIVE_CURSOR');
+  equal(report.executionCursor.uri,'gs://'+C.bucket+'/'+functionalJourneyPrefix(p)+p.phase+'-journey-current.json','JOURNEY_CURSOR_URI');
+  return build;
+}
+async function verifyFunctionalJourneyCleanup(p,report){
+  const token=readGcloud(['auth','print-access-token']).toString().trim(),stem='https://firestore.googleapis.com/v1/projects/'+C.projectId+'/databases/(default)/documents/tenants/'+FUNCTIONAL_JOURNEY.tenant+'/';
+  for(const t of report.cleanup.targets){need(/^(?:data\/(?:clientes|polizas|recibosEsperados|cobros)\/items|(?:previewReconciliation|reconciliation)(?:Events|Requests))$/.test(t.collection)&&/^[A-Za-z0-9_-]{1,180}$/.test(t.id),'JOURNEY_CLEANUP_PATH');const r=await fetch(stem+t.collection+'/'+t.id,{headers:{Authorization:'Bearer '+token}});equal(r.status,404,'JOURNEY_SERVER_CLEANUP_ABSENCE');}
+  for(const j of report.journeys){
+    const actor=j.serverReadback.documents.event.actor,member=await fetch(stem+'members/'+encodeURIComponent(actor.uid),{headers:{Authorization:'Bearer '+token}});need(member.ok,'JOURNEY_CURRENT_MEMBER');const m=firestoreFields((await member.json()).fields);equal(functionalJourneyMember(m,j.role),{activeRole:j.serverReadback.actor.activeRole,memberDigest:j.serverReadback.actor.memberDigest},'JOURNEY_MEMBERSHIP_PRESERVED');
+  }
+}
+async function acceptRetainedFunctionalJourney(phase,buildId,ref,report,io=gcloudReadIo()){
+  const p=report.plan;validateFunctionalJourneyPlan(p);equal([p.phase,p.facts.buildId],[phase,buildId],'JOURNEY_REQUESTED_PHASE_PACKAGE');await validateRetainedFunctionalJourney(p,report,ref,io);
+  const current=json(C.control),binding=json(UNIT_FILE),adopted=adoptedFunctionalJourney(current,binding,phase,buildId,ref);
+  if(adopted){equal(readFunctionSnapshot(binding.targets[phase],binding.targets.region).revision,adopted.revision,'JOURNEY_ADOPT_PHYSICAL_REVISION');return adopted;}
+  equal(await operationalClaimReader().findClaim(functionalJourneyPrefix(p)+phase+'-journey-current.json'),report.executionCursor,'JOURNEY_CURRENT_CURSOR_BEFORE_ACCEPT');
+  equal(scopedCandidate(),p.binding,'JOURNEY_FRESH_CANDIDATE');equal(functionalFacts(readFunctionalPackage(buildId)),p.facts,'JOURNEY_FRESH_PACKAGE');
+  equal(current.i66ScopedFunctionRelease.providerStages[phase.toUpperCase()+'_DEPLOYED'],p.deployment,'JOURNEY_FRESH_DEPLOYMENT');await verifyFunctionalJourneyCleanup(p,report);
+  equal(readFunctionSnapshot(p.snapshot.target,p.snapshot.region),p.snapshot,'JOURNEY_FRESH_PHYSICAL_REVISION');equal(await verifyScopedHosting(binding),p.hosting,'JOURNEY_FRESH_LIVE_HOSTING');await functionalUiHosting(phase,binding,p.hosting,current,p.uiHosting);checkedBranch();
+  return writeFunctionalStage(phase.toUpperCase()+'_VERIFIED',{...p.facts,target:p.snapshot.target,revision:p.snapshot.revision,trafficPercent:100,roles:p.binding.roles,journeys:ref});
+}
+async function runFunctionalJourneys(phase,buildId,out){
+  need(PHASES.includes(phase)&&uuid(buildId),'JOURNEY_RUN_ARGS');checkedBranch();const control=json(C.control),binding=json(UNIT_FILE),prior=control.i66ScopedFunctionRelease.providerStages?.[phase.toUpperCase()+'_VERIFIED'];
+  // Adoption precedes scopedCandidate: LIVE acceptance intentionally advances
+  // the epoch. An exact lost ACK must not authorize another old-epoch attempt.
+  if(prior){const ref=prior.journeys,io=gcloudReadIo(),report=JSON.parse((await io.object(ref)).data);if(report.schema===FUNCTIONAL_JOURNEY.reportSchema)return acceptRetainedFunctionalJourney(phase,buildId,ref,report,io);return adoptedFunctionalJourney(control,binding,phase,buildId,ref);}
+  const pkgFacts=control.i66ScopedFunctionRelease.providerStages?.PACKAGE_CERTIFIED;equal(pkgFacts?.buildId,buildId,'JOURNEY_CURRENT_PACKAGE_ID');
+  const base='i66/functional/'+binding.unit+'/'+pkgFacts.sourceSha+'/'+buildId+'/',reader=operationalClaimReader();
+  async function reconcile(){
+    const cursor=await reader.findClaim(base+phase+'-journey-current.json');if(!cursor)return null;
+    const pointer=JSON.parse((await reader.object(cursor)).data),ref=pointer.claim,claim=JSON.parse((await reader.object(ref)).data);
+    equal([pointer.schema,pointer.executionBuildId,pointer.planSha256],['GI_I66_SCOPED_FUNCTION_JOURNEY_CURSOR_V1',claim.executionBuildId,claim.planSha256],'JOURNEY_EXISTING_CURSOR');
+    equal([claim.schema,claim.phase,claim.packageBuildId],['GI_I66_SCOPED_FUNCTION_JOURNEY_CLAIM_V1',phase,buildId],'JOURNEY_EXISTING_CLAIM');need(uuid(claim.executionBuildId),'JOURNEY_EXISTING_BUILD');
+    const b=await reader.build(claim.executionBuildId);if(['PENDING','QUEUED','WORKING'].includes(b.status))return{status:'ATTEMPT_RUNNING',buildId:b.id};
+    if(b.status!=='SUCCESS'){
+      need(['FAILURE','TIMEOUT','CANCELLED','EXPIRED','INTERNAL_ERROR'].includes(b.status),'JOURNEY_TERMINAL_PROVIDER_STATUS');
+      const hold=await reader.findClaim(base+phase+'-journey-holds/'+b.id+'.json');need(hold,'JOURNEY_TERMINAL_HOLD_READBACK_REQUIRED');
+      const previousAttempt={cursor,claim:ref,hold,executionBuildId:b.id},prior=JSON.parse((await reader.object(hold)).data);
+      const retryPlan={...prior.plan,authorityHead:checkedBranch(),previousAttempt};await verifyPreviousFunctionalJourney(retryPlan,reader);
+      return{status:'READY_FOR_SAFE_JOURNEY_RETRY',previousAttempt};
+    }
+    const proof=await reader.findClaim(base+phase+'-role-journeys/'+b.id+'.json');need(proof,'JOURNEY_SUCCESS_RECEIPT_REQUIRED');const report=JSON.parse((await reader.object(proof)).data);equal(report.claim,ref,'JOURNEY_EXACT_CLAIM_READBACK');equal(report.executionCursor,cursor,'JOURNEY_EXACT_CURSOR_READBACK');
+    fs.mkdirSync(out,{recursive:true});const referenceFile=path.join(out,'journey-reference.json');if(fs.existsSync(referenceFile))equal(json(referenceFile),proof,'JOURNEY_LOCAL_REFERENCE_PREIMAGE');else write(referenceFile,proof);
+    return acceptRetainedFunctionalJourney(phase,buildId,proof,report,reader);
+  }
+  const existing=await reconcile();if(existing&&existing.status!=='READY_FOR_SAFE_JOURNEY_RETRY')return existing;
+  const plan=await makeFunctionalJourneyPlan(phase,buildId,existing?.previousAttempt||null),attemptOut=path.join(out,digest(plan));fs.mkdirSync(attemptOut,{recursive:true});
+  for(const [name,value] of [['plan.json',plan],['cloudbuild.json',functionalJourneyConfig(plan)]]){const file=path.join(attemptOut,name);if(fs.existsSync(file))equal(json(file),value,'JOURNEY_LOCAL_PLAN_PREIMAGE');else write(file,value);}const config=path.join(attemptOut,'cloudbuild.json');
+  let failure;try{execFileSync('gcloud',['builds','submit',C.repositoryUrl,'--git-source-revision='+plan.authorityHead,'--region='+C.region,'--project='+C.projectId,'--config='+path.resolve(config),'--quiet'],{stdio:'inherit'});}catch(error){failure=error;}
+  const result=await reconcile();if(result)return result;if(failure)throw failure;throw Error('I66_SCOPED_JOURNEY_CLAIM_UNCONFIRMED_NO_AUTOMATIC_RESUBMIT');
+}
+
 async function acceptFunctionalJourney(phase,buildId,refFile){
   need(phase==='preview'||phase==='live','FUNCTIONAL_ACCEPT_PHASE');
-  checkedBranch();const b=scopedCandidate(),pkg=readFunctionalPackage(buildId),facts=functionalFacts(pkg),target=b.targets[phase];
+  checkedBranch();const suppliedRef=json(refFile),suppliedIo=gcloudReadIo(),suppliedReport=JSON.parse((await suppliedIo.object(suppliedRef)).data);
+  if(suppliedReport.schema===FUNCTIONAL_JOURNEY.reportSchema)return acceptRetainedFunctionalJourney(phase,buildId,suppliedRef,suppliedReport,suppliedIo);
+  const already=adoptedFunctionalJourney(json(C.control),json(UNIT_FILE),phase,buildId,suppliedRef);if(already)return already;
+  const b=scopedCandidate(),pkg=readFunctionalPackage(buildId),facts=functionalFacts(pkg),target=b.targets[phase];
   const stages=json(C.control).i66ScopedFunctionRelease.providerStages||{},deployed=stages[phase==='preview'?'PREVIEW_DEPLOYED':'LIVE_DEPLOYED'];
   equal(deployed?.packageSha256,facts.packageSha256,'EXACT_DEPLOYED_PACKAGE_REQUIRED');
   const snapshot=readFunctionSnapshot(target,b.targets.region);equal(snapshot.revision,deployed.revision,'CURRENT_SIGNED_TEST_REVISION');
@@ -988,6 +1328,8 @@ async function rollbackFunctionalPhase(phase,buildId){
 
 async function main(args=process.argv.slice(2)){
   if(args[0]==='bind'&&args.length===4){const binding=bindingFromHosting(process.cwd(),json(args[1]),json(args[2]),git(process.cwd(),'rev-parse','HEAD'));write(args[3],binding);console.log('I66_NATIVE_BINDING_PREPARED_NOT_AUTHORIZED');return binding;}
+  if(args[0]==='run-functional-journeys'&&args.length===4){const result=await runFunctionalJourneys(args[1],args[2],args[3]);console.log(JSON.stringify(result));return result;}
+  if(args[0]==='functional-journey-worker'&&args.length===2)return functionalJourneyWorker(JSON.parse(args[1]));
   if(args[0]==='verify-functional-journey'&&args.length===4){const result=await acceptFunctionalJourney(args[1],args[2],args[3]);console.log(JSON.stringify(result));return result;}
   if(args[0]==='rollback-functional-phase'&&args.length===3){const result=await rollbackFunctionalPhase(args[1],args[2]);console.log(JSON.stringify(result));return result;}
   if(args[0]==='functional-phase'&&args.length===3){const result=await executeFunctionalPhase(args[1],args[2]);console.log(JSON.stringify(result));return result;}
@@ -1002,5 +1344,5 @@ async function main(args=process.argv.slice(2)){
   if(args[0]==='verify-runtime'&&args.length===2){const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=g.candidateForPhase(json(g.CONTROL),args[1]);return verifyRuntimeAuthority(p,{phase:args[1],action:'worker'});}
   throw Error('I66_NATIVE_OPERATIONAL_USE_BIND_PREPARE_WORKER_VERIFY');
 }
-module.exports={missingOperationalClaim,readFunctionSnapshot,checkServingSnapshot,verifyScopedHosting,readFunctionalPackage,scopedPhysical,assertCompositeFresh,scopedCandidate,packageFunctionalUnit,functionalBuildConfig,observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
+module.exports={FUNCTIONAL_JOURNEY,FUNCTIONAL_JOURNEY_PINS,validateFunctionalJourneyPlan,functionalJourneyConfig,validateFunctionalJourneyBuild,verifyFunctionalJourneyPins,functionalUiHosting,makeFunctionalJourneyPlan,functionalJourneyTargets,functionalServerTime,functionalMemberValue,functionalJourneyMember,validateFunctionalJourneyWitness,captureFunctionalJourneyWitness,validateFunctionalJourneyReport,functionalJourneyCleanupProof,functionalCleanupAbsent,validateFunctionalJourneyRetryEvidence,verifyPreviousFunctionalJourney,acquireFunctionalJourneyClaim,functionalJourneyWorker,adoptedFunctionalJourney,validateRetainedFunctionalJourney,verifyFunctionalJourneyCleanup,acceptRetainedFunctionalJourney,runFunctionalJourneys,missingOperationalClaim,readFunctionSnapshot,checkServingSnapshot,verifyScopedHosting,readFunctionalPackage,scopedPhysical,assertCompositeFresh,scopedCandidate,packageFunctionalUnit,functionalBuildConfig,observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(error=>{console.error(String(error.message||'I66_NATIVE_OPERATIONAL_HOLD').split('\n')[0]);process.exitCode=1;});

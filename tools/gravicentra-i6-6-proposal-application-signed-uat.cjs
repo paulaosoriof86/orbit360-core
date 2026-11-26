@@ -244,6 +244,153 @@ async function exerciseDocumentaryPayments({page,actor,cfg,tenant,item,nonce,bin
  }
  if(failure){failure.documentaryPaymentEvidence=proof;throw failure;}proof.status='PASS';validateDocumentaryPaymentUiEvidence(proof,{...cfg,buildId,binding});return proof;
 }
+// Scoped historical-payment QA consumes the already deployed callable unit.
+// It does not select or promote the independent composite transport candidate.
+const SCOPED_HISTORICAL_JOURNEY_SCHEMA='GI_I66_SCOPED_HISTORICAL_PAYMENT_JOURNEYS_V1';
+const SCOPED_HISTORICAL_UNIT_PATH='artifacts/orbit360-recovery/release-control/I6_6_SCOPED_FUNCTION_RELEASE.json';
+const gitBlobHash=bytes=>crypto.createHash('sha1').update(Buffer.concat([Buffer.from('blob '+bytes.length+'\0'),bytes])).digest('hex');
+function validateScopedHistoricalContext(input,control,bindingBytes){
+ const {phase,origin,binding,facts,hosting,uiHosting,revision}=input,unit=control.i66ScopedFunctionRelease,stage=unit?.providerStages?.[phase==='preview'?'PREVIEW_DEPLOYED':'LIVE_DEPLOYED'];
+ assert.ok(['preview','live'].includes(phase),'I66_SCOPED_JOURNEY_PHASE');
+ assert.equal(binding.schema,'GI_I66_SCOPED_FUNCTION_PACKAGE_V1');assert.equal(binding.unit,'documented-historical-payment');assert.equal(binding.scope,'BACKEND_CALLABLE');
+ assert.deepEqual(binding.targets,{preview:'orbit360CobrosReconciliationCommandPreview',live:'orbit360CobrosReconciliationCommand',region:'us-central1'});
+ assert.deepEqual(binding.roles,['Dirección','Operativo']);assert.deepEqual(JSON.parse(bindingBytes),binding);
+ assert.equal(unit?.candidatePath,SCOPED_HISTORICAL_UNIT_PATH);assert.equal(unit.candidateBlob,gitBlobHash(bindingBytes));assert.equal(facts.bindingBlob,unit.candidateBlob);
+ assert.match(facts.sourceSha,/^[a-f0-9]{40}$/);assert.match(facts.packageSha256,/^[a-f0-9]{64}$/);assert.match(facts.buildId,/^[a-f0-9-]{36}$/);
+ for(const entry of [unit.providerStages.PACKAGE_CERTIFIED,stage]){
+  assert.ok(entry,'I66_SCOPED_JOURNEY_DEPLOYMENT_REQUIRED');
+  for(const key of ['sourceSha','buildId','packageSha256','bindingBlob'])assert.equal(entry[key],facts[key],'I66_SCOPED_JOURNEY_'+key);
+  assert.deepEqual(entry.artifact,facts.artifact,'I66_SCOPED_JOURNEY_ARTIFACT');
+ }
+ assert.equal(facts.artifact.sha256,facts.packageSha256);assert.equal(stage.target,binding.targets[phase]);assert.equal(stage.revision,revision);assert.equal(stage.trafficPercent,100);
+ assert.equal(origin,phase==='live'?'https://app.aysseguros.com':control.i66FrontendReleaseHead.previewUrl,'I66_SCOPED_EXISTING_UI_ORIGIN_REQUIRED');
+ assert.ok(phase==='live'?origin==='https://app.aysseguros.com':/^https:\/\/ays-orbit-360-lab--gi-i66-rc-\d+-[a-z0-9]+\.web\.app$/.test(origin));
+ assert.deepEqual([hosting.version,hosting.buildId,hosting.sourceSha],[binding.predecessor.hostingVersion,binding.predecessor.buildId,binding.predecessor.sourceSha]);
+ assert.ok(uiHosting,'I66_SCOPED_UI_HOSTING_BINDING_REQUIRED');assert.equal(uiHosting.origin,origin);assert.match(uiHosting.sourceSha,/^[a-f0-9]{40}$/);assert.ok(uiHosting.buildId);assert.match(uiHosting.markerSha256,/^[a-f0-9]{64}$/);assert.match(uiHosting.version,/^sites\/ays-orbit-360-lab\/versions\/[a-z0-9]+$/);
+ assert.equal(uiHosting.basis,'SCOPED_HOSTING_PREDECESSOR');
+ assert.deepEqual([uiHosting.version,uiHosting.buildId,uiHosting.sourceSha,uiHosting.markerSha256],[hosting.version,hosting.buildId,hosting.sourceSha,hosting.markerSha256],'I66_SCOPED_UI_PROTECTED_IDENTITY');
+ if(phase==='live')assert.equal(unit.providerStages.PREVIEW_VERIFIED?.packageSha256,facts.packageSha256,'I66_SCOPED_JOURNEY_SIGNED_PREVIEW_REQUIRED');
+ return{phase,origin,sourceSha:facts.sourceSha,buildId:facts.buildId,packageSha256:facts.packageSha256,bindingBlob:facts.bindingBlob,revision,hostingBuildId:uiHosting.buildId,hostingSourceSha:uiHosting.sourceSha,hostingMarkerSha256:uiHosting.markerSha256,protectedLiveHosting:hosting,uiHosting,tenantId:TENANT,target:binding.targets[phase],region:binding.targets.region};
+}
+function scopedHistoricalFixture(nonce,role,primaryRow){
+ assert.match(nonce,/^[a-z0-9_]{12,60}$/);assert.ok(['direccion','operativo'].includes(role));assert.ok(Number.isInteger(primaryRow)&&primaryRow>=11&&primaryRow<=1569);
+ const key='b3004qa_i66_historical_'+role+'_'+nonce,ids={client:key+'_client',policy:key+'_policy',receipt:key+'_receipt',advisor:key+'_advisor',insurer:key+'_insurer'};
+ const runId=key+'_run',mark={tenantId:TENANT,__syntheticQa:true,qaRunId:runId,qaJourney:SCOPED_HISTORICAL_JOURNEY_SCHEMA},bundle='f445e2f4a20b9eb7a526bda8896472dab9e7ac4617b3c5d8124a939a0dee0e6a',primary='CobranzaCendoso (24).xlsx#row'+primaryRow;
+ const common={...mark,pais:'GT',moneda:'GTQ',asesorId:ids.advisor},amount=5880,paidDate='2026-01-05';
+ const client={id:ids.client,...common,nombre:'QA histórica sintética sin destinatario real'};
+ const policy={id:ids.policy,...common,clienteId:ids.client,aseguradoraId:ids.insurer,numero:'QA-HISTORICAL-'+nonce+'-'+role,primaTotal:amount,vigenciaInicio:'2025-11-25',vigenciaFin:'2026-11-25',estado:'Vigente',importadorP0:true,cobroAplicado:false,carteraMaterializada:false,recibosMaterializados:false};
+ const receipt={id:ids.receipt,...common,polizaId:ids.policy,clienteId:ids.client,aseguradoraId:ids.insurer,polizaNumero:policy.numero,estadoOperativo:'pago_reportado',estadoVisual:'Pago reportado',exigibilidad:'no_pendiente',enCartera:false,
+  fechaCorteFuente:'2026-09-18',fechaLimite:'2025-11-25',fechaPagoReportada:paidDate,formaPago:'Depósito',frecuencia:'Pago Único',fuenteAutoridad:'SIGA',gastosExpedicion:250,gastosFinanciamiento:0,impuestosIVA:630,
+  matchQuality:'I6_5_EXACT_POLICY_TERM',motivosCalidad:'I6_5_20260918_EXACT_POLICY_TERM_SOURCE_RECONCILIATION',primaNeta:5000,primaTotal:amount,requiereValidacion:false,serie:'1/1',sourceBundleSha256:bundle,
+  sourceRef:'Cobranza Efectuada desde 2024.xlsx',sourceRefsI65:[primary],vigenciaInicio:policy.vigenciaInicio,vigenciaFin:policy.vigenciaFin};
+ const cobroId='cob_'+hash(TENANT+'|receipt|'+ids.receipt).slice(0,28),sourceKey=hash(TENANT+'|'+bundle+'|'+primary);
+ return{ids,runId,amount,paidDate,client,policy,receipt,cobroId,sourceKey,invoiceNumber:'QA-HISTORICAL-INVOICE-'+role+'-'+nonce,applicationDate:paidDate,invoiceDate:paidDate};
+}
+function assertScopedHistoricalReadback({receipt,payment,request,event},f,actor,requestId,phase='preview'){
+ const eventId='payevt_'+hash(TENANT+'|'+f.ids.receipt+'|'+requestId).slice(0,28);
+ assert.deepEqual([request.status,request.operation,request.eventId,event.eventId,event.requestId,event.operation],['committed','reconcile_payment',eventId,eventId,requestId,'reconcile_payment']);
+ assert.equal(event.actor.uid,actor.uid);assert.equal(norm(event.actor.activeRole),actor.role);
+ assert.deepEqual([receipt.id,receipt.polizaId,receipt.clienteId,receipt.cobroId,payment.id,payment.reciboId,payment.polizaId,payment.clienteId],[f.ids.receipt,f.ids.policy,f.ids.client,f.cobroId,f.cobroId,f.ids.receipt,f.ids.policy,f.ids.client]);
+ assert.equal(receipt.__syntheticQa,true);if(phase==='preview')assert.equal(payment.__syntheticQa,true);
+ for(const row of [receipt,payment]){assert.equal(row.paidDate,f.paidDate);assert.equal(row.invoiceNumber,f.invoiceNumber);assert.equal(row.invoiceDate,f.invoiceDate);assert.equal(row.applicationState,'APPLIED_DIRECT');}
+ for(const key of ['fechaPagoReportada','fechaCorteFuente','sourceBundleSha256','sourceRef','sourceRefsI65','matchQuality','motivosCalidad','primaTotal','primaNeta','formaPago','vigenciaInicio','vigenciaFin','serie'])assert.equal(digest(receipt[key]),digest(f.receipt[key]),'I66_SCOPED_HISTORICAL_ORIGINAL_'+key);
+ assert.equal(payment.monto,f.amount);assert.equal(payment.paymentOrigin,'CRM_MIGRATED_DIRECT_PAYMENT');assert.equal(payment.paymentEvidenceType,'CRM_MIGRATED_DIRECT');
+ const proof=payment.historicalPaymentEvidence;assert.ok(proof);assert.equal(proof.newCollection,false);assert.equal(proof.sourceKey,f.sourceKey);assert.equal(proof.receiptId,f.ids.receipt);assert.equal(proof.policyId,f.ids.policy);assert.equal(proof.amount,f.amount);assert.equal(proof.fechaPagoReportada,f.paidDate);
+ assert.equal(request.result.historicalPaymentLinked,true);assert.equal(request.result.amount,f.amount);assert.equal(event.recordedPaymentBefore.amount,f.amount);assert.equal(event.recordedPaymentAfter.amount,f.amount);
+ assert.equal(event.recordedPaymentBefore.sourceCollection,'recibosEsperados');assert.equal(event.recordedPaymentBefore.sourceId,f.ids.receipt);assert.equal(digest(event.recordedPaymentBefore.historicalSource),digest(proof));
+ return eventId;
+}
+async function exerciseScopedHistoricalPayment({page,actor,context,tenant,item,nonce,onServerReadback},io={}){
+ assert.equal(typeof onServerReadback,'function','I66_SCOPED_SERVER_READBACK_CALLBACK_REQUIRED');
+ assert.ok(['direccion','operativo'].includes(actor.role));assert.ok(actor.uid);assert.equal(context.tenantId,TENANT);
+ const readMarker=io.readMarker|| (async()=>{const r=await fetch(context.origin+'/__recovery__/build.json',{cache:'no-store',redirect:'error'});assert.equal(r.status,200);const bytes=Buffer.from(await r.arrayBuffer());return{...JSON.parse(bytes),__qaMarkerSha256:hash(bytes)};});
+ const legal=io.requireExistingLegalReadiness||require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs').requireExistingLegalReadiness;
+ const marker=await readMarker();assert.deepEqual([marker.buildId,marker.sourceSha,marker.__qaMarkerSha256],[context.hostingBuildId,context.hostingSourceSha,context.hostingMarkerSha256],'I66_SCOPED_HOSTING_MARKER');
+ let f=null;const initial=11+(parseInt(hash(nonce+'|'+actor.role).slice(0,8),16)%1559);
+ // Never reuse a primary source key that already belongs to a real or QA payment.
+ for(let offset=0;offset<16;offset++){const candidate=scopedHistoricalFixture(nonce,actor.role,11+((initial-11+offset)%1559));const used=await item('cobros','_').parent.where('historicalPaymentEvidence.sourceKey','==',candidate.sourceKey).limit(1).get();if(used.empty){f=candidate;break;}}
+ assert.ok(f,'I66_SCOPED_HISTORICAL_SOURCE_NAMESPACE_BUSY');
+ const refs=[{collection:'clientes',id:f.ids.client,seed:f.client},{collection:'polizas',id:f.ids.policy,seed:f.policy},{collection:'recibosEsperados',id:f.ids.receipt,seed:f.receipt},{collection:'cobros',id:f.cobroId}].map(t=>({...t,ref:item(t.collection,t.id)}));
+ const targets=[],auditPrefix=context.phase==='preview'?'previewReconciliation':'reconciliation';let writerSettled=true,failure=null,pageClosed=false;
+ const proof={schema:SCOPED_HISTORICAL_JOURNEY_SCHEMA,status:'HOLD',role:actor.role==='direccion'?'Dirección':'Operativo',actorUidSha256:hash(actor.uid),origin:context.origin,route:'/#/cobros',receiptId:f.ids.receipt,cobroId:f.cobroId,policyId:f.ids.policy,clientId:f.ids.client,
+  originalPaymentBasis:'VERIFIED_HISTORICAL_RECEIPT',originalPaymentCount:null,afterPaymentCount:null,originalCobroDocumentCount:null,afterCobroDocumentCount:null,originalPaidDate:f.paidDate,originalAmount:f.amount,invoiceNumber:f.invoiceNumber,
+  sourceKey:f.sourceKey,normalUi:false,reloaded:false,replayUnchanged:false,idempotentReplay:false,newCollection:false,realCustomerWrites:0,cleanup:{status:'HOLD',remaining:null,targets:[]}};
+ const snapshot=async list=>Object.fromEntries(await Promise.all(list.map(async t=>{const s=await t.ref.get();return[t.ref.path,{exists:s.exists,data:s.exists?s.data():null,updateTime:s.exists?(assert.ok(s.updateTime&&Number.isSafeInteger(s.updateTime.seconds)&&Number.isSafeInteger(s.updateTime.nanoseconds),'I66_SCOPED_CAS_VERSION_REQUIRED'),s.updateTime.seconds+':'+s.updateTime.nanoseconds):null}];})));
+ async function linked(collection,fields){const ids=new Set();for(const field of fields){const s=await item(collection,'_').parent.where(field,'==',f.ids.receipt).limit(3).get();assert.ok(s.size<3,'I66_SCOPED_EXACT_FINANCIAL_SCAN');for(const d of s.docs)ids.add(d.id);}return [...ids].sort();}
+ async function projection(){return page.evaluate(async id=>{await Orbit.store._ensureCollections(['clientes','polizas','recibosEsperados','carteraPrimas','cobros']);const all=Orbit.modules.cobros.reportableRows();if(!all)return null;const rows=all.filter(r=>String(r.reciboId||r.receiptId||'')===id);return{count:rows.length,rows:rows.map(r=>({id:r.id,monto:r.monto,fechaPago:r.fechaPago,receiptId:r.reciboId||r.receiptId})),cobros:Orbit.store.all('cobros').filter(r=>(r.reciboId||r.receiptId)===id).map(r=>r.id)};},f.ids.receipt);}
+ async function identity(){const v=await page.evaluate(async()=>{const p=Orbit.productRuntimeBrowserProvidersP0;await p.initialize();const u=await p.waitForUser();const a=await Orbit.productAppP0.activate();return{uid:u?.uid,role:Orbit.session.rol(),started:a?.started===true,endpoint:Orbit.reconciliationDomain.status()};});assert.equal(v.uid,actor.uid);assert.equal(norm(v.role),actor.role);assert.equal(v.started,true);assert.equal(v.endpoint.functionName,context.target);assert.equal(v.endpoint.region,context.region);}
+ let observedData=null,observerFailure=null;
+ const matches=request=>{let data;try{data=request.postDataJSON()?.data;}catch{return false;}return request.method()==='POST'&&request.url()==='https://'+context.region+'-'+PROJECT+'.cloudfunctions.net/'+context.target&&data?.tenantId===TENANT&&norm(data.activeRole)===actor.role&&data.operation==='reconcile_payment'&&data.payload?.receiptId===f.ids.receipt;};
+ const capture=request=>{if(!matches(request))return;try{const data=request.postDataJSON().data;assert.equal(observedData,null,'I66_SCOPED_SINGLE_UI_COMMAND');observedData=data;assert.match(data.requestId,/^recui_[a-f0-9]{1,8}$/);const eventId='payevt_'+hash(TENANT+'|'+f.ids.receipt+'|'+data.requestId).slice(0,28);proof.requestId=data.requestId;proof.eventId=eventId;
+  targets.push({kind:'request',id:data.requestId,ref:tenant.collection(auditPrefix+'Requests').doc(data.requestId)},{kind:'event',id:eventId,ref:tenant.collection(auditPrefix+'Events').doc(eventId)});}catch(error){observerFailure=observerFailure||error;}};
+ try{
+  for(const t of refs)assert.equal((await t.ref.get()).exists,false,'I66_SCOPED_HISTORICAL_FIXTURE_COLLISION');assert.deepEqual(await linked('cobros',['reciboId','receiptId']),[]);assert.deepEqual(await linked('carteraPrimas',['reciboId','receiptId']),[]);
+  if(io.beforeFixtureWrite)await io.beforeFixtureWrite({receiptId:f.ids.receipt,targets:refs.map(t=>({collection:'data/'+t.collection+'/items',id:t.id}))});
+  for(const t of refs){targets.push(t);if(t.seed)await t.ref.create(t.seed);}
+  const before=await snapshot(refs);proof.beforeDigest=digest(before);proof.originalCobroDocumentCount=0;
+  await page.goto(context.origin+proof.route,{waitUntil:'commit',timeout:30000});await page.waitForFunction(()=>!!window.Orbit?.modules?.cobros?.conciliarFactura,null,{timeout:30000});await identity();await legal(page);
+  await page.waitForFunction(id=>{const rows=Orbit.modules.cobros.reportableRows();return Array.isArray(rows)&&rows.filter(r=>String(r.reciboId||r.receiptId||'')===id).length===1;},f.ids.receipt,{timeout:30000});
+  const originalProjection=await projection();assert.equal(originalProjection.count,1);assert.deepEqual(originalProjection.cobros,[]);assert.equal(originalProjection.rows[0].monto,f.amount);assert.equal(originalProjection.rows[0].fechaPago,f.paidDate);proof.originalPaymentCount=1;proof.originalProjection=originalProjection;
+  await page.evaluate(id=>Orbit.modules.cobros.conciliarFactura(id),f.ids.receipt);const modal=page.locator('#cob-conc');await modal.waitFor({state:'visible',timeout:10000});
+  assert.equal(await modal.locator('#cc-paid').inputValue(),f.paidDate);await modal.locator('#cc-aplicacion').fill(f.applicationDate);await modal.locator('#cc-invoice-date').fill(f.invoiceDate);await modal.locator('#cc-numero').fill(f.invoiceNumber);
+  page.on('request',capture);const waiting=page.waitForResponse(r=>matches(r.request()),{timeout:30000});waiting.catch(()=>{});writerSettled=false;
+  await modal.locator('#cc-ok').click();const response=await waiting,body=await response.json();writerSettled=true;page.off('request',capture);if(observerFailure){writerSettled=false;throw observerFailure;}
+  assert.equal(response.status(),200,'I66_SCOPED_HISTORICAL_UI_CALL_FAILED');assert.equal(body.result?.ok,true);assert.equal(body.result.historicalPaymentLinked,true);assert.equal(body.result.amount,f.amount);assert.ok(observedData);await modal.waitFor({state:'detached',timeout:10000});proof.normalUi=true;
+  const afterRows=await snapshot(targets),receipt=(await item('recibosEsperados',f.ids.receipt).get()).data(),payment=(await item('cobros',f.cobroId).get()).data(),request=(await tenant.collection(auditPrefix+'Requests').doc(proof.requestId).get()).data(),event=(await tenant.collection(auditPrefix+'Events').doc(proof.eventId).get()).data();
+  assertScopedHistoricalReadback({receipt,payment,request,event},f,actor,proof.requestId,context.phase);assert.equal(digest((await item('clientes',f.ids.client).get()).data()),digest(f.client));assert.equal(digest((await item('polizas',f.ids.policy).get()).data()),digest(f.policy));assert.deepEqual(await linked('cobros',['reciboId','receiptId']),[f.cobroId]);assert.deepEqual(await linked('carteraPrimas',['reciboId','receiptId']),[]);
+  proof.afterCobroDocumentCount=1;proof.afterDigest=digest(afterRows);
+  await page.reload({waitUntil:'commit',timeout:30000});await page.waitForFunction(()=>!!window.Orbit?.modules?.cobros?.reportableRows,null,{timeout:30000});await identity();await legal(page);
+  await page.waitForFunction(id=>{const rows=Orbit.modules.cobros.reportableRows();return Array.isArray(rows)&&rows.filter(r=>String(r.reciboId||r.receiptId||'')===id).length===1;},f.ids.receipt,{timeout:30000});const afterProjection=await projection();assert.equal(afterProjection.count,1);assert.deepEqual(afterProjection.cobros,[f.cobroId]);assert.equal(afterProjection.rows[0].monto,f.amount);assert.equal(afterProjection.rows[0].fechaPago,f.paidDate);proof.afterPaymentCount=1;proof.afterProjection=afterProjection;proof.reloaded=true;
+  assert.equal(digest(await snapshot(targets)),digest(afterRows),'I66_SCOPED_RELOAD_MUTATED_DATA');writerSettled=false;
+  const replay=await page.evaluate(async x=>Orbit.productRuntimeBrowserProvidersP0.callFunction(x.target,x.data,x.region),{target:context.target,region:context.region,data:observedData});writerSettled=true;assert.equal(replay.reused,true);assert.equal(digest(await snapshot(targets)),digest(afterRows),'I66_SCOPED_REPLAY_MUTATED_DATA_OR_VERSION');proof.replayUnchanged=true;proof.idempotentReplay=true;
+  const currentMarker=await readMarker();assert.deepEqual([currentMarker.buildId,currentMarker.sourceSha,currentMarker.__qaMarkerSha256],[context.hostingBuildId,context.hostingSourceSha,context.hostingMarkerSha256]);
+  const witness=await onServerReadback({journey:{...proof},before,after:afterRows});assert.equal(witness?.status,'PASS','I66_SCOPED_EXTERNAL_SERVER_READBACK_REQUIRED');proof.serverReadback=witness;
+ }catch(error){failure=error;}
+ finally{
+  try{page.off('request',capture);await page.close();pageClosed=true;}catch(error){failure=failure||error;}
+  const errors=[];let removed=0;
+  if(!writerSettled||!pageClosed)errors.push('WRITER_NOT_PROVEN_SETTLED');
+  for(const t of writerSettled&&pageClosed?targets.slice().reverse():[]){try{const s=await t.ref.get();if(!s.exists)continue;const row=s.data();assert.ok(s.updateTime,'I66_SCOPED_CLEANUP_CAS_REQUIRED');
+    if(t.kind==='request'){assert.equal(row.status,'committed');assert.equal(row.operation,'reconcile_payment');assert.equal(row.eventId,proof.eventId);assert.equal(row.result?.receiptId,f.ids.receipt);assert.equal(row.result?.cobroId,f.cobroId);}
+    else if(t.kind==='event'){assert.equal(row.actor?.uid,actor.uid);assert.equal(norm(row.actor?.activeRole),actor.role);assert.equal(row.receiptId,f.ids.receipt);assert.equal(row.cobroId,f.cobroId);assert.equal(row.requestId,proof.requestId);}
+    else if(t.collection==='cobros'){assert.equal(row.id,f.cobroId);if(context.phase==='preview')assert.equal(row.__syntheticQa,true);assert.equal(row.reciboId,f.ids.receipt);assert.equal(row.polizaId,f.ids.policy);assert.equal(row.clienteId,f.ids.client);assert.equal(row.monto,f.amount);assert.equal(row.paidDate,f.paidDate);assert.equal(row.historicalPaymentEvidence?.sourceKey,f.sourceKey);assert.equal(row.historicalPaymentEvidence?.newCollection,false);}
+    else {assert.equal(row.id,t.id);assert.equal(row.__syntheticQa,true);assert.equal(row.qaRunId,f.runId);assert.equal(row.qaJourney,SCOPED_HISTORICAL_JOURNEY_SCHEMA);if(t.collection!=='recibosEsperados')assert.equal(digest(row),digest(t.seed));}
+    await t.ref.delete({lastUpdateTime:s.updateTime});assert.equal((await t.ref.get()).exists,false);removed++;
+   }catch(error){errors.push('OWNERSHIP_OR_CAS_HOLD');failure=failure||error;}}
+  const remaining=(await Promise.all(targets.map(t=>t.ref.get()))).filter(s=>s.exists).length;proof.cleanup={status:errors.length||remaining?'HOLD':'PASS',remaining,removed,targets:targets.map(t=>({collection:t.ref.path.split('/').slice(2,-1).join('/'),id:t.ref.id}))};
+  if(errors.length||remaining)failure=failure||Error('I66_SCOPED_HISTORICAL_CLEANUP_HOLD');
+ }
+ if(failure){failure.scopedHistoricalJourney=proof;throw failure;}proof.status='PASS';return proof;
+}
+async function runScopedHistoricalPaymentJourneys(input,io={}){
+ const read=io.readFileSync||fs.readFileSync,control=JSON.parse(read('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json','utf8'));
+ const context=validateScopedHistoricalContext(input,control,read(SCOPED_HISTORICAL_UNIT_PATH));assert.equal(typeof input.onServerReadback,'function');
+ const admin=io.admin||require('firebase-admin'),chromium=io.chromium||require('playwright').chromium;
+ await (io.initializeSignedQaAdmin||require('./gravicentra-i66-signed-qa-runtime-auth.cjs').initializeSignedQaAdmin)(admin,{getLegacyCredential:()=>{throw Error('I66_SCOPED_JOURNEY_EXISTING_CLOUD_RUNTIME_REQUIRED');}});
+ const db=admin.firestore(),auth=admin.auth(),tenant=db.collection('tenants').doc(TENANT),item=(c,id)=>tenant.collection('data').doc(c).collection('items').doc(id);
+ const [members,advisors]=await Promise.all([tenant.collection('members').limit(150).get(),item('asesores','_').parent.limit(400).get()]);assert.ok(members.size<150&&advisors.size<400);
+ const roleOwner=require('../functions/product-active-role-contract');
+ const pick=(predicate,role)=>{const linked=new Set(),uids=new Set();for(const d of advisors.docs){const a=d.data();if([a.nombre,a.nombreCompleto,a.displayName,a.name].some(v=>predicate(norm(v)))){linked.add(d.id);[a.authUid,a.uid,a.userId].filter(Boolean).forEach(v=>uids.add(v));}}
+  const found=members.docs.filter(d=>{const m=d.data();let assigned=false;try{assigned=roleOwner.resolveProductActiveRole(m,role).activeRole===role;}catch{}return assigned&&([m.nombre,m.nombreCompleto,m.displayName,m.name,m.fullName].some(v=>predicate(norm(v)))||linked.has(m.advisorId||m.asesorId)||uids.has(d.id))&&m.active!==false&&m.activo!==false&&['active','activo'].includes(norm(m.status||m.estado))&&[].concat(m.countries||m.paises||[]).includes('GT');});assert.equal(found.length,1,'I66_SCOPED_JOURNEY_ACTOR_NOT_UNIQUE_'+role);return{uid:found[0].id,role,memberDigest:digest(found[0].data())};};
+ const actors=[pick(v=>v.includes('paula')&&v.includes('osorio'),'direccion'),pick(v=>v.startsWith('carloscastro'),'operativo')];assert.notEqual(actors[0].uid,actors[1].uid);
+ const report={schema:SCOPED_HISTORICAL_JOURNEY_SCHEMA,status:'HOLD',phase:context.phase,sourceSha:context.sourceSha,buildId:context.buildId,packageBuildId:context.buildId,packageSha256:context.packageSha256,bindingBlob:context.bindingBlob,revision:context.revision,hostingBuildId:context.hostingBuildId,protectedLiveHosting:context.protectedLiveHosting,uiHosting:context.uiHosting,journeys:[],realCustomerWrites:0,authOrMembershipMutations:0,cleanup:{status:'HOLD',remaining:null,targets:[]}};
+ const browser=await chromium.launch({headless:true,args:['--no-sandbox']});let failure=null;
+ try{for(const actor of actors){const user=await auth.getUser(actor.uid);assert.ok(!user.disabled&&user.emailVerified);const token=await auth.createCustomToken(actor.uid),session=await browser.newContext({viewport:{width:1280,height:900}});let page;
+  try{page=await session.newPage();await page.goto(context.origin+'/#/cobros',{waitUntil:'commit',timeout:30000});await page.waitForFunction(()=>!!window.Orbit?.productRuntimeBrowserProvidersP0&&!!window.Orbit?.productAppP0,null,{timeout:30000});
+   const signed=await page.evaluate(async token=>{const p=Orbit.productRuntimeBrowserProvidersP0,c=await p.initialize();await c.modules.auth.setPersistence(c.auth,c.modules.auth.browserSessionPersistence);await c.modules.auth.signInWithCustomToken(c.auth,token);const active=await Orbit.productAppP0.activate();return{uid:(await p.waitForUser())?.uid,started:active?.started===true,role:Orbit.session.rol(),assigned:Orbit.session.allowedRoles()};},token);
+   assert.equal(signed.uid,actor.uid);assert.equal(signed.started,true);assert.ok(signed.assigned.map(norm).includes(actor.role));
+   if(norm(signed.role)!==actor.role){await page.locator('#rol-sel').selectOption(actor.role==='direccion'?'Dirección':'Operativo');await page.waitForFunction(role=>String(Orbit.session.rol()).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()===role,actor.role,{timeout:10000});}
+   const country=page.locator('#pais-sel');if(await country.inputValue()!=='GT')await country.selectOption('GT');
+   const nonce=Date.now().toString(36)+'_'+crypto.randomBytes(5).toString('hex');
+   report.journeys.push(await (io.exercise||exerciseScopedHistoricalPayment)({page,actor,context,tenant,item,nonce,onServerReadback:input.onServerReadback},io));
+   assert.equal(digest((await tenant.collection('members').doc(actor.uid).get()).data()),actor.memberDigest,'I66_SCOPED_MEMBERSHIP_CHANGED');
+  }finally{await session.close();}}
+ }catch(error){failure=error;if(error.scopedHistoricalJourney)report.journeys.push(error.scopedHistoricalJourney);}
+ finally{try{await browser.close();}catch(error){failure=failure||error;}}
+ const cleanupTargets=report.journeys.flatMap(j=>j.cleanup.targets);report.cleanup={status:report.journeys.length===2&&report.journeys.every(j=>j.cleanup.status==='PASS')?'PASS':'HOLD',remaining:report.journeys.reduce((n,j)=>n+(j.cleanup.remaining||0),0),targets:cleanupTargets};
+ if(failure){failure.scopedHistoricalReport=report;throw failure;}assert.equal(report.journeys.length,2);assert.equal(report.cleanup.status,'PASS');report.status='PASS';return report;
+}
+
 async function main(){
  const cfg=validateEnvironment(process.env);
  const release=require('./gravicentra-i6-6-operational-release-candidate.cjs');
@@ -620,6 +767,6 @@ async function main(){
  console.log(JSON.stringify({sourceSha:report.sourceSha,phase:report.phase,status:report.status,checks:report.checks.length,cleanup:report.cleanup,realControlUnchanged:report.realControlUnchanged}));
  if(report.status!=='PASS')throw failure||Error('I66_PROPOSAL_SIGNED_UAT_HOLD');
 }
-module.exports={validateEnvironment,owned,makeStage,sourceIntakeFixture,intakeUiRequest,DOCUMENTARY_PAYMENT_QA_PROFILE,DOCUMENTARY_PAYMENT_QA_RECEIPT,DOCUMENTARY_PAYMENT_QA_SUCCESSOR_RECEIPT,DOCUMENTARY_PAYMENT_SOURCES,
+module.exports={SCOPED_HISTORICAL_JOURNEY_SCHEMA,validateScopedHistoricalContext,scopedHistoricalFixture,assertScopedHistoricalReadback,exerciseScopedHistoricalPayment,runScopedHistoricalPaymentJourneys,validateEnvironment,owned,makeStage,sourceIntakeFixture,intakeUiRequest,DOCUMENTARY_PAYMENT_QA_PROFILE,DOCUMENTARY_PAYMENT_QA_RECEIPT,DOCUMENTARY_PAYMENT_QA_SUCCESSOR_RECEIPT,DOCUMENTARY_PAYMENT_SOURCES,
  validateDocumentaryPaymentQaBinding,documentaryPaymentFixture,documentaryPaymentRequest,assertDocumentaryPaymentOwned,assertDocumentaryPaymentReadback,validateDocumentaryPaymentUiEvidence,exerciseDocumentaryPayments};
 if(require.main===module)main().catch(error=>{const safe=failureDetails(error,'BOOT');console.error('I66_PROPOSAL_SIGNED_UAT_HOLD '+safe.failureCode+' '+safe.failureCheck);process.exitCode=1;});

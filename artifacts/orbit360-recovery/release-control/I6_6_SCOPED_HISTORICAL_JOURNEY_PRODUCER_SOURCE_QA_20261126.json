@@ -1,0 +1,105 @@
+{
+  "schema": "GI_I66_SCOPED_HISTORICAL_JOURNEY_PRODUCER_SOURCE_QA_V1",
+  "status": "LOCAL_CAUSAL_SOURCE_PASS_SIGNED_PROVIDER_EXECUTION_PENDING",
+  "createdAt": "2026-11-26T02:07:54.084136+00:00",
+  "baseSourceSha": "f769fdf387d553eb91ce3ef5ec97d97cecd16eb3",
+  "executionProvider": "CLOUD_BUILD",
+  "unit": "documented-historical-payment",
+  "package": {
+    "buildId": "c640fadc-6886-407b-8e61-6973f11c7b33",
+    "sourceSha": "df9f2eb6c1d8ecdec6eb4af0019b38e0de4bc1b3",
+    "sha256": "5609a99eb0280ad427aac58ec85319e16388a747911c2e76775913f94556f73e",
+    "generation": "1795653870990085"
+  },
+  "protectedLiveHosting": {
+    "sourceSha": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "buildId": "gi-i66-65c825b2808a-57f234755dc1",
+    "hostingVersion": "sites/ays-orbit-360-lab/versions/332999a55b189108"
+  },
+  "previewUiOrigin": "https://ays-orbit-360-lab--gi-i66-rc-45287432665-qxusovq3.web.app",
+  "expectedPreviewRevision": "orbit360cobrosreconciliationcommandpreview-00094-jag",
+  "sourceChanges": [
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-operational.cjs",
+      "beforeGitBlobSha": "67e10dbd219cd3e1d7b410367ae564059168f078",
+      "beforeSha256": "ab77eb9928cbd60dcef4683eca6afc8e5e36a73f91276f913bf0b572f904fc87",
+      "gitBlobSha": "54b77f5a29670eb91e513dd5285d611e0e03b4ef",
+      "sha256": "cd71fcb268e5056e5afd11fc94bf1ed0c589ea0bc1e4ee82a3672d7ab944cbd6",
+      "sizeBytes": 146862
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+      "beforeGitBlobSha": "9f6eab1278c6b4fb935e423dd52db2330441b772",
+      "beforeSha256": "3e0b02806068af2147562e576dbe8abbfcc80f669dcc747afe677c8f0b9f8867",
+      "gitBlobSha": "9623d0c001a6ed8cebec46a7f41d8c924885b8be",
+      "sha256": "bcbd2cb08431c4aa9ec4d85ad7e37ebc96996ccb71269a2a7dbcb4f8422f1673",
+      "sizeBytes": 91876
+    },
+    {
+      "path": "tools/gravicentra-i66-scoped-historical-journeys.test.cjs",
+      "beforeGitBlobSha": null,
+      "beforeSha256": null,
+      "gitBlobSha": "ac5108bc898da3e5a82fda0a745ec8438e363fef",
+      "sha256": "3950253d3f2a5162b2cb3f5f1da835ef4d1c3808a2d3b1e17828139cfc0ac490",
+      "sizeBytes": 15324
+    },
+    {
+      "path": "tools/gravicentra-i66-scoped-historical-signed-driver.test.cjs",
+      "beforeGitBlobSha": null,
+      "beforeSha256": null,
+      "gitBlobSha": "5a301d0e290dd4295fb827603cd3ad79d9fe5eb2",
+      "sha256": "69f3343d1b57c73753a55ad12880c8d04062cb0a8133f4f290d6d8e0bbaa2c91",
+      "sizeBytes": 14697
+    }
+  ],
+  "tests": {
+    "command": "node --test tools/gravicentra-i66-scoped-historical-journeys.test.cjs tools/gravicentra-i66-scoped-historical-signed-driver.test.cjs tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs tools/gravicentra-i66-signed-qa-runtime-auth.test.cjs tools/gravicentra-i6-6-cloud-build-operational.test.cjs",
+    "passed": 132,
+    "failed": 0,
+    "producerDiscriminants": 18,
+    "driverCausal": 10,
+    "legacyDriver": 16,
+    "logPath": "artifacts/orbit360-recovery/release-control/I6_6_SCOPED_HISTORICAL_JOURNEY_PRODUCER_SOURCE_QA_20261126.tap",
+    "logSha256": "a79a03bd6b34e3fc125458279ab390eeaae00a10f53899946691a12f90144be0",
+    "localNode": "v24.22.3",
+    "providerRuntime": "node22; same checks rerun before any fixture write"
+  },
+  "rootCause": [
+    "No executable producer of the scoped role journey receipt existed; the consumer waited indefinitely.",
+    "Legacy proposal main selected request35 and rejected package source df9 before authentication.",
+    "One logical historical payment materializes from zero to one cobro documents; physical and logical counts must be separate.",
+    "Producer must retain canonical Firestore evidence before cleanup and accept only after cleanup plus actual Cloud Build SUCCESS.",
+    "Pre-write infrastructure failures cannot consume a permanent QA claim; exact terminal cleanup permits a CAS successor attempt with preserved immutable claims."
+  ],
+  "validated": [
+    "E3 actual UI modal/client/projection with actual scoped callable and both assigned roles",
+    "canonical callback before cleanup; exact amount/date/history/invoice relations",
+    "source/revision/role/browser-only/wrong physical count/replay/cleanup rejection",
+    "provider config/identity/steps/source validation",
+    "nested Timestamp normalization and audit timestamp handling",
+    "GCS retention window; generation/hash/bytes readback",
+    "LIVE lost ACK adoption before epoch validation",
+    "terminal cleanup-safe retry; active/unknown/dirty/crossed package rejection",
+    "cursor CAS applied but readback ACK lost preserves claim and admits zero-write recovery"
+  ],
+  "unchanged": [
+    "functions archive and source tree",
+    "package build/digest/generation",
+    "auth/IAM/memberships",
+    "request35 transport and V1",
+    "Hosting E3 and existing Preview452",
+    "Work and canonical refs"
+  ],
+  "commands": [
+    "node tools/gravicentra-i6-6-cloud-build-operational.cjs run-functional-journeys preview c640fadc-6886-407b-8e61-6973f11c7b33 /tmp/gi-scoped-historical-preview",
+    "node tools/gravicentra-i6-6-cloud-build-operational.cjs functional-phase live c640fadc-6886-407b-8e61-6973f11c7b33",
+    "node tools/gravicentra-i6-6-cloud-build-operational.cjs run-functional-journeys live c640fadc-6886-407b-8e61-6973f11c7b33 /tmp/gi-scoped-historical-live"
+  ],
+  "automaticAcceptance": "run-functional-journeys submits the signed Cloud Build, reads the actual provider outcome, verifies retained canonical witnesses and cleanup, then invokes the existing functional stage CAS. The operational sequence has three commands: run preview, functional-phase live, run live.",
+  "refreshRequirement": "After each authority CAS, Work refreshes its clean checkout to the canonical recovery HEAD before the next command. A stale head fails closed; no canonical reference is moved by this local delivery.",
+  "realProviderJourneysExecuted": 0,
+  "deploymentsPerformed": 0,
+  "businessWritesPerformed": 0,
+  "productionAccepted": false,
+  "review": "authority_release_audit read-only review completed; no independent deployment or provider PASS claimed"
+}
