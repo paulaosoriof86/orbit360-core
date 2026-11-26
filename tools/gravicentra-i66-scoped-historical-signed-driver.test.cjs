@@ -20,7 +20,7 @@ function input(phase='preview'){
 function harness(phase,role,options={}){
  const label=role==='direccion'?'Dirección':'Operativo',b=backend(label),{context}=input(phase),actor={uid:'operator',role};
  for(const key of [...b.documents.keys()])if(key.includes('/data/'))b.documents.delete(key);
- const versions=new Map(),deletes=[],calls=[],events=new Map();let n=0,closed=false,pending=null,ui,readbackCount=0;
+ const versions=new Map(),deletes=[],calls=[],events=new Map();let n=0,closed=false,pending=null,ui,readbackCount=0,claimCount=0;
  const ver=p=>versions.set(p,{seconds:100000,nanoseconds:++n});for(const p of b.documents.keys())ver(p);
  const proto=Object.getPrototypeOf(b.db.collection('tenants')),originalGet=proto.get;
  Object.defineProperty(proto,'parent',{get(){return new this.constructor(this.parts.slice(0,-1));}});proto.limit=function(){return this;};
@@ -58,12 +58,16 @@ function harness(phase,role,options={}){
  const page={evaluate,locator,goto:async()=>{},reload:async()=>load(),waitForFunction:async(fn,arg)=>{assert.ok(await evaluate(fn,arg),'UI wait condition');},
   on:(e,fn)=>events.set(e,[...(events.get(e)||[]),fn]),off:(e,fn)=>events.set(e,(events.get(e)||[]).filter(v=>v!==fn)),
   waitForResponse:match=>new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending=null;reject(Error('NO_UI_RESPONSE'));},1500);pending={match,resolve,reject,timer};}),close:async()=>{closed=true;}};
- const io={beforeFixtureWrite:async({receiptId,targets})=>{assert.equal([...b.documents].filter(([p])=>p.includes('/data/')).length,0);assert.match(receiptId,/^b3004qa_/);assert.equal(targets.length,4);assert.ok(targets.every(t=>t.collection.startsWith('data/')&&t.collection.endsWith('/items')));if(options.claimHold)throw Error('CLAIM_NOT_ACQUIRED');},readMarker:async()=>({buildId:context.hostingBuildId,sourceSha:context.hostingSourceSha,__qaMarkerSha256:context.hostingMarkerSha256}),requireExistingLegalReadiness:async()=>{}};
+ const io={beforeFixtureWrite:async({receiptId,targets})=>{claimCount++;assert.equal([...b.documents].filter(([p])=>p.includes('/data/')).length,0);assert.match(receiptId,/^b3004qa_/);assert.equal(targets.length,4);assert.ok(targets.every(t=>t.collection.startsWith('data/')&&t.collection.endsWith('/items')));if(options.claimHold)throw Error('CLAIM_NOT_ACQUIRED');},readMarker:async()=>({buildId:context.hostingBuildId,sourceSha:context.hostingSourceSha,__qaMarkerSha256:context.hostingMarkerSha256}),requireExistingLegalReadiness:async()=>{if(options.legalHold){
+  const legalRuntime={Orbit:{auth:{user:()=>({uid:actor.uid,email:'qa@example.invalid'})},productAppP0:{isStarted:()=>true},legal:{__gateState:{pendingScopes:{'user:qa@example.invalid':true},doneScopes:{}},aceptaciones:()=>({}),yaAcepto:()=>false}},document:{documentElement:{getAttribute:()=>null},querySelectorAll:()=>[{}]},location:{origin:context.origin}};legalRuntime.window=legalRuntime;vm.createContext(legalRuntime);
+  const run=fn=>vm.runInContext('('+fn.toString()+')()',legalRuntime);
+  await require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs').requireExistingLegalReadiness({waitForFunction:async fn=>assert.equal(run(fn),true),evaluate:async fn=>run(fn)});
+ }}};
  const run=()=>D.exerciseScopedHistoricalPayment({page,actor,context,tenant,item,nonce:'historical_fixture_0123456789',onServerReadback:async({journey,before,after})=>{
   readbackCount++;assert.equal(closed,false);assert.equal(deletes.length,0);assert.equal(journey.originalCobroDocumentCount,0);assert.equal(journey.afterCobroDocumentCount,1);
   const r=await tenant.collection(phase==='preview'?'previewReconciliationRequests':'reconciliationRequests').doc(journey.requestId).get();assert.equal(r.exists,true);assert.equal(r.data().result.historicalPaymentLinked,true);assert.equal(Object.values(before).filter(x=>x.exists).length,3);assert.equal(Object.values(after).filter(x=>x.exists).length,6);
   return{status:options.witnessHold?'HOLD':'PASS',requestId:journey.requestId,matchingPaymentIds:[journey.cobroId]};}},io);
- return{run,b,calls,deletes,get readbackCount(){return readbackCount;}};
+ return{run,b,calls,deletes,get readbackCount(){return readbackCount;},get claimCount(){return claimCount;}};
 }
 for(const phase of ['preview','live'])for(const role of ['direccion','operativo'])test('scoped historical '+phase+' '+role+' actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup',async()=>{
  const h=harness(phase,role),p=await h.run();assert.equal(p.status,'PASS');assert.equal(p.normalUi,true);assert.equal(p.idempotentReplay,true);assert.equal(p.originalPaymentCount,1);assert.equal(p.originalCobroDocumentCount,0);assert.equal(p.afterCobroDocumentCount,1);assert.equal(h.calls.length,2);assert.ok(h.calls.every(c=>c.operation==='reconcile_payment'));assert.equal(h.readbackCount,1);assert.equal(h.deletes.length,6);assert.equal(p.cleanup.remaining,0);assert.ok(p.cleanup.targets.every(t=>t.collection&&t.id));
@@ -76,3 +80,7 @@ test('replay that changes a same-value record version is detected',async()=>{con
 test('an unexpected duplicate request is caught inside the journey and retains namespace while unsettled',async()=>{const h=harness('preview','direccion',{duplicateRequest:true});let error;try{await h.run();}catch(e){error=e;}assert.ok(error);assert.match(error.message,/SINGLE_UI_COMMAND/);assert.equal(error.scopedHistoricalJourney.cleanup.status,'HOLD');assert.equal(h.deletes.length,0);assert.equal(h.readbackCount,0);});
 
 test('the current E3 Preview origin requires its protected identity and cannot substitute the retained35 channel',()=>{const {value,control,bytes}=input();assert.equal(D.validateScopedHistoricalContext(value,control,bytes).hostingSourceSha,value.hosting.sourceSha);value.uiHosting.sourceSha='d'.repeat(40);assert.throws(()=>D.validateScopedHistoricalContext(value,control,bytes),/UI_PROTECTED_IDENTITY/);const alt=input();alt.value.origin='https://ays-orbit-360-lab--gi-i66-rc-45518809761-eiytd3a3.web.app';alt.value.uiHosting.origin=alt.value.origin;assert.throws(()=>D.validateScopedHistoricalContext(alt.value,alt.control,alt.bytes),/EXISTING_UI_ORIGIN_REQUIRED/);});
+
+test('missing actual legal readiness rejects before claim or fixtures without accepting or changing consent',async()=>{
+ const h=harness('preview','operativo',{legalHold:true});let error;try{await h.run();}catch(e){error=e;}assert.match(error?.message||'',/I66_DIRECT_FORMS_EXISTING_ACTOR_LEGAL_ACCEPTANCE_REQUIRED/);assert.equal(h.claimCount,0);assert.equal(h.b.writes.length,0);assert.equal(h.calls.length,0);assert.equal(h.deletes.length,0);assert.equal([...h.b.documents].filter(([p])=>p.includes('/data/')).length,0);assert.equal(error.scopedHistoricalJourney.cleanup.status,'PASS');assert.equal(error.scopedHistoricalJourney.cleanup.remaining,0);assert.deepEqual(error.scopedHistoricalJourney.cleanup.targets,[]);
+});

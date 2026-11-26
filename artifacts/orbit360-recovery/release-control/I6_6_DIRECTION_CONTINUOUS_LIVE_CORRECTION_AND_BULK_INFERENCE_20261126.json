@@ -1,0 +1,60 @@
+{
+  "schema": "GI_I66_DIRECTION_CONTINUOUS_LIVE_CORRECTION_DECISION_V1",
+  "status": "OWNER_INSTRUCTION_RECORDED_IMPLEMENTATION_AND_LIVE_EVIDENCE_REQUIRED",
+  "project": "Gravicentra Insurance",
+  "repository": "paulaosoriof86/orbit360-core",
+  "branch": "recovery/fase-a-clean-20260831",
+  "activeGate": "I6.6",
+  "recordedDateGuatemala": "2026-11-25",
+  "authority": "LATEST_EXPLICIT_USER_INSTRUCTION_IN_THIS_SESSION",
+  "decision": {
+    "cadence": "Corregir el hallazgo transversal completo, ejecutar las pruebas pertinentes, publicar de inmediato en LIVE, comprobar persistencia y readback, continuar con el siguiente.",
+    "noAccumulation": true,
+    "noWaitForUnrelatedWork": true,
+    "existingPublicationAuthorizationContinues": true,
+    "doNotRequestSameBusinessAuthorizationAgain": true,
+    "noPreviewAsDeliverableOrManualWaitingGate": true,
+    "ownerLiteralInstruction": "Necesitamos no pasar a preview sino de una vez a publicación. Garantiza grabar esta regla, congélala. Y asimismo lo que modifiques del mecanismo.",
+    "implementation": "Conservar la validación del correctivo y su evidencia; eliminar las esperas y publicaciones Preview como destino. La validación pendiente del paquete ya desplegado no autoriza presentarlo como LIVE. Adaptar el owner vigente en la frontera coordinada; no crear otro mecanismo paralelo.",
+    "immutableArtifactRequired": true,
+    "rollbackAndLiveReadbackRequired": true,
+    "noInventedAcceptanceOrConsent": true,
+    "oneCoordinatedReleaseWriter": true
+  },
+  "manualAndBulkInference": {
+    "surface": "Recibos y pagos",
+    "action": "Aplicar por inferencia",
+    "selection": "Varias cuotas; sugerir anteriores pendientes a una cuota acreditada, sólo misma póliza y vigencia; usuario revisa y quita excepciones antes de confirmar una vez.",
+    "orphanPayments": "Apartar sólo los recibos que podrían duplicar un abono existente sin cuota asociada; permitir continuar con los demás.",
+    "resultingState": "Inferido",
+    "reconciled": false,
+    "preservePerReceipt": [
+      "fuente",
+      "período contractual",
+      "cuota ancla",
+      "regla",
+      "actor",
+      "historial"
+    ],
+    "unknownActualPaymentDate": "No inventar fecha real ni asignar recaudo a un mes desconocido.",
+    "monthlyCollectionImpact": "0 mientras no exista evidencia de fecha real de recaudo",
+    "laterDirectEvidence": "Conciliar y enriquecer el mismo registro; no crear otro pago.",
+    "requiredChecks": [
+      "persistencia tras recarga",
+      "recaudo mensual inalterado",
+      "idempotencia por cuota y lote",
+      "sin doble pago",
+      "excepciones respetadas",
+      "alcance póliza y vigencia",
+      "sin conciliación anticipada"
+    ]
+  },
+  "continuity": {
+    "writerAcknowledged": "21c8b45dc018",
+    "admittedProducerCommit": "f2e5168ea12d83dbac8a6e68a5b63110ce10277a",
+    "preparedSignerCommit": "2b7a9bc85f8363c73ca990c3faeca630a3b836bd",
+    "preparedProductCommit": "ef8c6ee13a652430648d37369df16610b0d1baea",
+    "newLiveAcceptanceClaimed": false,
+    "priorPreparedWorkPreserved": true
+  }
+}

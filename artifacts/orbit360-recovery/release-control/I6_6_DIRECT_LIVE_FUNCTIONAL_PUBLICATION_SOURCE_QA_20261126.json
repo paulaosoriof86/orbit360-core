@@ -1,0 +1,88 @@
+{
+  "schema": "GI_I66_DIRECT_LIVE_FUNCTIONAL_PUBLICATION_SOURCE_QA_V1",
+  "status": "SOURCE_QA_PASS_NO_PROVIDER_EXECUTION_OR_LIVE_ACCEPTANCE",
+  "baseHead": "497974704cf4f5125aa8ae2f413479a268fe56fe",
+  "baseTree": "08b36ce765e6b095eeb0c792bc6faff66c4e8c28",
+  "verifiedBaseReconstruction": true,
+  "decision": {
+    "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_CONTINUOUS_LIVE_CORRECTION_AND_BULK_INFERENCE_20261126.json",
+    "blob": "e9e4f82a8e1df98046345719096ae986e4936574",
+    "preservedCommit": "06de3a5c0e22c2188d1a8614c68573916a8c1995"
+  },
+  "existingPackage": {
+    "buildId": "c640fadc-6886-407b-8e61-6973f11c7b33",
+    "sourceSha": "df9f2eb6c1d8ecdec6eb4af0019b38e0de4bc1b3",
+    "sha256": "5609a99eb0280ad427aac58ec85319e16388a747911c2e76775913f94556f73e",
+    "unchanged": true
+  },
+  "tests": {
+    "pass": 133,
+    "fail": 0,
+    "directModeDiscriminants": 8,
+    "newBeforeWriteLegalPreflight": 1,
+    "logPath": "artifacts/orbit360-recovery/release-control/I6_6_DIRECT_LIVE_FUNCTIONAL_PUBLICATION_SOURCE_QA_20261126.tap",
+    "logSha256": "85649fd98aab2dbbb79f0b015da4ee870aa89af40f18ae78eb9ca12093d55717",
+    "command": "node --test --test-reporter=tap tools/gravicentra-i66-direct-live-functional-publication.test.cjs tools/gravicentra-i66-provider-outcome-github-signing.test.cjs tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i66-scoped-historical-journeys.test.cjs tools/gravicentra-i66-scoped-historical-signed-driver.test.cjs tools/gravicentra-i6-6-proposal-application-signed-uat.test.cjs"
+  },
+  "preserved": {
+    "signerOwnerPreimage": "9aa1b7714800dec158a7528f311ede1cf2c63ead",
+    "workDriverPreimage": "f5afc2a36b3aa81d40216c82e4a9a3f3529adafb",
+    "workLegalAdapterUnchanged": "af8aae801acdc9394fd850ced225f74125f68c49",
+    "request35History": true,
+    "unitBinding": true,
+    "functionsTree": true,
+    "rbac": true,
+    "actualLiveJourneysRequired": true,
+    "noPreviewAcceptanceFabricated": true
+  },
+  "publicationMode": "DIRECT_LIVE_CERTIFIED_PACKAGE_V1",
+  "route": [
+    "functional-phase direct-live <packageBuildId>",
+    "run-functional-journeys live <packageBuildId> <out>"
+  ],
+  "rollback": "Existing rollback-functional-phase live <packageBuildId>; exact predecessor archive and Ready revision checked and retained before direct deployment. LIVE_DEPLOYED is not accepted until signed journeys pass.",
+  "limits": [
+    "This changes the existing single-callable scoped publisher only; the nine-callable attachments descriptor is not executable under this binding.",
+    "Source QA does not certify provider deployment, actor legal readiness or LIVE acceptance.",
+    "The separate Work legal adapter remains in place; no consent was executed or invented by this delta."
+  ],
+  "mutations": {
+    "provider": 0,
+    "canonicalRefs": 0,
+    "businessData": 0,
+    "authOrPermissions": 0,
+    "consent": 0
+  },
+  "files": [
+    {
+      "path": "tools/gravicentra-i66-frontend-control.cjs",
+      "blob": "6fde025510cd9f6b423bacaaadf9234893175df5",
+      "sha256": "d3c4a3da52547ab9fbfe9ba2ca86bca1ea9d5467fd2cda807aeb46388a3e7ca1"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cloud-build-operational.cjs",
+      "blob": "221918a555593e0f00914ac2eb5ae8a3ba6c0899",
+      "sha256": "88d2fc4169e45d209b794012b4a55ebd3d73f80d68087ad917f45c40d1e3e743"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-proposal-application-signed-uat.cjs",
+      "blob": "c4b28b678279687acc5f4faeff25ea60b8143e7a",
+      "sha256": "f7a191ae32f13b720c434b16e35dab64c97e69f00aed9e6c8867ad832eaa5fe7"
+    },
+    {
+      "path": "tools/gravicentra-i66-scoped-historical-signed-driver.test.cjs",
+      "blob": "6d2b7cc5a130ceb640ea9751cb29adb10b67206b",
+      "sha256": "2f1d00a292639147a457a7b3e31626a16a0ae5c6629a3ffe51d12a88fc727f2e"
+    },
+    {
+      "path": "tools/gravicentra-i66-direct-live-functional-publication.test.cjs",
+      "blob": "5fd44a31a32b12e37111da3ee6620224bd971df0",
+      "sha256": "49c963907948c1946d992f2d21a062812cf44ec42abe8d51b6f1e822f4eb9a15"
+    },
+    {
+      "path": "artifacts/orbit360-recovery/release-control/I6_6_DIRECTION_CONTINUOUS_LIVE_CORRECTION_AND_BULK_INFERENCE_20261126.json",
+      "blob": "e9e4f82a8e1df98046345719096ae986e4936574",
+      "sha256": "2776b389bc79be2475681bb6313d714ec1a3ba557e55a59b1063a81bd3a5ae35"
+    }
+  ]
+}

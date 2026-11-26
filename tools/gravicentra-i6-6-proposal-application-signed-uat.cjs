@@ -269,7 +269,13 @@ function validateScopedHistoricalContext(input,control,bindingBytes){
  assert.ok(uiHosting,'I66_SCOPED_UI_HOSTING_BINDING_REQUIRED');assert.equal(uiHosting.origin,origin);assert.match(uiHosting.sourceSha,/^[a-f0-9]{40}$/);assert.ok(uiHosting.buildId);assert.match(uiHosting.markerSha256,/^[a-f0-9]{64}$/);assert.match(uiHosting.version,/^sites\/ays-orbit-360-lab\/versions\/[a-z0-9]+$/);
  assert.equal(uiHosting.basis,'SCOPED_HOSTING_PREDECESSOR');
  assert.deepEqual([uiHosting.version,uiHosting.buildId,uiHosting.sourceSha,uiHosting.markerSha256],[hosting.version,hosting.buildId,hosting.sourceSha,hosting.markerSha256],'I66_SCOPED_UI_PROTECTED_IDENTITY');
- if(phase==='live')assert.equal(unit.providerStages.PREVIEW_VERIFIED?.packageSha256,facts.packageSha256,'I66_SCOPED_JOURNEY_SIGNED_PREVIEW_REQUIRED');
+ if(phase==='live'){
+  if(stage.publication||unit.publicationMethod){
+   const publication=require('./gravicentra-i66-frontend-control.cjs').directLivePublication();
+   assert.deepEqual(stage.publication,publication,'I66_SCOPED_DIRECT_LIVE_DEPLOYMENT_AUTHORITY');
+   assert.deepEqual(unit.publicationMethod,publication,'I66_SCOPED_DIRECT_LIVE_CURRENT_AUTHORITY');
+  }else assert.equal(unit.providerStages.PREVIEW_VERIFIED?.packageSha256,facts.packageSha256,'I66_SCOPED_JOURNEY_SIGNED_PREVIEW_REQUIRED');
+ }
  return{phase,origin,sourceSha:facts.sourceSha,buildId:facts.buildId,packageSha256:facts.packageSha256,bindingBlob:facts.bindingBlob,revision,hostingBuildId:uiHosting.buildId,hostingSourceSha:uiHosting.sourceSha,hostingMarkerSha256:uiHosting.markerSha256,protectedLiveHosting:hosting,uiHosting,tenantId:TENANT,target:binding.targets[phase],region:binding.targets.region};
 }
 function scopedHistoricalFixture(nonce,role,primaryRow){
@@ -334,11 +340,14 @@ async function exerciseScopedHistoricalPayment({page,actor,context,tenant,item,n
  const capture=request=>{if(!matches(request))return;try{const data=request.postDataJSON().data;assert.equal(observedData,null,'I66_SCOPED_SINGLE_UI_COMMAND');observedData=data;assert.match(data.requestId,/^recui_[a-f0-9]{1,8}$/);const eventId='payevt_'+hash(TENANT+'|'+f.ids.receipt+'|'+data.requestId).slice(0,28);proof.requestId=data.requestId;proof.eventId=eventId;
   targets.push({kind:'request',id:data.requestId,ref:tenant.collection(auditPrefix+'Requests').doc(data.requestId)},{kind:'event',id:eventId,ref:tenant.collection(auditPrefix+'Events').doc(eventId)});}catch(error){observerFailure=observerFailure||error;}};
  try{
+  // A fresh signed browser may lack an existing legal record. Check signed
+  // identity and legal readiness before acquiring a claim or creating fixtures.
+  await page.goto(context.origin+proof.route,{waitUntil:'commit',timeout:30000});await page.waitForFunction(()=>!!window.Orbit?.modules?.cobros?.conciliarFactura,null,{timeout:30000});await identity();await legal(page);
   for(const t of refs)assert.equal((await t.ref.get()).exists,false,'I66_SCOPED_HISTORICAL_FIXTURE_COLLISION');assert.deepEqual(await linked('cobros',['reciboId','receiptId']),[]);assert.deepEqual(await linked('carteraPrimas',['reciboId','receiptId']),[]);
   if(io.beforeFixtureWrite)await io.beforeFixtureWrite({receiptId:f.ids.receipt,targets:refs.map(t=>({collection:'data/'+t.collection+'/items',id:t.id}))});
   for(const t of refs){targets.push(t);if(t.seed)await t.ref.create(t.seed);}
   const before=await snapshot(refs);proof.beforeDigest=digest(before);proof.originalCobroDocumentCount=0;
-  await page.goto(context.origin+proof.route,{waitUntil:'commit',timeout:30000});await page.waitForFunction(()=>!!window.Orbit?.modules?.cobros?.conciliarFactura,null,{timeout:30000});await identity();await legal(page);
+  await page.reload({waitUntil:'commit',timeout:30000});await page.waitForFunction(()=>!!window.Orbit?.modules?.cobros?.conciliarFactura,null,{timeout:30000});await identity();await legal(page);
   await page.waitForFunction(id=>{const rows=Orbit.modules.cobros.reportableRows();return Array.isArray(rows)&&rows.filter(r=>String(r.reciboId||r.receiptId||'')===id).length===1;},f.ids.receipt,{timeout:30000});
   const originalProjection=await projection();assert.equal(originalProjection.count,1);assert.deepEqual(originalProjection.cobros,[]);assert.equal(originalProjection.rows[0].monto,f.amount);assert.equal(originalProjection.rows[0].fechaPago,f.paidDate);proof.originalPaymentCount=1;proof.originalProjection=originalProjection;
   await page.evaluate(id=>Orbit.modules.cobros.conciliarFactura(id),f.ids.receipt);const modal=page.locator('#cob-conc');await modal.waitFor({state:'visible',timeout:10000});

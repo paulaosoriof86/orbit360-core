@@ -555,8 +555,25 @@ function commitProviderOutcome(change) {
   }finally{fs.rmSync(temp,{recursive:true,force:true});}
 }
 
+const DIRECT_LIVE_PUBLICATION=Object.freeze({
+  mode:'DIRECT_LIVE_CERTIFIED_PACKAGE_V1',
+  decisionPath:dir+'I6_6_DIRECTION_CONTINUOUS_LIVE_CORRECTION_AND_BULK_INFERENCE_20261126.json',
+  decisionBlob:'e9e4f82a8e1df98046345719096ae986e4936574'
+});
+function directLivePublication(io=require('node:fs')){
+  const raw=io.readFileSync(DIRECT_LIVE_PUBLICATION.decisionPath,'utf8');
+  assert.equal(blob(raw),DIRECT_LIVE_PUBLICATION.decisionBlob,'DIRECT_LIVE_EXACT_OWNER_DECISION');
+  const receipt=JSON.parse(raw);
+  assert.deepEqual([receipt.schema,receipt.repository,receipt.branch,receipt.activeGate],
+    ['GI_I66_DIRECTION_CONTINUOUS_LIVE_CORRECTION_DECISION_V1','paulaosoriof86/orbit360-core','recovery/fase-a-clean-20260831','I6.6'],'DIRECT_LIVE_OWNER_SCOPE');
+  for(const key of ['existingPublicationAuthorizationContinues','noPreviewAsDeliverableOrManualWaitingGate','immutableArtifactRequired','rollbackAndLiveReadbackRequired','noInventedAcceptanceOrConsent','oneCoordinatedReleaseWriter'])
+    assert.equal(receipt.decision[key],true,'DIRECT_LIVE_OWNER_REQUIREMENT_'+key);
+  return {...DIRECT_LIVE_PUBLICATION};
+}
 function prepareFunctionalStage(stage,facts,head,io=require('node:fs')){
-  const track=['PACKAGE_CERTIFIED','PREVIEW_DEPLOYED','PREVIEW_VERIFIED','LIVE_DEPLOYED','LIVE_VERIFIED'];
+  const direct=!!facts.publication;
+  if(direct){assert.deepEqual(facts.publication,directLivePublication(io),'DIRECT_LIVE_PUBLICATION_BINDING');assert.ok(stage.startsWith('LIVE_'),'DIRECT_LIVE_LIVE_STAGE_ONLY');}
+  const track=direct?['PACKAGE_CERTIFIED','LIVE_DEPLOYED','LIVE_VERIFIED']:['PACKAGE_CERTIFIED','PREVIEW_DEPLOYED','PREVIEW_VERIFIED','LIVE_DEPLOYED','LIVE_VERIFIED'];
   const terminal=/^(PREVIEW|LIVE)_(HOLD|ROLLED_BACK)$/.exec(stage);
   const deployedStage=terminal&&terminal[1]+'_DEPLOYED',i=track.indexOf(terminal?deployedStage:stage);
   assert.ok(i>=0,'UNKNOWN_FUNCTIONAL_STAGE');
@@ -564,18 +581,34 @@ function prepareFunctionalStage(stage,facts,head,io=require('node:fs')){
   const authority=cp.i66ScopedFunctionRelease,cursor=cp.i66ActiveRecoveryCursor;
   assert.ok(authority?.candidatePath&&authority.candidateBlob===blob(io.readFileSync(authority.candidatePath,'utf8')),'SCOPED_CANDIDATE_DRIFT');
   const binding=read(authority.candidatePath);assert.equal(facts.bindingBlob,authority.candidateBlob);
+  if(direct&&stage==='LIVE_DEPLOYED'){
+    assert.deepEqual([facts.rollbackRevision,facts.rollbackProof?.revision,facts.rollbackProof?.archiveSha256,facts.rollbackProof?.ready],
+      [binding.predecessor.revision,binding.predecessor.revision,binding.predecessor.archiveSha256,true],'DIRECT_LIVE_PROVEN_ROLLBACK_REQUIRED');
+    assert.equal(String(facts.rollbackProof.source?.generation),binding.predecessor.sourceGeneration,'DIRECT_LIVE_ROLLBACK_SOURCE_GENERATION');
+    assert.match(facts.rollbackProof.configurationDigest||'',/^[a-f0-9]{64}$/,'DIRECT_LIVE_ROLLBACK_CONFIGURATION');
+  }
   assert.match(facts.sourceSha,/^[a-f0-9]{40}$/);assert.match(facts.packageSha256,/^[a-f0-9]{64}$/);
   const stages=authority.providerStages||{},prior=stages[stage];
   if(prior){assert.deepEqual(prior,facts,'SCOPED_STAGE_IDENTITY_DRIFT');return {status:'NOOP_ALREADY_RECONCILED',expectedHeadOid:head,changes:{}};}
   const predecessorCount=terminal&&terminal[2]==='ROLLED_BACK'?i+1:i;
-  assert.deepEqual(Object.keys(stages),track.slice(0,predecessorCount),'SCOPED_STAGE_PREDECESSOR');
+  if(direct){
+    const previewKeys=Object.keys(stages).filter(key=>key.startsWith('PREVIEW_'));
+    assert.ok([[],['PREVIEW_DEPLOYED'],['PREVIEW_DEPLOYED','PREVIEW_VERIFIED']].some(keys=>JSON.stringify(keys)===JSON.stringify(previewKeys)),'DIRECT_LIVE_PRESERVED_PREVIEW_HISTORY');
+    for(const key of previewKeys)for(const field of ['sourceSha','buildId','packageSha256','bindingBlob','artifact'])assert.deepEqual(stages[key][field],stages.PACKAGE_CERTIFIED[field],'DIRECT_LIVE_PRESERVED_PACKAGE');
+    assert.deepEqual(Object.keys(stages).filter(key=>!key.startsWith('PREVIEW_')),track.slice(0,predecessorCount),'SCOPED_STAGE_PREDECESSOR');
+    if(stages.LIVE_DEPLOYED)assert.deepEqual(stages.LIVE_DEPLOYED.publication,facts.publication,'DIRECT_LIVE_METHOD_CONTINUITY');
+    assert.equal(stages.LIVE_VERIFIED,undefined,'DIRECT_LIVE_ALREADY_ACCEPTED');
+  }else{
+    assert.equal(stages.LIVE_DEPLOYED?.publication,undefined,'DIRECT_LIVE_METHOD_REQUIRED');
+    assert.deepEqual(Object.keys(stages),track.slice(0,predecessorCount),'SCOPED_STAGE_PREDECESSOR');
+  }
   if(terminal){
     assert.ok(facts.receipt?.uri&&/^[0-9]+$/.test(facts.receipt.generation)&&/^[a-f0-9]{64}$/.test(facts.receipt.sha256),'SCOPED_TERMINAL_PROVIDER_EVIDENCE');
     if(terminal[2]==='ROLLED_BACK')assert.deepEqual([facts.revision,facts.rolledBackRevision],[stages[deployedStage].rollbackRevision,stages[deployedStage].revision]);
   }
   if(i){const first=stages.PACKAGE_CERTIFIED;for(const key of ['sourceSha','buildId','packageSha256','bindingBlob','artifact'])assert.deepEqual(facts[key],first[key],'SCOPED_SAME_ARTIFACT_'+key);}
   if(i>=1){
-    assert.equal(facts.target,i<3?binding.targets.preview:binding.targets.live);
+    assert.equal(facts.target,stage.startsWith('PREVIEW_')?binding.targets.preview:binding.targets.live);
     assert.ok(typeof facts.revision==='string'&&facts.revision.startsWith(facts.target.toLowerCase()+'-'));
     assert.equal(facts.trafficPercent,100);
   }
@@ -583,8 +616,9 @@ function prepareFunctionalStage(stage,facts,head,io=require('node:fs')){
   const old=cursor.currentEvidencePath,oldRaw=io.readFileSync(old,'utf8'),progress=JSON.parse(oldRaw);
   assert.equal(blob(oldRaw),cursor.currentEvidenceBlobSha);const next=old.replace(/_R\d+\.json$/,'_R'+(progress.version+1)+'.json');
   assert.notEqual(next,old);assert.ok(!io.existsSync(next));
-  const expectedPreimages=Object.fromEntries([P.cp,P.state,P.transport,old,authority.candidatePath].map(p=>[p,blob(io.readFileSync(p,'utf8'))]));expectedPreimages[next]=null;
+  const expectedPreimages=Object.fromEntries([P.cp,P.state,P.transport,old,authority.candidatePath,...(direct?[DIRECT_LIVE_PUBLICATION.decisionPath]:[])].map(p=>[p,blob(io.readFileSync(p,'utf8'))]));expectedPreimages[next]=null;
   authority.providerStages={...stages,[stage]:facts};authority.status=stage;authority.packageStatus='CERTIFIED';
+  if(direct)authority.publicationMethod=facts.publication;
   if(stage==='LIVE_VERIFIED'){
     authority.accepted={epoch:binding.releaseEpoch+1,target:facts.target,revision:facts.revision,sourceSha:facts.sourceSha,packageSha256:facts.packageSha256,
       sourcePins:Object.fromEntries(binding.owners.map(p=>[p,binding.sourcePins[p]]))};
@@ -1308,7 +1342,7 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
-module.exports={prepareFunctionalStage,prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
+module.exports={DIRECT_LIVE_PUBLICATION,directLivePublication,prepareFunctionalStage,prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
   resolveNativeExecutionProgress,assertNativeExecutionProgress,terminalAttemptRecords,assertTerminalAttemptProgress,
   prepareTerminalAttemptReconciliation,assertTerminalAttemptChangeSetPreimages,prepareTerminalCli,
   ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveFinancialAndPlanProjections,assertActiveReleaseProgress,

@@ -1,0 +1,809 @@
+TAP version 13
+# {"status":"PASS","checks":26,"scope":"SIGNED_UAT_OFFLINE_GUARDS_ONLY","cloudWrites":0}
+# Subtest: documentary binding admits only the historical receipt or its closed published successor
+ok 1 - documentary binding admits only the historical receipt or its closed published successor
+  ---
+  duration_ms: 2.60256
+  type: 'test'
+  ...
+# Subtest: build markers keep their independent historical and financial binding without reading an out-of-scope control
+ok 2 - build markers keep their independent historical and financial binding without reading an out-of-scope control
+  ---
+  duration_ms: 13.395865
+  type: 'test'
+  ...
+# Subtest: documentary fixtures use only the existing Preview synthetic prefix, exact sources and no real recipient
+ok 3 - documentary fixtures use only the existing Preview synthetic prefix, exact sources and no real recipient
+  ---
+  duration_ms: 1.475302
+  type: 'test'
+  ...
+# Subtest: documentary response observer rejects another actor, receipt, request, endpoint, operation or amount
+ok 4 - documentary response observer rejects another actor, receipt, request, endpoint, operation or amount
+  ---
+  duration_ms: 1.165556
+  type: 'test'
+  ...
+# Subtest: documentary candidate binding rejects malformed or widened metadata x=>delete x.receiptBlob
+ok 5 - documentary candidate binding rejects malformed or widened metadata x=>delete x.receiptBlob
+  ---
+  duration_ms: 6.072146
+  type: 'test'
+  ...
+# Subtest: documentary candidate binding rejects malformed or widened metadata x=>{x.receiptPath='private/raw.json';}
+ok 6 - documentary candidate binding rejects malformed or widened metadata x=>{x.receiptPath='private/raw.json';}
+  ---
+  duration_ms: 0.270678
+  type: 'test'
+  ...
+# Subtest: documentary candidate binding rejects malformed or widened metadata x=>{x.profile='other';}
+ok 7 - documentary candidate binding rejects malformed or widened metadata x=>{x.profile='other';}
+  ---
+  duration_ms: 0.336144
+  type: 'test'
+  ...
+# Subtest: documentary candidate binding rejects malformed or widened metadata x=>{x.allowRealPayments=true;}
+ok 8 - documentary candidate binding rejects malformed or widened metadata x=>{x.allowRealPayments=true;}
+  ---
+  duration_ms: 0.369804
+  type: 'test'
+  ...
+# Subtest: documentary UI orchestration PREVIEW historical executes actual command builder and callable, then reload/replay/CAS restore
+ok 9 - documentary UI orchestration PREVIEW historical executes actual command builder and callable, then reload/replay/CAS restore
+  ---
+  duration_ms: 39.264494
+  type: 'test'
+  ...
+# Subtest: documentary UI orchestration PREVIEW successor executes actual command builder and callable, then reload/replay/CAS restore
+ok 10 - documentary UI orchestration PREVIEW successor executes actual command builder and callable, then reload/replay/CAS restore
+  ---
+  duration_ms: 23.296774
+  type: 'test'
+  ...
+# Subtest: documentary UI orchestration LIVE historical executes actual command builder and callable, then reload/replay/CAS restore
+ok 11 - documentary UI orchestration LIVE historical executes actual command builder and callable, then reload/replay/CAS restore
+  ---
+  duration_ms: 24.592983
+  type: 'test'
+  ...
+# Subtest: documentary UI orchestration LIVE successor executes actual command builder and callable, then reload/replay/CAS restore
+ok 12 - documentary UI orchestration LIVE successor executes actual command builder and callable, then reload/replay/CAS restore
+  ---
+  duration_ms: 14.723337
+  type: 'test'
+  ...
+# Subtest: uncertain UI response cannot clean while a server writer may still commit or claim PASS
+ok 13 - uncertain UI response cannot clean while a server writer may still commit or claim PASS
+  ---
+  duration_ms: 6.86241
+  type: 'test'
+  ...
+# Subtest: same replay values with a changed exact update version fail even if the payment count is one
+ok 14 - same replay values with a changed exact update version fail even if the payment count is one
+  ---
+  duration_ms: 10.537418
+  type: 'test'
+  ...
+# Subtest: an existing payment linked through either receipt alias holds before any fixture or payment write and is retained
+ok 15 - an existing payment linked through either receipt alias holds before any fixture or payment write and is retained
+  ---
+  duration_ms: 3.409788
+  type: 'test'
+  ...
+# Subtest: restore guard rejects a foreign actor or changed financial identity before deletion
+ok 16 - restore guard rejects a foreign actor or changed financial identity before deletion
+  ---
+  duration_ms: 0.656025
+  type: 'test'
+  ...
+# Subtest: the direct mode consumes exact frozen owner instruction and refuses absent or changed authorization
+ok 17 - the direct mode consumes exact frozen owner instruction and refuses absent or changed authorization
+  ---
+  duration_ms: 3.853771
+  type: 'test'
+  ...
+# Subtest: certified source advances directly to LIVE with preserved history and no invented Preview acceptance: false
+ok 18 - certified source advances directly to LIVE with preserved history and no invented Preview acceptance: false
+  ---
+  duration_ms: 342.010938
+  type: 'test'
+  ...
+# Subtest: certified source advances directly to LIVE with preserved history and no invented Preview acceptance: true
+ok 19 - certified source advances directly to LIVE with preserved history and no invented Preview acceptance: true
+  ---
+  duration_ms: 185.005322
+  type: 'test'
+  ...
+# Subtest: direct metadata rejects missing rollback, source substitution, wrong target or forged method and keeps legacy gate
+ok 20 - direct metadata rejects missing rollback, source substitution, wrong target or forged method and keeps legacy gate
+  ---
+  duration_ms: 182.449
+  type: 'test'
+  ...
+# Subtest: direct rollback preserves evidence and returns to exact known revision without acceptance
+ok 21 - direct rollback preserves evidence and returns to exact known revision without acceptance
+  ---
+  duration_ms: 193.122447
+  type: 'test'
+  ...
+# Subtest: real publisher dispatch deploys only LIVE with exact package after rollback readiness and retains physical proof
+ok 22 - real publisher dispatch deploys only LIVE with exact package after rollback readiness and retains physical proof
+  ---
+  duration_ms: 45.359907
+  type: 'test'
+  ...
+# Subtest: missing rollback or authority prevents provider mutation; historical live still requires its Preview
+ok 23 - missing rollback or authority prevents provider mutation; historical live still requires its Preview
+  ---
+  duration_ms: 158.690516
+  type: 'test'
+  ...
+# Subtest: LIVE driver accepts the actual direct-deployed package without fake Preview but preserves its role/source constraints
+ok 24 - LIVE driver accepts the actual direct-deployed package without fake Preview but preserves its role/source constraints
+  ---
+  duration_ms: 98.240834
+  type: 'test'
+  ...
+# Subtest: native continuation rejects a stale billing blocker even when all copied projections agree
+ok 25 - native continuation rejects a stale billing blocker even when all copied projections agree
+  ---
+  duration_ms: 10.29435
+  type: 'test'
+  ...
+# Subtest: native continuation accepts the corrected pending state without changing proof or advancing acceptance
+ok 26 - native continuation accepts the corrected pending state without changing proof or advancing acceptance
+  ---
+  duration_ms: 2.703468
+  type: 'test'
+  ...
+# Subtest: native continuation preserves a distinct request billing hold and an unrelated unbound Actions lane
+ok 27 - native continuation preserves a distinct request billing hold and an unrelated unbound Actions lane
+  ---
+  duration_ms: 2.075344
+  type: 'test'
+  ...
+# Subtest: native continuation rejects request source and immutable package substitutions independently
+ok 28 - native continuation rejects request source and immutable package substitutions independently
+  ---
+  duration_ms: 12.588485
+  type: 'test'
+  ...
+# Subtest: native continuation requires the exact active cursor and safe pinned fragment references
+ok 29 - native continuation requires the exact active cursor and safe pinned fragment references
+  ---
+  duration_ms: 2.482443
+  type: 'test'
+  ...
+# Subtest: native continuation reads immutable prior evidence by its pinned path and rejects edited historical bytes
+ok 30 - native continuation reads immutable prior evidence by its pinned path and rejects edited historical bytes
+  ---
+  duration_ms: 0.920585
+  type: 'test'
+  ...
+# Subtest: native continuation rejects a false functional acceptance or undeclared hosting effects in transport-only proof
+ok 31 - native continuation rejects a false functional acceptance or undeclared hosting effects in transport-only proof
+  ---
+  duration_ms: 1.6649
+  type: 'test'
+  ...
+# Subtest: native continuation does not infer certification from a submitted or unread package
+ok 32 - native continuation does not infer certification from a submitted or unread package
+  ---
+  duration_ms: 0.67275
+  type: 'test'
+  ...
+# Subtest: native continuation leaves legacy and unrelated archived provider evidence unchanged
+ok 33 - native continuation leaves legacy and unrelated archived provider evidence unchanged
+  ---
+  duration_ms: 0.364837
+  type: 'test'
+  ...
+# Subtest: native continuation recognizes exact consumed request history without blocking composite closure or transferring PASS
+ok 34 - native continuation recognizes exact consumed request history without blocking composite closure or transferring PASS
+  ---
+  duration_ms: 0.926012
+  type: 'test'
+  ...
+# Subtest: native continuation rejects consumed request history for another source digest or release head
+ok 35 - native continuation rejects consumed request history for another source digest or release head
+  ---
+  duration_ms: 2.082324
+  type: 'test'
+  ...
+# Subtest: current R60 continuation preserves retired Preview28 evidence without directing its execution
+ok 36 - current R60 continuation preserves retired Preview28 evidence without directing its execution
+  ---
+  duration_ms: 134.266833
+  type: 'test'
+  ...
+# Subtest: R59 A12 retry is rejected even after its objective, remaining lane and nextIncomplete are synchronized
+ok 37 - R59 A12 retry is rejected even after its objective, remaining lane and nextIncomplete are synchronized
+  ---
+  duration_ms: 32.784477
+  type: 'test'
+  ...
+# Subtest: a built but retired target cannot reappear as the pending immutable build
+ok 38 - a built but retired target cannot reappear as the pending immutable build
+  ---
+  duration_ms: 53.359116
+  type: 'test'
+  ...
+# Subtest: active execution aliases independently reject a retired retry; an archived old next step remains historical
+ok 39 - active execution aliases independently reject a retired retry; an archived old next step remains historical
+  ---
+  duration_ms: 81.116795
+  type: 'test'
+  ...
+# Subtest: retired prohibitions and a distinct successor are allowed, but a contradictory appended retry is rejected
+ok 40 - retired prohibitions and a distinct successor are allowed, but a contradictory appended retry is rejected
+  ---
+  duration_ms: 52.115846
+  type: 'test'
+  ...
+# Subtest: execution snapshot tracks request, scoped Preview and operational candidate without mutable aliases
+ok 41 - execution snapshot tracks request, scoped Preview and operational candidate without mutable aliases
+  ---
+  duration_ms: 0.65926
+  type: 'test'
+  ...
+# Subtest: progress projection preserves the actual scoped results without advancing an unproved full gate
+ok 42 - progress projection preserves the actual scoped results without advancing an unproved full gate
+  ---
+  duration_ms: 0.990227
+  type: 'test'
+  ...
+# Subtest: progress reproduces and rejects the old Chrome and performance lane statuses
+ok 43 - progress reproduces and rejects the old Chrome and performance lane statuses
+  ---
+  duration_ms: 1.840098
+  type: 'test'
+  ...
+# Subtest: progress rejects a lane with a stale proof even if its status still matches
+ok 44 - progress rejects a lane with a stale proof even if its status still matches
+  ---
+  duration_ms: 0.731797
+  type: 'test'
+  ...
+# Subtest: progress rejects obsolete Preview work after the composite artifact is already LIVE accepted
+ok 45 - progress rejects obsolete Preview work after the composite artifact is already LIVE accepted
+  ---
+  duration_ms: 0.884973
+  type: 'test'
+  ...
+# Subtest: progress rejects completion or reordering that only edits the derived remaining list
+ok 46 - progress rejects completion or reordering that only edits the derived remaining list
+  ---
+  duration_ms: 2.960406
+  type: 'test'
+  ...
+# Subtest: progress rejects the old four-role cursor after the five-role result was recorded
+ok 47 - progress rejects the old four-role cursor after the five-role result was recorded
+  ---
+  duration_ms: 0.684247
+  type: 'test'
+  ...
+# Subtest: progress rejects stale performance and financial cursors independently
+ok 48 - progress rejects stale performance and financial cursors independently
+  ---
+  duration_ms: 1.349926
+  type: 'test'
+  ...
+# Subtest: progress does not turn scoped read-only success into full A04 or A12 or A14 acceptance
+ok 49 - progress does not turn scoped read-only success into full A04 or A12 or A14 acceptance
+  ---
+  duration_ms: 3.62152
+  type: 'test'
+  ...
+# Subtest: progress refuses an observer receipt pinned to another deployed artifact
+ok 50 - progress refuses an observer receipt pinned to another deployed artifact
+  ---
+  duration_ms: 1.049054
+  type: 'test'
+  ...
+# Subtest: progress rejects deletion or edited summary of the pinned observer results
+ok 51 - progress rejects deletion or edited summary of the pinned observer results
+  ---
+  duration_ms: 3.476726
+  type: 'test'
+  ...
+# Subtest: progress guard reads neither staged observer source nor its previous QA pins
+ok 52 - progress guard reads neither staged observer source nor its previous QA pins
+  ---
+  duration_ms: 1.532365
+  type: 'test'
+  ...
+# Subtest: progress publication E3 to E4 archives the old proof and admits a pending successor without transferring PASS
+ok 53 - progress publication E3 to E4 archives the old proof and admits a pending successor without transferring PASS
+  ---
+  duration_ms: 11.814707
+  type: 'test'
+  ...
+# Subtest: progress same-artifact reconciliation preserves its scoped proof and prior observer QA pins
+ok 54 - progress same-artifact reconciliation preserves its scoped proof and prior observer QA pins
+  ---
+  duration_ms: 3.64217
+  type: 'test'
+  ...
+# Subtest: progress observer history transitions on generation source or digest and does not duplicate on resume
+ok 55 - progress observer history transitions on generation source or digest and does not duplicate on resume
+  ---
+  duration_ms: 8.149403
+  type: 'test'
+  ...
+# Subtest: progress pending successor rejects a stale current observer summary or pointer reintroduced from E3
+ok 56 - progress pending successor rejects a stale current observer summary or pointer reintroduced from E3
+  ---
+  duration_ms: 9.809147
+  type: 'test'
+  ...
+# Subtest: progress successor retains a separately prepared observer authority for its exact new target
+ok 57 - progress successor retains a separately prepared observer authority for its exact new target
+  ---
+  duration_ms: 2.154009
+  type: 'test'
+  ...
+# Subtest: progress another publication before the pending observer completes advances its target without duplicating the old proof
+ok 58 - progress another publication before the pending observer completes advances its target without duplicating the old proof
+  ---
+  duration_ms: 2.250792
+  type: 'test'
+  ...
+# Subtest: progress incorporating a matching observed result retires the prior pending marker without bypassing target validation
+ok 59 - progress incorporating a matching observed result retires the prior pending marker without bypassing target validation
+  ---
+  duration_ms: 0.861859
+  type: 'test'
+  ...
+# Subtest: canonical preflight keeps the active progress check after composite E3 becomes frontend E4
+ok 60 - canonical preflight keeps the active progress check after composite E3 becomes frontend E4
+  ---
+  duration_ms: 4.557106
+  type: 'test'
+  ...
+# Subtest: native continuation reproduces the pinned R84 provider drift despite internally consistent projections
+ok 61 - native continuation reproduces the pinned R84 provider drift despite internally consistent projections
+  ---
+  duration_ms: 47.934683
+  type: 'test'
+  ...
+# Subtest: native continuation R84 correction changes four pending statuses and preserves all acceptance and historical proof
+ok 62 - native continuation R84 correction changes four pending statuses and preserves all acceptance and historical proof
+  ---
+  duration_ms: 43.398689
+  type: 'test'
+  ...
+# Subtest: native continuation keeps pinned R84 proof through two checkpoints and exact consumed closure
+ok 63 - native continuation keeps pinned R84 proof through two checkpoints and exact consumed closure
+  ---
+  duration_ms: 97.841919
+  type: 'test'
+  ...
+# Subtest: native continuation requires pins for every external proof group without traversing older checkpoints
+ok 64 - native continuation requires pins for every external proof group without traversing older checkpoints
+  ---
+  duration_ms: 92.660393
+  type: 'test'
+  ...
+# Subtest: native continuation shares a matching explicit pin before resolving the unpinned side
+ok 65 - native continuation shares a matching explicit pin before resolving the unpinned side
+  ---
+  duration_ms: 46.209824
+  type: 'test'
+  ...
+# Subtest: native continuation rejects conflicting multi-checkpoint pins even for already cached R84 proof
+ok 66 - native continuation rejects conflicting multi-checkpoint pins even for already cached R84 proof
+  ---
+  duration_ms: 105.481254
+  type: 'test'
+  ...
+# Subtest: current financial completion and canonical plan redirect agree without rewriting historical evidence
+ok 67 - current financial completion and canonical plan redirect agree without rewriting historical evidence
+  ---
+  duration_ms: 90.28131
+  type: 'test'
+  ...
+# Subtest: the stale Control Plane PENDING_APPLICATION copy is rejected against the applied receipt
+ok 68 - the stale Control Plane PENDING_APPLICATION copy is rejected against the applied receipt
+  ---
+  duration_ms: 11.513768
+  type: 'test'
+  ...
+# Subtest: synchronizing two stale financial summaries cannot undo sealed payment application
+ok 69 - synchronizing two stale financial summaries cannot undo sealed payment application
+  ---
+  duration_ms: 74.768851
+  type: 'test'
+  ...
+# Subtest: canonical plan cannot resume the old release or point outside the active cursor
+ok 70 - canonical plan cannot resume the old release or point outside the active cursor
+  ---
+  duration_ms: 98.820217
+  type: 'test'
+  ...
+# Subtest: payment application proof must retain its pinned bytes
+ok 71 - payment application proof must retain its pinned bytes
+  ---
+  duration_ms: 11.712799
+  type: 'test'
+  ...
+# Subtest: the active state mirror archives the entire former mixed summary and rejects stale source evidence or next action
+ok 72 - the active state mirror archives the entire former mixed summary and rejects stale source evidence or next action
+  ---
+  duration_ms: 23.852949
+  type: 'test'
+  ...
+# Subtest: frontend E4 closure always installs the active mirror and cannot keep or delete the old resume summary
+ok 73 - frontend E4 closure always installs the active mirror and cannot keep or delete the old resume summary
+  ---
+  duration_ms: 2.985041
+  type: 'test'
+  ...
+# Subtest: E4 consumes its request and advances only current frontend views while retaining financial and backend proofs
+ok 74 - E4 consumes its request and advances only current frontend views while retaining financial and backend proofs
+  ---
+  duration_ms: 4.424418
+  type: 'test'
+  ...
+# Subtest: the checked-out physical receipt agrees with the active control, ledger and transport
+ok 75 - the checked-out physical receipt agrees with the active control, ledger and transport
+  ---
+  duration_ms: 40.229871
+  type: 'test'
+  ...
+# Subtest: frontend file counts remain versioned and composite counts remain tied to their signed proof
+ok 76 - frontend file counts remain versioned and composite counts remain tied to their signed proof
+  ---
+  duration_ms: 14.01045
+  type: 'test'
+  ...
+# Subtest: rejects drift in control count
+ok 77 - rejects drift in control count
+  ---
+  duration_ms: 17.718756
+  type: 'test'
+  ...
+# Subtest: rejects drift in transport count
+ok 78 - rejects drift in transport count
+  ---
+  duration_ms: 16.501155
+  type: 'test'
+  ...
+# Subtest: rejects drift in Preview count
+ok 79 - rejects drift in Preview count
+  ---
+  duration_ms: 12.037597
+  type: 'test'
+  ...
+# Subtest: rejects drift in manifest
+ok 80 - rejects drift in manifest
+  ---
+  duration_ms: 11.784335
+  type: 'test'
+  ...
+# Subtest: rejects drift in artifact
+ok 81 - rejects drift in artifact
+  ---
+  duration_ms: 10.864563
+  type: 'test'
+  ...
+# Subtest: rejects drift in generation
+ok 82 - rejects drift in generation
+  ---
+  duration_ms: 11.422819
+  type: 'test'
+  ...
+# Subtest: rejects drift in versioned head removal
+ok 83 - rejects drift in versioned head removal
+  ---
+  duration_ms: 12.662908
+  type: 'test'
+  ...
+# Subtest: terminal receipt reproduces the actual bce/R88 drift that the previous owner accepted
+ok 84 - terminal receipt reproduces the actual bce/R88 drift that the previous owner accepted
+  ---
+  duration_ms: 207.674565
+  type: 'test'
+  ...
+# Subtest: terminal producer derives a complete atomic metadata correction from the real consumed claim
+ok 85 - terminal producer derives a complete atomic metadata correction from the real consumed claim
+  ---
+  duration_ms: 264.639164
+  type: 'test'
+  ...
+# Subtest: terminal reconciliation second execution is a true NOOP without another checkpoint
+ok 86 - terminal reconciliation second execution is a true NOOP without another checkpoint
+  ---
+  duration_ms: 245.018044
+  type: 'test'
+  ...
+# Subtest: terminal changeset rejects a moved writer HEAD or any concurrent authority preimage
+ok 87 - terminal changeset rejects a moved writer HEAD or any concurrent authority preimage
+  ---
+  duration_ms: 186.117231
+  type: 'test'
+  ...
+# Subtest: a newly retained terminal receipt and its cursor projections are one prepared transaction
+ok 88 - a newly retained terminal receipt and its cursor projections are one prepared transaction
+  ---
+  duration_ms: 193.091568
+  type: 'test'
+  ...
+# Subtest: terminal receipt and active projections reject partial publication and renewed stale next actions
+ok 89 - terminal receipt and active projections reject partial publication and renewed stale next actions
+  ---
+  duration_ms: 612.234653
+  type: 'test'
+  ...
+# Subtest: terminal reconciliation refuses unproved compensation and preserves a different request artifact
+ok 90 - terminal reconciliation refuses unproved compensation and preserves a different request artifact
+  ---
+  duration_ms: 421.302274
+  type: 'test'
+  ...
+# Subtest: terminal history survives PREVIEW_RETRY_ADMITTED without freezing the active retry on the failed build
+ok 91 - terminal history survives PREVIEW_RETRY_ADMITTED without freezing the active retry on the failed build
+  ---
+  duration_ms: 295.637007
+  type: 'test'
+  ...
+# Subtest: terminal history survives PREVIEW_RETRY_RUNNING without freezing the active retry on the failed build
+ok 92 - terminal history survives PREVIEW_RETRY_RUNNING without freezing the active retry on the failed build
+  ---
+  duration_ms: 366.074231
+  type: 'test'
+  ...
+# Subtest: terminal history survives SIGNED_PREVIEW_PASS_LIVE_PENDING without freezing the active retry on the failed build
+ok 93 - terminal history survives SIGNED_PREVIEW_PASS_LIVE_PENDING without freezing the active retry on the failed build
+  ---
+  duration_ms: 297.632504
+  type: 'test'
+  ...
+# Subtest: an arbitrary retry marker or edited retry admission cannot hide the terminal predecessor
+ok 94 - an arbitrary retry marker or edited retry admission cannot hide the terminal predecessor
+  ---
+  duration_ms: 432.899296
+  type: 'test'
+  ...
+# Subtest: missing ephemeral SSH key uses existing gh expected-head signing with exact three-path Git tree
+ok 95 - missing ephemeral SSH key uses existing gh expected-head signing with exact three-path Git tree
+  ---
+  duration_ms: 738.439456
+  type: 'test'
+  ...
+# Subtest: lost ACK after committed CAS adopts exact signed commit without a second mutation
+ok 96 - lost ACK after committed CAS adopts exact signed commit without a second mutation
+  ---
+  duration_ms: 999.713464
+  type: 'test'
+  ...
+# Subtest: transport loss before commit retries identical payload only after unchanged-head readback
+ok 97 - transport loss before commit retries identical payload only after unchanged-head readback
+  ---
+  duration_ms: 929.73034
+  type: 'test'
+  ...
+# Subtest: readback rejects unsigned without retry or alternate signer
+ok 98 - readback rejects unsigned without retry or alternate signer
+  ---
+  duration_ms: 796.743336
+  type: 'test'
+  ...
+# Subtest: readback rejects wrong-tree without retry or alternate signer
+ok 99 - readback rejects wrong-tree without retry or alternate signer
+  ---
+  duration_ms: 622.931251
+  type: 'test'
+  ...
+# Subtest: readback rejects wrong-parent without retry or alternate signer
+ok 100 - readback rejects wrong-parent without retry or alternate signer
+  ---
+  duration_ms: 644.759151
+  type: 'test'
+  ...
+# Subtest: permission rejection remains a single failed mutation and cannot create a signing credential
+ok 101 - permission rejection remains a single failed mutation and cannot create a signing credential
+  ---
+  duration_ms: 437.258877
+  type: 'test'
+  ...
+# Subtest: concurrent foreign HEAD is rejected before mutation
+ok 102 - concurrent foreign HEAD is rejected before mutation
+  ---
+  duration_ms: 526.127133
+  type: 'test'
+  ...
+# Subtest: changed working preimage prevents the GitHub mutation
+ok 103 - changed working preimage prevents the GitHub mutation
+  ---
+  duration_ms: 82.696913
+  type: 'test'
+  ...
+# Subtest: a source path cannot be smuggled into the three metadata paths
+ok 104 - a source path cannot be smuggled into the three metadata paths
+  ---
+  duration_ms: 76.402661
+  type: 'test'
+  ...
+# Subtest: real E3 Cobros UI and actual scoped callable produce worker canonical witnesses for both assigned roles before cleanup
+ok 105 - real E3 Cobros UI and actual scoped callable produce worker canonical witnesses for both assigned roles before cleanup
+  ---
+  duration_ms: 276.755211
+  type: 'test'
+  ...
+# Subtest: retained report rejects wrong source
+ok 106 - retained report rejects wrong source
+  ---
+  duration_ms: 3.901372
+  type: 'test'
+  ...
+# Subtest: retained report rejects wrong revision
+ok 107 - retained report rejects wrong revision
+  ---
+  duration_ms: 1.164353
+  type: 'test'
+  ...
+# Subtest: retained report rejects wrong role
+ok 108 - retained report rejects wrong role
+  ---
+  duration_ms: 1.44059
+  type: 'test'
+  ...
+# Subtest: retained report rejects browser-only proof
+ok 109 - retained report rejects browser-only proof
+  ---
+  duration_ms: 1.016365
+  type: 'test'
+  ...
+# Subtest: retained report rejects false original physical count
+ok 110 - retained report rejects false original physical count
+  ---
+  duration_ms: 1.135251
+  type: 'test'
+  ...
+# Subtest: retained report rejects changed original amount
+ok 111 - retained report rejects changed original amount
+  ---
+  duration_ms: 1.629779
+  type: 'test'
+  ...
+# Subtest: retained report rejects no replay
+ok 112 - retained report rejects no replay
+  ---
+  duration_ms: 1.034102
+  type: 'test'
+  ...
+# Subtest: retained report rejects cleanup pending
+ok 113 - retained report rejects cleanup pending
+  ---
+  duration_ms: 4.255403
+  type: 'test'
+  ...
+# Subtest: retained report rejects fake witness source
+ok 114 - retained report rejects fake witness source
+  ---
+  duration_ms: 2.116956
+  type: 'test'
+  ...
+# Subtest: retained report rejects same actor for two roles
+ok 115 - retained report rejects same actor for two roles
+  ---
+  duration_ms: 1.83439
+  type: 'test'
+  ...
+# Subtest: Cloud Build SUCCESS must prove exact source, SDK, principal, package, roles and executed steps
+ok 116 - Cloud Build SUCCESS must prove exact source, SDK, principal, package, roles and executed steps
+  ---
+  duration_ms: 49.574085
+  type: 'test'
+  ...
+# Subtest: nested Admin Timestamp and REST ISO preserve all member fields and nanoseconds
+ok 117 - nested Admin Timestamp and REST ISO preserve all member fields and nanoseconds
+  ---
+  duration_ms: 1.033811
+  type: 'test'
+  ...
+# Subtest: provider-retained report and claim times cannot precede or outlive their execution
+ok 118 - provider-retained report and claim times cannot precede or outlive their execution
+  ---
+  duration_ms: 47.527995
+  type: 'test'
+  ...
+# Subtest: LIVE lost ACK adopts the exact canonical stage before old binding epoch validation, without reexecution
+ok 119 - LIVE lost ACK adopts the exact canonical stage before old binding epoch validation, without reexecution
+  ---
+  duration_ms: 68.230942
+  type: 'test'
+  ...
+# Subtest: terminal failure with proven cleanup can continue same package; active, unknown, dirty and crossed package cannot
+ok 120 - terminal failure with proven cleanup can continue same package; active, unknown, dirty and crossed package cannot
+  ---
+  duration_ms: 7.737647
+  type: 'test'
+  ...
+# Subtest: claim is acquired only inside awaited beforeFixtureWrite, after dependency install and tests
+ok 121 - claim is acquired only inside awaited beforeFixtureWrite, after dependency install and tests
+  ---
+  duration_ms: 0.709283
+  type: 'test'
+  ...
+# Subtest: cursor CAS applied with lost readback ACK retains the immutable claim and permits retry after zero-write cleanup
+ok 122 - cursor CAS applied with lost readback ACK retains the immutable claim and permits retry after zero-write cleanup
+  ---
+  duration_ms: 32.000704
+  type: 'test'
+  ...
+# Subtest: scoped historical preview direccion actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup
+ok 123 - scoped historical preview direccion actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup
+  ---
+  duration_ms: 101.445097
+  type: 'test'
+  ...
+# Subtest: scoped historical preview operativo actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup
+ok 124 - scoped historical preview operativo actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup
+  ---
+  duration_ms: 52.840032
+  type: 'test'
+  ...
+# Subtest: scoped historical live direccion actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup
+ok 125 - scoped historical live direccion actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup
+  ---
+  duration_ms: 40.303022
+  type: 'test'
+  ...
+# Subtest: scoped historical live operativo actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup
+ok 126 - scoped historical live operativo actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup
+  ---
+  duration_ms: 44.169172
+  type: 'test'
+  ...
+# Subtest: scoped identity consumes deployed df9 package and retained hosting, independent of old composite transport source
+ok 127 - scoped identity consumes deployed df9 package and retained hosting, independent of old composite transport source
+  ---
+  duration_ms: 32.717127
+  type: 'test'
+  ...
+# Subtest: uncertain acknowledgement retains owned synthetic data and cannot claim completed cleanup
+ok 128 - uncertain acknowledgement retains owned synthetic data and cannot claim completed cleanup
+  ---
+  duration_ms: 43.262438
+  type: 'test'
+  ...
+# Subtest: claim denial holds before any fixture write; later readback witness HOLD cleans proven completed synthetic writes
+ok 129 - claim denial holds before any fixture write; later readback witness HOLD cleans proven completed synthetic writes
+  ---
+  duration_ms: 76.932096
+  type: 'test'
+  ...
+# Subtest: replay that changes a same-value record version is detected
+ok 130 - replay that changes a same-value record version is detected
+  ---
+  duration_ms: 19.384176
+  type: 'test'
+  ...
+# Subtest: an unexpected duplicate request is caught inside the journey and retains namespace while unsettled
+ok 131 - an unexpected duplicate request is caught inside the journey and retains namespace while unsettled
+  ---
+  duration_ms: 13.661584
+  type: 'test'
+  ...
+# Subtest: the current E3 Preview origin requires its protected identity and cannot substitute the retained35 channel
+ok 132 - the current E3 Preview origin requires its protected identity and cannot substitute the retained35 channel
+  ---
+  duration_ms: 10.476949
+  type: 'test'
+  ...
+# Subtest: missing actual legal readiness rejects before claim or fixtures without accepting or changing consent
+ok 133 - missing actual legal readiness rejects before claim or fixtures without accepting or changing consent
+  ---
+  duration_ms: 15.58853
+  type: 'test'
+  ...
+1..133
+# tests 133
+# suites 0
+# pass 133
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5979.413626

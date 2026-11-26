@@ -847,15 +847,26 @@ function retainedFunctionRecord(name,value){
 function functionalFacts(pkg){
   return {sourceSha:pkg.sourceSha,buildId:pkg.buildId,packageSha256:pkg.artifact.sha256,bindingBlob:pkg.receipt.bindingBlob,artifact:pkg.artifact};
 }
+function verifyFunctionalRollback(before,binding,phase){
+  checkServingSnapshot(before,binding.predecessor,phase);
+  const revision=JSON.parse(readGcloud(['run','revisions','describe',before.revision,'--region='+before.region,'--format=json(status.conditions)']));
+  need(revision.status?.conditions?.some(row=>row.type==='Ready'&&row.status==='True'),'FUNCTIONAL_ROLLBACK_READY_BEFORE_DEPLOY');
+  return {revision:before.revision,source:before.source,archiveSha256:phase==='live'?binding.predecessor.archiveSha256:binding.predecessor.previewArchiveSha256,
+    configurationDigest:before.configurationDigest,ready:true};
+}
 async function executeFunctionalPhase(phase,buildId){
-  need(['package','preview','live'].includes(phase),'FUNCTIONAL_PHASE');
+  need(['package','preview','live','direct-live'].includes(phase),'FUNCTIONAL_PHASE');
+  const direct=phase==='direct-live',owner=require('./gravicentra-i66-frontend-control.cjs');if(direct)phase='live';
+  const publication=direct?owner.directLivePublication():null,method=publication?{publication}:{};
+  if(publication)equal(git(process.cwd(),'rev-parse','HEAD:'+publication.decisionPath),publication.decisionBlob,'DIRECT_LIVE_SIGNED_OWNER_DECISION');
+  if(phase==='preview'&&fs.existsSync(owner.DIRECT_LIVE_PUBLICATION.decisionPath))throw Error('I66_NATIVE_OPERATIONAL_DIRECT_LIVE_OWNER_INSTRUCTION_REQUIRES_LIVE');
   checkedBranch();const binding=scopedCandidate(),pkg=readFunctionalPackage(buildId),facts=functionalFacts(pkg);
   await verifyScopedHosting(binding);
   const c=json(C.control),stages=c.i66ScopedFunctionRelease.providerStages||{};
   need(!Object.keys(stages).some(k=>/_(HOLD|ROLLED_BACK)$/.test(k)),'TERMINAL_FUNCTIONAL_UNIT_REQUIRES_FRESH_ADMISSION');
   if(phase==='package')return writeFunctionalStage('PACKAGE_CERTIFIED',facts);
   equal(stages.PACKAGE_CERTIFIED,facts,'ARTIFACT_SIGNED_IN_AUTHORITY');
-  if(phase==='live')need(stages.PREVIEW_VERIFIED&&stages.PREVIEW_VERIFIED.packageSha256===facts.packageSha256,'SIGNED_PREVIEW_REQUIRED');
+  if(phase==='live'&&!direct)need(stages.PREVIEW_VERIFIED&&stages.PREVIEW_VERIFIED.packageSha256===facts.packageSha256,'SIGNED_PREVIEW_REQUIRED');
   const target=binding.targets[phase],region=binding.targets.region,stage=phase==='preview'?'PREVIEW_DEPLOYED':'LIVE_DEPLOYED';
   const snapshot=readFunctionSnapshot(target,region),prefix='i66/functional/'+binding.unit+'/'+pkg.sourceSha+'/'+buildId+'/';
   const claimName=prefix+phase+'-claim.json',reader=operationalClaimReader(),previous=await reader.findClaim(claimName);
@@ -863,28 +874,32 @@ async function executeFunctionalPhase(phase,buildId){
   async function recordHold(ref) {
     const terminal=JSON.parse((await reader.object(ref)).data);
     equal([terminal.target,terminal.phase,terminal.buildId,terminal.packageSha256],[target,phase,buildId,facts.packageSha256],'EXACT_HELD_OPERATION');
-    return writeFunctionalStage(phase.toUpperCase()+'_HOLD',{...facts,target,receipt:ref,revision:terminal.observedRevision,trafficPercent:100});
+    equal(terminal.publication,publication||undefined,'FUNCTIONAL_HOLD_PUBLICATION_METHOD');
+    return writeFunctionalStage(phase.toUpperCase()+'_HOLD',{...facts,...method,target,receipt:ref,revision:terminal.observedRevision,trafficPercent:100});
   }
   const pendingHold=await reader.findClaim(holdKey);
   if(pendingHold)return recordHold(pendingHold);
-  let before;
+  let before,rollbackProof;
   if(previous){
     const claim=JSON.parse((await reader.object(previous)).data);
     equal([claim.phase,claim.target,claim.packageSha256,claim.buildId,claim.bindingBlob],[phase,target,facts.packageSha256,buildId,facts.bindingBlob],'FUNCTIONAL_EXISTING_CLAIM_BINDING');
+    equal(claim.publication,publication||undefined,'FUNCTIONAL_EXISTING_PUBLICATION_METHOD');
     before=claim.before;
+    if(direct){rollbackProof=verifyFunctionalRollback(before,binding,phase);equal(claim.rollbackProof,rollbackProof,'DIRECT_LIVE_RETAINED_ROLLBACK_PREIMAGE');}
     // A lost ACK can be adopted only from a physical source and config readback.
     // An unfinished or rolled-back attempt cannot execute a second deployment.
     need(snapshot.revision!==before.revision,'CONSUMED_FUNCTIONAL_CLAIM_NO_REDEPLOY');
   }else{
     before=snapshot;checkServingSnapshot(before,binding.predecessor,phase);
     if(phase==='preview')checkServingSnapshot(readFunctionSnapshot(binding.targets.live,region),binding.predecessor,'live');
-    if(phase==='live'){
+    if(phase==='live'&&!direct){
       const preview=readFunctionSnapshot(binding.targets.preview,region);
       equal(preview.revision,stages.PREVIEW_VERIFIED.revision,'CURRENT_ACCEPTED_PREVIEW_REVISION');
     }
+    if(direct)rollbackProof=verifyFunctionalRollback(before,binding,phase);
     checkedBranch();
     // The compare-and-create must be exclusive even if two observers read no claim.
-    const claim={...facts,phase,target,before,authorityHead:checkedBranch()};
+    const claim={...facts,...method,...(direct?{rollbackProof}:{}),phase,target,before,authorityHead:checkedBranch()};
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),'gi-function-claim-')),file=path.join(dir,'claim.json');
     try{fs.writeFileSync(file,JSON.stringify(claim)+'\n',{mode:0o600});readGcloud(['storage','cp',file,'gs://'+C.bucket+'/'+claimName,'--if-generation-match=0','--quiet']);}
     finally{fs.rmSync(dir,{recursive:true,force:true});}
@@ -895,7 +910,7 @@ async function executeFunctionalPhase(phase,buildId){
     catch(error){
       const fresh=readFunctionSnapshot(target,region),src=fresh.source;
       if(fresh.revision===before.revision||sha(scopedArchive('gs://'+src.bucket+'/'+src.object,src.generation))!==facts.packageSha256){
-        const held=await retainedFunctionRecord(holdKey,{...facts,target,phase,beforeRevision:before.revision,observedRevision:fresh.revision});
+        const held=await retainedFunctionRecord(holdKey,{...facts,...method,target,phase,beforeRevision:before.revision,observedRevision:fresh.revision});
         return recordHold(held);
       }
     }
@@ -904,8 +919,8 @@ async function executeFunctionalPhase(phase,buildId){
   need(after.revision!==before.revision,'FUNCTIONAL_NEW_REVISION_REQUIRED');
   equal(sha(scopedArchive('gs://'+src.bucket+'/'+src.object,src.generation)),facts.packageSha256,'EXACT_DEPLOYED_FUNCTION_ARCHIVE');
   equal(after.configurationDigest,before.configurationDigest,'FUNCTION_CONFIGURATION_CHANGED');
-  const receipt=await retainedFunctionRecord(prefix+phase+'-deployment.json',{...facts,phase,target,before,after,trafficPercent:100});
-  return writeFunctionalStage(stage,{...facts,target,revision:after.revision,trafficPercent:100,receipt,rollbackRevision:before.revision});
+  const receipt=await retainedFunctionRecord(prefix+phase+'-deployment.json',{...facts,...method,...(direct?{rollbackProof}:{}),phase,target,before,after,trafficPercent:100});
+  return writeFunctionalStage(stage,{...facts,...method,...(direct?{rollbackProof}:{}),target,revision:after.revision,trafficPercent:100,receipt,rollbackRevision:before.revision});
 }
 
 function firestoreFields(values){
@@ -1221,7 +1236,7 @@ async function acceptRetainedFunctionalJourney(phase,buildId,ref,report,io=gclou
   equal(scopedCandidate(),p.binding,'JOURNEY_FRESH_CANDIDATE');equal(functionalFacts(readFunctionalPackage(buildId)),p.facts,'JOURNEY_FRESH_PACKAGE');
   equal(current.i66ScopedFunctionRelease.providerStages[phase.toUpperCase()+'_DEPLOYED'],p.deployment,'JOURNEY_FRESH_DEPLOYMENT');await verifyFunctionalJourneyCleanup(p,report);
   equal(readFunctionSnapshot(p.snapshot.target,p.snapshot.region),p.snapshot,'JOURNEY_FRESH_PHYSICAL_REVISION');equal(await verifyScopedHosting(binding),p.hosting,'JOURNEY_FRESH_LIVE_HOSTING');await functionalUiHosting(phase,binding,p.hosting,current,p.uiHosting);checkedBranch();
-  return writeFunctionalStage(phase.toUpperCase()+'_VERIFIED',{...p.facts,target:p.snapshot.target,revision:p.snapshot.revision,trafficPercent:100,roles:p.binding.roles,journeys:ref});
+  return writeFunctionalStage(phase.toUpperCase()+'_VERIFIED',{...p.facts,...(p.deployment.publication?{publication:p.deployment.publication}:{}),target:p.snapshot.target,revision:p.snapshot.revision,trafficPercent:100,roles:p.binding.roles,journeys:ref});
 }
 async function runFunctionalJourneys(phase,buildId,out){
   need(PHASES.includes(phase)&&uuid(buildId),'JOURNEY_RUN_ARGS');checkedBranch();const control=json(C.control),binding=json(UNIT_FILE),prior=control.i66ScopedFunctionRelease.providerStages?.[phase.toUpperCase()+'_VERIFIED'];
@@ -1248,6 +1263,7 @@ async function runFunctionalJourneys(phase,buildId,out){
     return acceptRetainedFunctionalJourney(phase,buildId,proof,report,reader);
   }
   const existing=await reconcile();if(existing&&existing.status!=='READY_FOR_SAFE_JOURNEY_RETRY')return existing;
+  if(phase==='preview'&&fs.existsSync(require('./gravicentra-i66-frontend-control.cjs').DIRECT_LIVE_PUBLICATION.decisionPath))throw Error('I66_NATIVE_OPERATIONAL_DIRECT_LIVE_OWNER_INSTRUCTION_REQUIRES_LIVE');
   const plan=await makeFunctionalJourneyPlan(phase,buildId,existing?.previousAttempt||null),attemptOut=path.join(out,digest(plan));fs.mkdirSync(attemptOut,{recursive:true});
   for(const [name,value] of [['plan.json',plan],['cloudbuild.json',functionalJourneyConfig(plan)]]){const file=path.join(attemptOut,name);if(fs.existsSync(file))equal(json(file),value,'JOURNEY_LOCAL_PLAN_PREIMAGE');else write(file,value);}const config=path.join(attemptOut,'cloudbuild.json');
   let failure;try{execFileSync('gcloud',['builds','submit',C.repositoryUrl,'--git-source-revision='+plan.authorityHead,'--region='+C.region,'--project='+C.projectId,'--config='+path.resolve(config),'--quiet'],{stdio:'inherit'});}catch(error){failure=error;}
@@ -1261,6 +1277,7 @@ async function acceptFunctionalJourney(phase,buildId,refFile){
   const already=adoptedFunctionalJourney(json(C.control),json(UNIT_FILE),phase,buildId,suppliedRef);if(already)return already;
   const b=scopedCandidate(),pkg=readFunctionalPackage(buildId),facts=functionalFacts(pkg),target=b.targets[phase];
   const stages=json(C.control).i66ScopedFunctionRelease.providerStages||{},deployed=stages[phase==='preview'?'PREVIEW_DEPLOYED':'LIVE_DEPLOYED'];
+  need(!deployed?.publication,'DIRECT_LIVE_REQUIRES_RETAINED_SIGNED_JOURNEY');
   equal(deployed?.packageSha256,facts.packageSha256,'EXACT_DEPLOYED_PACKAGE_REQUIRED');
   const snapshot=readFunctionSnapshot(target,b.targets.region);equal(snapshot.revision,deployed.revision,'CURRENT_SIGNED_TEST_REVISION');
   const hosting=await verifyScopedHosting(b),ref=json(refFile),io=gcloudReadIo();
@@ -1321,7 +1338,7 @@ async function rollbackFunctionalPhase(phase,buildId){
   readGcloud(['run','services','update-traffic',snapshot.service,'--region='+b.targets.region,'--to-revisions='+before.revision+'=100','--quiet']);
   const status=JSON.parse(readGcloud(['run','services','describe',snapshot.service,'--region='+b.targets.region,'--format=json(status.traffic)']));
   const traffic=status.status.traffic.filter(x=>x.percent>0);equal(traffic.map(x=>[x.revisionName,x.percent]),[[before.revision,100]],'ROLLBACK_TRAFFIC_READBACK');
-  const facts={...functionalFacts(pkg),phase,target,revision:before.revision,trafficPercent:100,rolledBackRevision:snapshot.revision};
+  const facts={...functionalFacts(pkg),...(deployed.publication?{publication:deployed.publication}:{}),phase,target,revision:before.revision,trafficPercent:100,rolledBackRevision:snapshot.revision};
   const receipt=await retainedFunctionRecord('i66/functional/'+b.unit+'/'+pkg.sourceSha+'/'+buildId+'/'+phase+'-rollback.json',facts);
   return writeFunctionalStage(phase.toUpperCase()+'_ROLLED_BACK',{...facts,receipt});
 }
