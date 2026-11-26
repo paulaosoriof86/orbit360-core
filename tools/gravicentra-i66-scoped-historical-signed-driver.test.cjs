@@ -58,7 +58,14 @@ function harness(phase,role,options={}){
  const evaluate=async(fn,arg)=>{ui.browser.argument=clone(arg);return clone(await vm.runInContext('('+fn.toString()+')(argument)',ui.browser));};
  const find=s=>{const parts=s.split(' ');let e=ui.doc.getElementById(parts.shift().slice(1));for(const p of parts)e=e?.querySelector(p);return e;};
  const locator=s=>({locator:c=>locator(s+' '+c),waitFor:async({state})=>{assert.equal(!!find(s),state!=='detached',s);},inputValue:async()=>find(s).value,fill:async v=>{find(s).value=v;},click:async()=>{assert.equal(find(s).disabled,false);await find(s).onclick();}});
- const page={evaluate,locator,goto:async()=>{},reload:async()=>load(),waitForFunction:async(fn,arg)=>{assert.ok(await evaluate(fn,arg),'UI wait condition');},
+ let pendingActivation;
+ const page={evaluate,locator,goto:async()=>{},reload:async()=>{
+  load();
+  if(options.delayedActivation){pendingActivation=ui.Orbit.productAppP0;delete ui.Orbit.productAppP0;}
+ },waitForFunction:async(fn,arg)=>{
+  if(!await evaluate(fn,arg)&&pendingActivation){ui.Orbit.productAppP0=pendingActivation;pendingActivation=null;}
+  assert.ok(await evaluate(fn,arg),'UI wait condition');
+ },
   on:(e,fn)=>events.set(e,[...(events.get(e)||[]),fn]),off:(e,fn)=>events.set(e,(events.get(e)||[]).filter(v=>v!==fn)),
   waitForResponse:match=>new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending=null;reject(Error('NO_UI_RESPONSE'));},1500);pending={match,resolve,reject,timer};}),close:async()=>{closed=true;}};
  const io={beforeFixtureWrite:async({receiptId,targets})=>{claimCount++;assert.equal([...b.documents].filter(([p])=>p.includes('/data/')).length,0);assert.match(receiptId,/^b3004qa_/);assert.equal(targets.length,4);assert.ok(targets.every(t=>t.collection.startsWith('data/')&&t.collection.endsWith('/items')));if(options.claimHold)throw Error('CLAIM_NOT_ACQUIRED');},readMarker:async()=>({buildId:context.hostingBuildId,sourceSha:context.hostingSourceSha,__qaMarkerSha256:context.hostingMarkerSha256}),requireExistingLegalReadiness:async()=>{if(options.legalHold){
@@ -72,6 +79,11 @@ function harness(phase,role,options={}){
   return{status:options.witnessHold?'HOLD':'PASS',requestId:journey.requestId,matchingPaymentIds:[journey.cobroId]};}},io);
  return{run,b,calls,deletes,get readbackCount(){return readbackCount;},get claimCount(){return claimCount;}};
 }
+test('cold reload waits for the signed product activation API after Cobros registers',async()=>{
+ const h=harness('live','direccion',{delayedActivation:true});
+ const proof=await h.run();
+ assert.equal(proof.reloaded,true);assert.equal(proof.idempotentReplay,true);assert.equal(proof.cleanup.remaining,0);
+});
 for(const phase of ['preview','live'])for(const role of ['direccion','operativo'])test('scoped historical '+phase+' '+role+' actual modal/callable: logical1→1, physical0→1, reload/replay/readback then cleanup',async()=>{
  const h=harness(phase,role),p=await h.run();assert.equal(p.status,'PASS');assert.equal(p.normalUi,true);assert.equal(p.idempotentReplay,true);assert.equal(p.originalPaymentCount,1);assert.equal(p.originalCobroDocumentCount,0);assert.equal(p.afterCobroDocumentCount,1);assert.equal(h.calls.length,2);assert.ok(h.calls.every(c=>c.operation==='reconcile_payment'));assert.equal(h.readbackCount,1);assert.equal(h.deletes.length,6);assert.equal(p.cleanup.remaining,0);assert.ok(p.cleanup.targets.every(t=>t.collection&&t.id));
 });
