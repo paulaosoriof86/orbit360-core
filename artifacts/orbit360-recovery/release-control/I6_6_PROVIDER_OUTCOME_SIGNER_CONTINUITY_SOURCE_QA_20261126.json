@@ -1,0 +1,68 @@
+{
+  "schema": "GI_I66_PROVIDER_OUTCOME_SIGNER_CONTINUITY_SOURCE_QA_V1",
+  "status": "SOURCE_QA_PASS_REAL_PROVIDER_EXECUTION_PENDING",
+  "baseHead": "f2e5168ea12d83dbac8a6e68a5b63110ce10277a",
+  "createdAtUtc": "2026-11-26T02:30:11.453075+00:00",
+  "causalObservation": {
+    "reportedBy": "root",
+    "runtime": "current authorized Cloud Shell",
+    "missingExistingFiles": [
+      "/tmp/gravicentra-p0.JLaL1T/p0-one-release-signing",
+      "/tmp/gravicentra-p0.JLaL1T/p0-one-release-signing.pub"
+    ],
+    "existingGhLoginConfirmed": "paulaosoriof86",
+    "priorFailure": "commitProviderOutcome requires GRAVICENTRA_I66_SIGNING_KEY and local private/public files before recording an already verified provider result",
+    "scope": "This observation does not assert that a different Work executor has lost its signer."
+  },
+  "change": "Existing synchronous metadata owner uses existing gh authenticated createCommitOnBranch when no explicitly configured SSH key and public companion are present; exact parent/tree/message and GitHub signature remain mandatory. Existing configured registered SSH route is preserved.",
+  "files": [
+    {
+      "path": "tools/gravicentra-i66-frontend-control.cjs",
+      "beforeBlob": "1401c23d00a31214f56298806e6a0b1fb6009b55",
+      "afterBlob": "9aa1b7714800dec158a7528f311ede1cf2c63ead",
+      "sha256": "bcdf878dd704945212bb4355026a6571cb40bf17add1dc8b87394f4775ee4710",
+      "bytes": 111046
+    },
+    {
+      "path": "tools/gravicentra-i66-provider-outcome-github-signing.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "98915d09c6189d01541bb98f45586bd34d636c67",
+      "sha256": "005f272cf1617228f619fafc692274b3ce8062991faa43c08f8c83530c151e3b",
+      "bytes": 8154
+    }
+  ],
+  "tests": {
+    "passed": 98,
+    "failed": 0,
+    "newDiscriminants": 10,
+    "command": "node --test tools/gravicentra-i66-provider-outcome-github-signing.test.cjs tools/gravicentra-i66-frontend-control.test.cjs tools/gravicentra-i66-scoped-historical-journeys.test.cjs",
+    "logPath": "artifacts/orbit360-recovery/release-control/I6_6_PROVIDER_OUTCOME_SIGNER_CONTINUITY_SOURCE_QA_20261126.tap",
+    "logSha256": "5b2e6a1d1b5a97e00690c82bdc86271f20a819153a501ed1a50d3809f801f20a"
+  },
+  "discriminants": [
+    "missing ephemeral SSH path with no key generation",
+    "exact three metadata paths and actual Git tree",
+    "lost ACK after successful CAS adopts once",
+    "transport loss before CAS retries identical payload only after unchanged HEAD",
+    "unsigned result rejected",
+    "wrong tree rejected",
+    "wrong parent rejected",
+    "write permission failure remains single failed attempt",
+    "concurrent HEAD rejected before mutation",
+    "working preimage or additional source path rejected"
+  ],
+  "invariants": {
+    "newCredentials": 0,
+    "keyRegistrations": 0,
+    "iamChanges": 0,
+    "authChanges": 0,
+    "productSourceChanges": 0,
+    "hostingChanges": 0,
+    "deployments": 0,
+    "businessWrites": 0,
+    "snapshot132Changed": false,
+    "providerReceiptsFabricated": false
+  },
+  "continuation": "Admit only at a coordinated free boundary. The signed journey pins the tools tree; do not change this owner during an active journey or before resolving its result. Resume the current package through the existing three scoped commands.",
+  "productionAccepted": false
+}

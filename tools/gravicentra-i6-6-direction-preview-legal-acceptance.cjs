@@ -731,7 +731,76 @@ async function acceptDirectionLiveLegal({page,actor,cfg}){
   }
 }
 
-module.exports={CONTROL,RECEIPT,DECISION,SOURCE_BASE,SOURCE_PARENT,ORIGIN,ADVISOR,TENANT,VERSION,CLAUSES,TERMS_SHA256,REVIEW_SHA256,TECHNICAL_RETRY,technicalRetryCandidatePin,validateTechnicalRetry,
+// The scoped Cobros package uses the already certified E3 interface. Its own
+// source and the current request-35 transport do not identify those UI bytes.
+const historicalE3=Object.freeze({
+  preview:'68b18de6a285eedd0dd678ff7f89fe18f7b6a882',
+  live:'f509fe1a58c8067aeafe7d655e0244a99328c5ce',
+  digest:'7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc',
+  generation:'1795660702011577'
+});
+function protectedDirectionControl(context,actor) {
+  assert.equal(actor.role,'direccion','SCOPED_DIRECTION_PERSONAL_ROLE');
+  assert.equal(actor.advisorId,ADVISOR,'SCOPED_DIRECTION_PERSONAL_ADVISOR');
+  assert.ok(['preview','live'].includes(context.phase),'SCOPED_DIRECTION_PHASE');
+  const control=JSON.parse(fs.readFileSync('artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'));
+  const front=control.i66FrontendReleaseHead, unit=control.i66ScopedFunctionRelease;
+  const stage=unit.providerStages[context.phase.toUpperCase()+'_DEPLOYED'];
+  assert.equal(unit.unit,'documented-historical-payment');
+  assert.equal(unit.protectedHosting,front.hostingVersion);
+  assert.deepEqual([stage.sourceSha,stage.buildId,stage.packageSha256,stage.revision],
+    [context.sourceSha,context.buildId,context.packageSha256,context.revision]);
+  assert.equal(front.artifactDigest,'sha256:'+historicalE3.digest);
+  assert.deepEqual([context.uiHosting.version,context.hostingSourceSha,context.hostingBuildId],
+    [front.hostingVersion,front.sourceSha,front.buildId]);
+  assert.equal(context.origin,context.phase==='preview'?front.previewUrl:LIVE_SCOPE.origin);
+  const head=historicalE3[context.phase];
+  const git=(...args)=>execFileSync('git',args);
+  git('merge-base','--is-ancestor',head,'HEAD');
+  const archived=JSON.parse(git('show',head+':'+CONTROL));
+  const candidate=require('./gravicentra-i6-6-operational-release-candidate.cjs').candidateForPhase(archived,context.phase);
+  assert.deepEqual([candidate.sourceSha,candidate.buildId,candidate.artifactId,candidate.artifactDigest,candidate.previewUrl],
+    [front.sourceSha,front.buildId,front.artifactId,front.artifactDigest,front.previewUrl]);
+  const cfg={phase:context.phase.toUpperCase(),source:front.sourceSha,origin:context.origin};
+  const paths=[RECEIPT,I66_SCOPE.receiptPath];
+  if(context.phase==='live')paths.push(LIVE_SCOPE.authorizationPath,LIVE_SCOPE.proposalPath);
+  for(const file of paths) {
+    const current=fs.readFileSync(file);
+    assert.deepEqual(current,git('show',head+':'+file),'SCOPED_DIRECTION_AUTHORITY_CHANGED');
+    assert.deepEqual(current,git('show',front.sourceSha+':'+file),'SCOPED_DIRECTION_SOURCE_DECISION_CHANGED');
+  }
+  assert.equal(hash(fs.readFileSync(RECEIPT)),I66_SCOPE.historicalReceiptSha256);
+  git('merge-base','--is-ancestor',I66_SCOPE.sourceBaseHead,front.sourceSha);
+  if(context.phase==='live') {
+    const auth=readLiveScopeAuthorization(archived,candidate);
+    git('merge-base','--is-ancestor',auth.receipt.sourceBaseHead,front.sourceSha);
+    assert.equal(hash(actor.uid),auth.receipt.subject.actorUidSha256);
+    return {cfg,candidate,receipt:auth.receipt,receiptSha256:auth.receiptSha256};
+  }
+  const bytes=fs.readFileSync(I66_SCOPE.receiptPath),receipt=JSON.parse(bytes),receiptSha256=hash(bytes);
+  validateI66ScopeDecision({receipt,receiptSha256,candidate,cfg,actor,control:archived});
+  return {cfg,candidate,receipt,receiptSha256};
+}
+async function acceptHistoricalDirectionLegal({page,actor,context}){
+  const authority=protectedDirectionControl(context,actor);
+  const root=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'i66-e3-legal-'));
+  try{
+    const uri='gs://ays-orbit360-firestore-private-backup-646761409743/i66/functional/qa-hosting-artifacts/'+historicalE3.digest+'.zip#'+historicalE3.generation;
+    const raw=execFileSync('gcloud',['storage','cat',uri],{maxBuffer:8*1024*1024});
+    assert.equal(hash(raw),historicalE3.digest,'SCOPED_DIRECTION_IMMUTABLE_UI_ARCHIVE');
+    const zip=path.join(root,'archive.zip');fs.writeFileSync(zip,raw);
+    const tar=execFileSync('unzip',['-p',zip,'gi-i66-exact-package.tar.gz'],{maxBuffer:8*1024*1024});
+    for(const file of ['bundle/site/__recovery__/build.json','bundle/site/core/legal.js']){
+      const dst=path.join(root,file);fs.mkdirSync(path.dirname(dst),{recursive:true});
+      fs.writeFileSync(dst,execFileSync('tar',['-xzOf','-',file],{input:tar}));
+    }
+    const proof=await applyDirectionLegalUi({...authority,page,actor,cfg:{...authority.cfg,packageRoot:root},scoped:true,phase:authority.cfg.phase});
+    if(context.phase==='live')validateLiveAcceptanceProof(proof,authority.candidate);
+    else validateAcceptanceProof(proof,authority.candidate);
+    return proof;
+  }finally{fs.rmSync(root,{recursive:true});}
+}
+module.exports={protectedDirectionControl,acceptHistoricalDirectionLegal,CONTROL,RECEIPT,DECISION,SOURCE_BASE,SOURCE_PARENT,ORIGIN,ADVISOR,TENANT,VERSION,CLAUSES,TERMS_SHA256,REVIEW_SHA256,TECHNICAL_RETRY,technicalRetryCandidatePin,validateTechnicalRetry,
   PROPOSAL_DIAGNOSTIC_RETRY,proposalDiagnosticRetryCandidatePin,validateProposalDiagnosticRetry,I66_SCOPE,usesI66Scope,i66ScopeCandidatePin,validateI66ScopeCandidate,validateI66ScopeDecision,validateReloadReadback,
   LIVE_SCOPE,liveScopeCandidatePin,buildLiveReviewQuestion,buildLiveReviewContext,liveReviewContextDigest,validateLiveScopeCandidate,validateLiveScopeDecision,readLiveScopeAuthorization,assertDirectionLiveLegalAuthority,preflightDirectionLiveLegalPackage,validateLiveAcceptanceProof,acceptDirectionLiveLegal,
   LEGAL_FAILURE_CHECKS,LEGAL_FAILURE_SUBSTAGES,safeLegalFailureSubstage,digest,projectCatalog,validateDecision,validatePresentationIdentity,validatePresentation,validateCountrySelection,validateAccepted,validateAcceptanceProof,acceptDirectionPreviewLegal};

@@ -479,45 +479,79 @@ function commitProviderOutcome(change) {
   assert.match(checkpoint,/^artifacts\/orbit360-recovery\/release-control\/I6_6_CURRENT_EXECUTION_PROGRESS_[0-9]{8}_R[1-9][0-9]*\.json$/);
   assert.ok(paths.includes(P.cp)&&paths.includes(P.state));
   const git=(args,options={})=>execFileSync('git',args,{stdio:['pipe','pipe','pipe'],maxBuffer:16*1024*1024,...options});
-  const gh=(args)=>JSON.parse(execFileSync('gh',['api',...args],{encoding:'utf8'}));
+  const gh=(args,input)=>JSON.parse(execFileSync('gh',['api',...args],{encoding:'utf8',input,maxBuffer:16*1024*1024}));
   const ref=()=>gh(['repos/'+repo+'/git/ref/heads/'+branch]).object.sha;
-  assert.equal(ref(),head,'I66_TERMINAL_RECOMPOSE_FROM_FRESH_HEAD');
   assertTerminalAttemptChangeSetPreimages(change,{head:git(['rev-parse','HEAD']).toString().trim(),...fs});
   for(const [p,expected] of Object.entries(change.expectedPreimages)){
     const row=git(['ls-tree',head,'--',p]).toString().trim();
     assert.equal(row?row.split(/\s+/)[2]:null,expected,'I66_TERMINAL_VERSIONED_PREIMAGE_'+p);
   }
   const account=gh(['user']);assert.equal(account.login,'paulaosoriof86');
-  const key=process.env.GRAVICENTRA_I66_SIGNING_KEY;assert.ok(key&&path.isAbsolute(key),'I66_SIGNING_KEY_REQUIRED');
-  const publicKey=fs.readFileSync(key+'.pub','utf8').trim().split(/\s+/).slice(0,2).join(' ');
-  assert.ok(gh(['users/'+account.login+'/ssh_signing_keys']).some(k=>k.key.trim().split(/\s+/).slice(0,2).join(' ')===publicKey),'I66_PROVIDER_REGISTERED_SIGNER_REQUIRED');
   const temp=fs.mkdtempSync(path.join(os.tmpdir(),'gi-i66-signed-cas-'));
   const email=account.id+'+'+account.login+'@users.noreply.github.com';
   const message='release(i66): reconcile verified provider outcome at R'+change.changes[checkpoint].version;
   try{
-    const env={...process.env,GIT_INDEX_FILE:path.join(temp,'index')};
+    const env={...process.env,GIT_INDEX_FILE:path.join(temp,'index')},additions=[];
     git(['read-tree',head],{env});
     for(const p of paths){
       const bytes=serial(change.changes[p]);
       const oid=git(['hash-object','-w','--stdin'],{input:bytes}).toString().trim();assert.equal(oid,blob(bytes));
       git(['update-index','--add','--cacheinfo','100644',oid,p],{env});
+      additions.push({path:p,contents:Buffer.from(bytes).toString('base64')});
     }
     const tree=git(['write-tree'],{env}).toString().trim();
-    const sha=git(['-c','user.name='+account.login,'-c','user.email='+email,'-c','gpg.format=ssh','-c','user.signingkey='+key,'commit-tree','-S',tree,'-p',head,'-m',message]).toString().trim();
-    fs.writeFileSync(path.join(temp,'allowed'),email+' '+publicKey+'\n',{mode:0o600});
-    git(['-c','gpg.ssh.allowedSignersFile='+path.join(temp,'allowed'),'verify-commit',sha]);
-    assert.equal(git(['rev-list','--parents','-1',sha]).toString().trim(),sha+' '+head);
-    assert.equal(git(['rev-parse',sha+'^{tree}']).toString().trim(),tree);
-    assert.equal(git(['log','-1','--format=%s',sha]).toString().trim(),message);
-    fs.writeFileSync(path.join(temp,'pre-push'),'#!/bin/sh\nset -eu\nread -r local_ref local_sha remote_ref remote_sha\ntest "$local_sha" = "'+sha+'" && test "$remote_ref" = "refs/heads/'+branch+'" && test "$remote_sha" = "'+head+'" || exit 1\nif read -r extra; then exit 1; fi\n',{mode:0o700});
-    assert.equal(ref(),head,'I66_TERMINAL_RECOMPOSE_FROM_FRESH_HEAD');
-    try{git(['-c','core.hooksPath='+temp,'-c','credential.helper=','-c','credential.helper=!gh auth git-credential','push','--porcelain',remote,sha+':refs/heads/'+branch]);}
-    catch(error){if(ref()!==sha)throw Error('I66_SIGNED_CAS_UNCONFIRMED_RECOMPOSE_FROM_FRESH_HEAD');}
-    const commit=gh(['repos/'+repo+'/git/commits/'+sha]);
-    assert.equal(commit.verification.verified,true,'I66_GITHUB_VERIFICATION_REQUIRED');
-    assert.deepEqual(commit.parents.map(p=>p.sha),[head]);assert.equal(commit.tree.sha,tree);
-    assert.equal(commit.message.replace(/\n$/,''),message);assert.equal(ref(),sha);
-    return {sha,tree,parent:head,message,verified:true};
+    // Read back the exact one-parent tree and its GitHub signature before
+    // adopting any acknowledgement. A different concurrent commit is a HOLD.
+    function verified(sha){
+      assert.match(sha,/^[a-f0-9]{40}$/);
+      const commit=gh(['repos/'+repo+'/git/commits/'+sha]);
+      assert.equal(commit.verification.verified,true,'I66_GITHUB_VERIFICATION_REQUIRED');
+      assert.deepEqual(commit.parents.map(p=>p.sha),[head],'I66_SIGNED_CAS_EXACT_PARENT');
+      assert.equal(commit.tree.sha,tree,'I66_SIGNED_CAS_EXACT_TREE');
+      assert.equal(commit.message.replace(/\n$/,''),message,'I66_SIGNED_CAS_EXACT_MESSAGE');
+      assert.equal(ref(),sha,'I66_SIGNED_CAS_POST_COMMIT_HEAD_CHANGED');
+      return {sha,tree,parent:head,message,verified:true};
+    }
+    const initial=ref();if(initial!==head)return verified(initial);
+    const key=process.env.GRAVICENTRA_I66_SIGNING_KEY;
+    // An explicitly configured, still-present registered key preserves the
+    // existing SSH route. A lost /tmp key is not a new credential requirement:
+    // the existing authenticated GitHub expected-head mutation signs the same
+    // bounded metadata delta. No key is generated, registered or exported.
+    if(key&&path.isAbsolute(key)&&fs.existsSync(key)&&fs.existsSync(key+'.pub')){
+      const publicKey=fs.readFileSync(key+'.pub','utf8').trim().split(/\s+/).slice(0,2).join(' ');
+      assert.ok(gh(['users/'+account.login+'/ssh_signing_keys']).some(k=>k.key.trim().split(/\s+/).slice(0,2).join(' ')===publicKey),'I66_PROVIDER_REGISTERED_SIGNER_REQUIRED');
+      const sha=git(['-c','user.name='+account.login,'-c','user.email='+email,'-c','gpg.format=ssh','-c','user.signingkey='+key,'commit-tree','-S',tree,'-p',head,'-m',message]).toString().trim();
+      fs.writeFileSync(path.join(temp,'allowed'),email+' '+publicKey+'\n',{mode:0o600});
+      git(['-c','gpg.ssh.allowedSignersFile='+path.join(temp,'allowed'),'verify-commit',sha]);
+      assert.equal(git(['rev-list','--parents','-1',sha]).toString().trim(),sha+' '+head);
+      assert.equal(git(['rev-parse',sha+'^{tree}']).toString().trim(),tree);
+      assert.equal(git(['log','-1','--format=%s',sha]).toString().trim(),message);
+      fs.writeFileSync(path.join(temp,'pre-push'),'#!/bin/sh\nset -eu\nread -r local_ref local_sha remote_ref remote_sha\ntest "$local_sha" = "'+sha+'" && test "$remote_ref" = "refs/heads/'+branch+'" && test "$remote_sha" = "'+head+'" || exit 1\nif read -r extra; then exit 1; fi\n',{mode:0o700});
+      const fresh=ref();if(fresh!==head)return verified(fresh);
+      try{git(['-c','core.hooksPath='+temp,'-c','credential.helper=','-c','credential.helper=!gh auth git-credential','push','--porcelain',remote,sha+':refs/heads/'+branch]);}
+      catch(error){if(ref()!==sha)throw Error('I66_SIGNED_CAS_UNCONFIRMED_RECOMPOSE_FROM_FRESH_HEAD');}
+      return verified(sha);
+    }
+    const query='mutation($input:CreateCommitOnBranchInput!){createCommitOnBranch(input:$input){commit{oid}}}';
+    const payload=JSON.stringify({query,variables:{input:{branch:{repositoryNameWithOwner:repo,branchName:branch},expectedHeadOid:head,message:{headline:message},fileChanges:{additions}}}});
+    const transient=error=>/ECONNRESET|ETIMEDOUT|EPIPE|ENOTFOUND|EAI_AGAIN|unexpected EOF|connection reset|timed out|timeout|HTTP 50[234]/i.test(String(error?.stderr||'')+' '+String(error?.message||''));
+    for(let attempt=0;attempt<3;attempt++){
+      const fresh=ref();if(fresh!==head)return verified(fresh);
+      try{
+        const response=gh(['graphql','--input','-'],payload);
+        assert.ok(!response.errors?.length&&response.data?.createCommitOnBranch?.commit?.oid,'I66_SIGNED_EXPECTED_HEAD_CAS_FAILED');
+        return verified(response.data.createCommitOnBranch.commit.oid);
+      }catch(error){
+        // Never switch signing method or blindly repeat after an unknown ACK.
+        // Re-read first; only the exact accepted commit or unchanged parent is
+        // admissible. A read failure leaves the retained provider proof pending.
+        const observed=ref();if(observed!==head)return verified(observed);
+        if(!transient(error)||attempt===2)throw error;
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,200*(attempt+1));
+      }
+    }
+    throw Error('I66_SIGNED_CAS_UNCONFIRMED_RECOMPOSE_FROM_FRESH_HEAD');
   }finally{fs.rmSync(temp,{recursive:true,force:true});}
 }
 

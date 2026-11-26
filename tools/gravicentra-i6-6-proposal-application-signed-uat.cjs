@@ -304,7 +304,17 @@ async function exerciseScopedHistoricalPayment({page,actor,context,tenant,item,n
  assert.equal(typeof onServerReadback,'function','I66_SCOPED_SERVER_READBACK_CALLBACK_REQUIRED');
  assert.ok(['direccion','operativo'].includes(actor.role));assert.ok(actor.uid);assert.equal(context.tenantId,TENANT);
  const readMarker=io.readMarker|| (async()=>{const r=await fetch(context.origin+'/__recovery__/build.json',{cache:'no-store',redirect:'error'});assert.equal(r.status,200);const bytes=Buffer.from(await r.arrayBuffer());return{...JSON.parse(bytes),__qaMarkerSha256:hash(bytes)};});
- const legal=io.requireExistingLegalReadiness||require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs').requireExistingLegalReadiness;
+ const existingLegal=io.requireExistingLegalReadiness||require('./gravicentra-i6-6-carlos-paula-live-direct-renewal-synthetic-uat.cjs').requireExistingLegalReadiness;
+ let directionLegalProof;
+ const legal=async page=>{
+  try{return await existingLegal(page);}catch(error){
+   if(actor.role!=='direccion'||directionLegalProof||error.message!=='I66_DIRECT_FORMS_EXISTING_ACTOR_LEGAL_ACCEPTANCE_REQUIRED')throw error;
+   const signed=await page.evaluate(()=>{const u=Orbit.auth.user();return {uid:u.uid,advisorId:u.advisorId};});
+   assert.equal(signed.uid,actor.uid,'SCOPED_DIRECTION_AUTHENTICATED_ACTOR');
+   directionLegalProof=await require('./gravicentra-i6-6-direction-preview-legal-acceptance.cjs').acceptHistoricalDirectionLegal({page,actor:{...actor,advisorId:signed.advisorId},context});
+   return existingLegal(page);
+  }
+ };
  const marker=await readMarker();assert.deepEqual([marker.buildId,marker.sourceSha,marker.__qaMarkerSha256],[context.hostingBuildId,context.hostingSourceSha,context.hostingMarkerSha256],'I66_SCOPED_HOSTING_MARKER');
  let f=null;const initial=11+(parseInt(hash(nonce+'|'+actor.role).slice(0,8),16)%1559);
  // Never reuse a primary source key that already belongs to a real or QA payment.
@@ -344,6 +354,7 @@ async function exerciseScopedHistoricalPayment({page,actor,context,tenant,item,n
   assert.equal(digest(await snapshot(targets)),digest(afterRows),'I66_SCOPED_RELOAD_MUTATED_DATA');writerSettled=false;
   const replay=await page.evaluate(async x=>Orbit.productRuntimeBrowserProvidersP0.callFunction(x.target,x.data,x.region),{target:context.target,region:context.region,data:observedData});writerSettled=true;assert.equal(replay.reused,true);assert.equal(digest(await snapshot(targets)),digest(afterRows),'I66_SCOPED_REPLAY_MUTATED_DATA_OR_VERSION');proof.replayUnchanged=true;proof.idempotentReplay=true;
   const currentMarker=await readMarker();assert.deepEqual([currentMarker.buildId,currentMarker.sourceSha,currentMarker.__qaMarkerSha256],[context.hostingBuildId,context.hostingSourceSha,context.hostingMarkerSha256]);
+  if(directionLegalProof)proof.directionLegalAcceptance=directionLegalProof;
   const witness=await onServerReadback({journey:{...proof},before,after:afterRows});assert.equal(witness?.status,'PASS','I66_SCOPED_EXTERNAL_SERVER_READBACK_REQUIRED');proof.serverReadback=witness;
  }catch(error){failure=error;}
  finally{
