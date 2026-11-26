@@ -13693,5 +13693,29 @@
     "acceptanceScope": "Current immutable candidate42 B4-003 only. Earlier accepted module evidence is preserved monotonically; no new global-IAM/security certification or other gate acceptance.",
     "subsequentGateAuthorized": false,
     "augustDataRefreshAuthorized": false
+  },
+  "i66TechnicalHandoffs": {
+    "GI-HO-07": {
+      "id": "GI-HO-07",
+      "gate": "I6.6",
+      "handoff": "PORT-HO-GI-20261126-03",
+      "classification": "DEPENDENCY",
+      "related": [
+        "GI-AUD-08",
+        "GI-AUD-09",
+        "GI-AUD-10"
+      ],
+      "status": "RECEIVED_OPEN",
+      "existingSource": "ef8c6ee13a652430648d37369df16610b0d1baea",
+      "administrativeCobrosBlob": "0d602488d3ac2f94aa22862b44a98d3524f93439",
+      "protectedCobrosBlob": "f673af776484431295aa7e4b20ae26d3b09eab7e",
+      "registeredDeployment": "d2f8d8c1673450fc79bc8240ceb2dcf814873a5f",
+      "functionalReleaseAccepted": false,
+      "requirements": [
+        "Use documented administrative calendar preview and commit with tenant, policy, edition and receipt identity.",
+        "Preserve existing payment IDs and independent settlement status. Re-inspect after concurrent changes.",
+        "Reconcile RC-01 through RC-14 and all affected projections on reload. Keep identifiable evidence private."
+      ]
+    }
   }
 }
