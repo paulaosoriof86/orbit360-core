@@ -16,6 +16,7 @@ if(args[1]!=='graphql')throw Error('Unexpected endpoint; no credentials or signi
 const raw=fs.readFileSync(0,'utf8'),payload=JSON.parse(raw),input=payload.variables.input;
 state.writes++;state.payloads.push(crypto.createHash('sha256').update(raw).digest('hex'));save();
 if(input.expectedHeadOid!==state.head)throw Error('expected HEAD rejected');
+if(state.mode==='cut'){process.stderr.write('HTTP 499 / EPIPE');process.exit(1);}
 if(state.mode==='denied'){process.stderr.write('GraphQL: Resource not accessible (HTTP 403)');process.exit(1);}
 if(state.mode==='before-ack'&&state.writes===1){process.stderr.write('connection reset by peer');process.exit(1);}
 const index=path.join(path.dirname(file),'provider-index'),env={...process.env,GIT_INDEX_FILE:index};
@@ -50,3 +51,16 @@ test('permission rejection remains a single failed mutation and cannot create a 
 test('concurrent foreign HEAD is rejected before mutation',()=>{const f=fixture();try{const s=f.state(),foreign='f'.repeat(40);s.head=foreign;s.commits[foreign]={sha:foreign,parents:[{sha:f.head}],tree:{sha:'0'.repeat(40)},message:'Another writer',verification:{verified:true}};f.save(s);const r=f.run();assert.equal(r.status,1);assert.match(r.stderr,/I66_SIGNED_CAS_EXACT_TREE/);assert.equal(f.state().writes,0);}finally{f.cleanup();}});
 test('changed working preimage prevents the GitHub mutation',()=>{const f=fixture();try{f.put(owner.P.state,{other:true});const r=f.run();assert.equal(r.status,1);assert.match(r.stderr,/I66_TERMINAL_PREIMAGE_CAS_CHANGED/);assert.equal(f.state().writes,0);}finally{f.cleanup();}});
 test('a source path cannot be smuggled into the three metadata paths',()=>{const f=fixture();try{f.change.changes['functions/bootstrap.js']={unexpected:true};f.update();const r=f.run();assert.equal(r.status,1);assert.equal(f.state().writes,0);}finally{f.cleanup();}});
+
+test('499 without ACK consumes one attempt per invocation and survives a process restart with a bounded identical payload',()=>{
+  const f=fixture('cut');
+  try{
+    for(let i=1;i<=3;i++){
+      const result=f.run();
+      assert.equal(result.status,1);assert.match(result.stderr,/I66_SIGNED_CAS_ACK_PENDING/);
+      assert.equal(f.state().writes,i);assert.equal(f.state().head,f.head);
+    }
+    const result=f.run();
+    assert.equal(result.status,1);assert.equal(f.state().writes,3);assert.equal(new Set(f.state().payloads).size,1);
+  }finally{f.cleanup();}
+});

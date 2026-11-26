@@ -291,7 +291,7 @@ function bindingFromHosting(cwd,hostingPlan,receipt,mechanismSha){
 }
 function makePlan(cwd,phase){
   need(PHASES.includes(phase),'PHASE');const g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
-  const control=json(path.join(cwd,g.CONTROL)),p=g.candidateForPhase(control,phase);assertCompositeFresh(p,json(path.join(cwd,C.control)),(ref,f)=>git(cwd,'rev-parse',ref+':'+f));validateBinding(p);
+  const control=json(path.join(cwd,g.CONTROL)),p=g.candidateForPhase(control,phase);assertCompositeFresh(p,json(path.join(cwd,C.control)),(ref,f)=>git(cwd,'rev-parse',ref+':'+f),phase,fs.existsSync(path.join(cwd,UNIT_FILE))?json(path.join(cwd,UNIT_FILE)):undefined);validateBinding(p);
   const authorityHead=git(cwd,'rev-parse','HEAD');equal(git(cwd,'status','--porcelain','--untracked-files=no'),'','CLEAN_AUTHORITY_CHECKOUT');
   verifyPinnedOwners(p,{head:authorityHead,cwd});
   const workflow=phase==='preview'?C.previewWorkflow:C.liveWorkflow,bytes=gitBytes(cwd,p.sourceSha,workflow),blocks=workflowBlocks(bytes.toString(),phase);runtimeBlocks(blocks,phase);
@@ -426,10 +426,39 @@ function consumeNativeEnv(file,env){
     else need(match[2].startsWith(env.RUNNER_TEMP+'/')&&!match[2].split('/').includes('..'),'PACKAGE_PATH_OUTPUT');env[match[1]]=match[2];}
   fs.writeFileSync(file,'',{mode:0o600});return env;
 }
+async function protectOverlappingLiveDeploy(candidate,phase,control,binding,reader=operationalClaimReader()){
+  const release=control.i66ScopedFunctionRelease,pkg=release?.providerStages?.PACKAGE_CERTIFIED;
+  if(phase!=='live'||!pkg)return;
+  need(Array.isArray(candidate.targets?.live),'COMPOSITE_LIVE_TARGETS_REQUIRED');
+  if(!candidate.targets.live.some(t=>t.name===binding.targets.live&&t.region===binding.targets.region))return;
+  if(release.accepted){
+    const live=readFunctionSnapshot(binding.targets.live,binding.targets.region);
+    equal(live.revision,release.accepted.revision,'COMPOSITE_ACCEPTED_SERVING_REVISION');
+    const src=live.source;
+    equal(sha(scopedArchive('gs://'+src.bucket+'/'+src.object,src.generation)),release.accepted.packageSha256,'COMPOSITE_ACCEPTED_SERVING_PACKAGE');
+    return;
+  }
+  const prefix='i66/functional/'+binding.unit+'/'+pkg.sourceSha+'/'+pkg.buildId+'/live-';
+  const claim=await reader.findClaim(prefix+'claim.json');
+  if(!claim)return;
+  const rolled=release.providerStages.LIVE_ROLLED_BACK;
+  need(rolled,'SCOPED_LIVE_CLAIM_PENDING_BEFORE_COMPOSITE_DEPLOY');
+  const receipt=await reader.findClaim(prefix+'rollback.json');
+  equal(receipt,rolled.receipt,'COMPOSITE_RECONCILED_COMPENSATION');
+  const restored=JSON.parse((await reader.object(receipt)).data);
+  equal([restored.target,restored.revision,restored.packageSha256,restored.buildId],
+    [binding.targets.live,binding.predecessor.revision,pkg.packageSha256,pkg.buildId],'COMPOSITE_ROLLBACK_PROOF');
+  // A later unrelated service revision must never be overwritten on this basis.
+  const row=JSON.parse(readGcloud(['run','services','describe',binding.targets.live.toLowerCase(),
+    '--region='+binding.targets.region,'--format=json']));
+  equal(singleRollbackRoute(row,binding.targets.live,binding.targets.region).revision,restored.revision,'COMPOSITE_PHYSICAL_PREDECESSOR');
+}
 function branchGuard(p,plan,cwd){
   git(cwd,'fetch','--quiet',C.repositoryUrl,'refs/heads/'+C.branch);const head=git(cwd,'rev-parse','FETCH_HEAD');
   const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),tr=JSON.parse(gitBytes(cwd,head,g.CONTROL));
-  assertCompositeFresh(p,JSON.parse(gitBytes(cwd,head,C.control)),(ref,f)=>git(cwd,'rev-parse',ref+':'+f));equal(g.candidateForPhase(tr,plan.phase),p,'CURRENT_CANONICAL_AUTHORIZATION');verifyPinnedOwners(p,{head,cwd});
+  const releaseControl=JSON.parse(gitBytes(cwd,head,C.control));
+  const binding=releaseControl.i66ScopedFunctionRelease?JSON.parse(gitBytes(cwd,head,UNIT_FILE)):undefined;
+  assertCompositeFresh(p,releaseControl,(ref,f)=>git(cwd,'rev-parse',ref+':'+f),plan.phase,binding);equal(g.candidateForPhase(tr,plan.phase),p,'CURRENT_CANONICAL_AUTHORIZATION');verifyPinnedOwners(p,{head,cwd});
   equal(blob(gitBytes(cwd,head,'artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_PROMOTION_AUTHORITY.json')),plan.financialAuthorityBlob,'CURRENT_FINANCIAL_AUTHORITY');return head;
 }
 async function retainMake(phase){
@@ -484,7 +513,12 @@ async function worker(plan){
     command(process.execPath,['tools/gravicentra-i66-frontend-promotion-owner.cjs','--verify-composite-financial-preview']);
     shell('signedPreview');shell('snapshot');
   }
-  branchGuard(p,plan,cwd);const claimValue={schema:'GI_I66_NATIVE_OPERATIONAL_CLAIM_V1',executionProvider:C.provider,buildId:identity.buildId,phase:plan.phase,sourceSha:p.sourceSha,artifactId:p.artifactId,artifactDigest:p.artifactDigest,authorityHead:plan.authorityHead,planSha256:digest(plan),candidateSha256:plan.candidateSha256};
+  const protectLive=async()=>{
+    const head=branchGuard(p,plan,cwd),control=JSON.parse(gitBytes(cwd,head,C.control));
+    if(plan.phase==='live'&&control.i66ScopedFunctionRelease?.providerStages?.PACKAGE_CERTIFIED)
+      await protectOverlappingLiveDeploy(p,plan.phase,control,JSON.parse(gitBytes(cwd,head,UNIT_FILE)));
+  };
+  await protectLive();const claimValue={schema:'GI_I66_NATIVE_OPERATIONAL_CLAIM_V1',executionProvider:C.provider,buildId:identity.buildId,phase:plan.phase,sourceSha:p.sourceSha,artifactId:p.artifactId,artifactDigest:p.artifactDigest,authorityHead:plan.authorityHead,planSha256:digest(plan),candidateSha256:plan.candidateSha256};
   let io=await preview.cloudIo(await sdkHeaders());const claim=await io.retain(lockName(p,plan.phase),Buffer.from(JSON.stringify(claimValue)+'\n'),'application/json');
   const retainedBefore={};
   try{
@@ -493,7 +527,7 @@ async function worker(plan){
   }
   // Recheck branch/pins after durable preimages and immediately before the
   // original deploy block. Runtime owner also gates every Make transition.
-  branchGuard(p,plan,cwd);await verifyRuntimeAuthority(p,{phase:plan.phase,action:'worker'});
+  await protectLive();await verifyRuntimeAuthority(p,{phase:plan.phase,action:'worker'});
     // Child output stays in the private execution artifact. Publish only the
     // safe prefixes now so an authenticated operator can observe a pending
     // Make/CAS handoff while the original deploy block is still running.
@@ -686,9 +720,11 @@ function scopedPhysical(control) {
   return {...hosting,functionalEpoch:accepted.epoch,backendRevisions:hosting.backendRevisions.map(target=>
     target.name===accepted.target?{...target,currentRevision:accepted.revision}:target)};
 }
-function assertCompositeFresh(candidate,control,readBlob){
+function assertCompositeFresh(candidate,control,readBlob,phase='live',binding){
   const release=control.i66ScopedFunctionRelease;
-  need(!release?.providerStages?.LIVE_DEPLOYED||!!release.accepted,'LIVE_FUNCTION_PENDING_POSTCHECK');
+  if(phase==='preview')return;
+  if(binding&&Array.isArray(candidate.targets?.live)&&!candidate.targets.live.some(row=>row.name===binding.targets.live&&row.region===binding.targets.region))return;
+  need(!release?.providerStages?.LIVE_DEPLOYED||!!release.accepted||!!release.providerStages.LIVE_ROLLED_BACK,'LIVE_FUNCTION_PENDING_POSTCHECK');
   const last=release?.accepted;
   if(!last)return;
   // No older composite may overwrite this function. Recomposition must prove
@@ -744,7 +780,7 @@ function functionalBuildConfig(cwd=process.cwd(),sourceSha){
 function readGcloud(args,options={}){
   return execFileSync('gcloud',[...args,'--project='+C.projectId],{maxBuffer:48*1024*1024,stdio:['ignore','pipe','pipe'],...options});
 }
-function readFunctionSnapshot(target,region) {
+function readFunctionSnapshot(target,region,restoredTraffic) {
   const fn=JSON.parse(readGcloud(['functions','describe',target,'--gen2','--region='+region,'--format=json']));
   equal(fn.name,'projects/'+C.projectId+'/locations/'+region+'/functions/'+target,'EXACT_FUNCTION_RESOURCE');
   equal(fn.state,'ACTIVE','EXISTING_ACTIVE_FUNCTION');equal(fn.buildConfig.entryPoint,target,'EXACT_FUNCTION_ENTRYPOINT');
@@ -755,10 +791,10 @@ function readFunctionSnapshot(target,region) {
   const traffic=run.status.traffic.filter(x=>Number(x.percent)>0);
   need(traffic.length===1&&Number(traffic[0].percent)===100,'EXCLUSIVE_REVISION_TRAFFIC');
   const revision=traffic[0].revisionName;
-  equal(sc.revision,revision,'FUNCTION_SOURCE_MUST_MATCH_SERVING_REVISION');
+  equal(restoredTraffic||sc.revision,revision,'FUNCTION_SOURCE_MUST_MATCH_SERVING_REVISION');
   need(run.status.conditions.some(x=>x.type==='Ready'&&x.status==='True'),'RUN_READY');
   const config={...sc};for(const k of ['revision','uri','service','allTrafficOnLatestRevision'])delete config[k];
-  return {target,region,service,revision,source,configurationDigest:digest(config)};
+  return {target,region,service,revision:sc.revision,source,configurationDigest:digest(config)};
 }
 function scopedArchive(uri,generation){
   need(typeof uri==='string'&&uri.startsWith('gs://')&&!uri.includes('#')&&/^[1-9][0-9]+$/.test(String(generation)),'FROZEN_ARCHIVE_REQUIRED');
@@ -823,9 +859,16 @@ function checkedBranch(){
   const head=git(process.cwd(),'rev-parse','HEAD'),remote=git(process.cwd(),'ls-remote',C.repositoryUrl,'refs/heads/'+C.branch).split(/\s+/)[0];
   equal(remote,head,'FUNCTIONAL_AUTHORITY_CHANGED_RECOMPOSE');return head;
 }
-function writeFunctionalStage(stage,facts){
+async function writeFunctionalStage(stage,facts,recoveredDeployment){
   const owner=require('./gravicentra-i66-frontend-control.cjs');
-  const change=owner.prepareFunctionalStage(stage,facts,checkedBranch());
+  if(stage==='LIVE_VERIFIED'&&facts.publication){
+    const prefix='i66/functional/'+json(UNIT_FILE).unit+'/'+facts.sourceSha+'/'+facts.buildId+'/live-';
+    need(!await operationalClaimReader().findClaim(prefix+'rollback-intent.json'),'JOURNEY_COMPENSATION_PENDING');
+  }
+  const ref=facts.journeys||facts.receipt||facts.artifact;
+  const {meta}=await gcloudReadIo().object(ref);
+  need(meta.timeCreated&&Number.isFinite(Date.parse(meta.timeCreated)),'IMMUTABLE_STAGE_TIMESTAMP');
+  const change=owner.prepareFunctionalStage(stage,facts,checkedBranch(),fs,new Date(meta.timeCreated).toISOString(),recoveredDeployment);
   return change.status==='NOOP_ALREADY_RECONCILED'?{status:change.status}:owner.commitProviderOutcome(change);
 }
 function retainedFunctionRecord(name,value){
@@ -854,6 +897,10 @@ function verifyFunctionalRollback(before,binding,phase){
   return {revision:before.revision,source:before.source,archiveSha256:phase==='live'?binding.predecessor.archiveSha256:binding.predecessor.previewArchiveSha256,
     configurationDigest:before.configurationDigest,ready:true};
 }
+function verifyClaimIdentity(claim){
+  const {transitionId,...inputs}=claim;
+  if(transitionId!==undefined)equal(transitionId,digest(inputs),'FUNCTIONAL_CLAIM_IDENTITY_CHANGED');
+}
 async function executeFunctionalPhase(phase,buildId){
   need(['package','preview','live','direct-live'].includes(phase),'FUNCTIONAL_PHASE');
   const direct=phase==='direct-live',owner=require('./gravicentra-i66-frontend-control.cjs');if(direct)phase='live';
@@ -877,11 +924,13 @@ async function executeFunctionalPhase(phase,buildId){
     equal(terminal.publication,publication||undefined,'FUNCTIONAL_HOLD_PUBLICATION_METHOD');
     return writeFunctionalStage(phase.toUpperCase()+'_HOLD',{...facts,...method,target,receipt:ref,revision:terminal.observedRevision,trafficPercent:100});
   }
+  if(direct)need(!await reader.findClaim(prefix+'live-rollback-intent.json'),'DIRECT_ROLLBACK_PENDING_NO_DEPLOYMENT');
   const pendingHold=await reader.findClaim(holdKey);
   if(pendingHold)return recordHold(pendingHold);
   let before,rollbackProof;
   if(previous){
     const claim=JSON.parse((await reader.object(previous)).data);
+    verifyClaimIdentity(claim);
     equal([claim.phase,claim.target,claim.packageSha256,claim.buildId,claim.bindingBlob],[phase,target,facts.packageSha256,buildId,facts.bindingBlob],'FUNCTIONAL_EXISTING_CLAIM_BINDING');
     equal(claim.publication,publication||undefined,'FUNCTIONAL_EXISTING_PUBLICATION_METHOD');
     before=claim.before;
@@ -900,6 +949,7 @@ async function executeFunctionalPhase(phase,buildId){
     checkedBranch();
     // The compare-and-create must be exclusive even if two observers read no claim.
     const claim={...facts,...method,...(direct?{rollbackProof}:{}),phase,target,before,authorityHead:checkedBranch()};
+    claim.transitionId=digest(claim);
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),'gi-function-claim-')),file=path.join(dir,'claim.json');
     try{fs.writeFileSync(file,JSON.stringify(claim)+'\n',{mode:0o600});readGcloud(['storage','cp',file,'gs://'+C.bucket+'/'+claimName,'--if-generation-match=0','--quiet']);}
     finally{fs.rmSync(dir,{recursive:true,force:true});}
@@ -1245,6 +1295,7 @@ async function runFunctionalJourneys(phase,buildId,out){
   if(prior){const ref=prior.journeys,io=gcloudReadIo(),report=JSON.parse((await io.object(ref)).data);if(report.schema===FUNCTIONAL_JOURNEY.reportSchema)return acceptRetainedFunctionalJourney(phase,buildId,ref,report,io);return adoptedFunctionalJourney(control,binding,phase,buildId,ref);}
   const pkgFacts=control.i66ScopedFunctionRelease.providerStages?.PACKAGE_CERTIFIED;equal(pkgFacts?.buildId,buildId,'JOURNEY_CURRENT_PACKAGE_ID');
   const base='i66/functional/'+binding.unit+'/'+pkgFacts.sourceSha+'/'+buildId+'/',reader=operationalClaimReader();
+  if(phase==='live')need(!await reader.findClaim(base+'live-rollback-intent.json'),'JOURNEY_COMPENSATION_PENDING');
   async function reconcile(){
     const cursor=await reader.findClaim(base+phase+'-journey-current.json');if(!cursor)return null;
     const pointer=JSON.parse((await reader.object(cursor)).data),ref=pointer.claim,claim=JSON.parse((await reader.object(ref)).data);
@@ -1322,10 +1373,169 @@ async function acceptFunctionalJourney(phase,buildId,refFile){
   }
   return writeFunctionalStage(phase==='preview'?'PREVIEW_VERIFIED':'LIVE_VERIFIED',{...facts,target,revision:snapshot.revision,trafficPercent:100,roles:b.roles,journeys:ref});
 }
+function validateDirectRollbackOwnership({head,control,binding,facts,claim,receipt,ref,scopePreserved,live,rollback,archiveDigest,publication}){
+  verifyClaimIdentity(claim);
+  const stages=control.i66ScopedFunctionRelease.providerStages;
+  equal(stages.PACKAGE_CERTIFIED,facts,'RECOVERY_CERTIFIED_PACKAGE');
+  need(!control.i66ScopedFunctionRelease.accepted&&!Object.keys(stages).some(key=>['LIVE_VERIFIED','LIVE_ROLLED_BACK','LIVE_HOLD'].includes(key)),'RECOVERY_NONTERMINAL_UNIT');
+  equal(claim.publication,publication,'RECOVERY_CLAIM_METHOD');
+  equal(receipt.publication,publication,'RECOVERY_RECEIPT_METHOD');
+  for(const record of [claim,receipt]){
+    for(const key of Object.keys(facts))equal(record[key],facts[key],'RECOVERY_PACKAGE_'+key);
+    equal([record.target,record.phase],[binding.targets.live,'live'],'RECOVERY_EXACT_TARGET');
+  }
+  const before=claim.before,after=receipt.after;
+  equal(receipt.before,before,'RECOVERY_BEFORE');
+  equal([before.target,before.region,before.service,before.revision],
+    [binding.targets.live,binding.targets.region,binding.targets.live.toLowerCase(),binding.predecessor.revision],'RECOVERY_PREDECESSOR');
+  equal([after.target,after.region,after.service,after.configurationDigest],
+    [before.target,before.region,before.service,before.configurationDigest],'RECOVERY_CONFIGURATION');
+  need(after.revision!==before.revision,'RECOVERY_DISTINCT_REVISION');
+  equal(receipt.trafficPercent,100,'RECOVERY_EXCLUSIVE_TRAFFIC');
+  equal(archiveDigest,facts.packageSha256,'RECOVERY_SERVING_ARCHIVE');
+  equal(after,live,'RECOVERY_EXACT_SERVING_POSTIMAGE');
+  equal([claim.rollbackProof,receipt.rollbackProof],[rollback,rollback],'RECOVERY_PHYSICAL_ROLLBACK_PROOF');
+  need(rollback.ready&&rollback.revision===before.revision,'RECOVERY_PREDECESSOR_READY');
+  need(sha40(claim.authorityHead)&&sha40(head)&&scopePreserved,'RECOVERY_AUTHORITY_PREIMAGE');
+  const deployment={...facts,publication,target:binding.targets.live,revision:after.revision,trafficPercent:100,receipt:ref,
+    rollbackRevision:before.revision,rollbackProof:rollback};
+  if(stages.LIVE_DEPLOYED)equal(stages.LIVE_DEPLOYED,deployment,'RECOVERY_SIGNED_DEPLOYMENT');
+  return deployment;
+}
+
+async function checkDirectRollback(buildId,options={}){
+  const head=checkedBranch(),binding=scopedCandidate(),facts=functionalFacts(readFunctionalPackage(buildId));
+  const owner=require('./gravicentra-i66-frontend-control.cjs'),publication=owner.directLivePublication();
+  const control=json(C.control),prefix='i66/functional/'+binding.unit+'/'+facts.sourceSha+'/'+buildId+'/live-';
+  const reader=operationalClaimReader();
+  const [claimRef,ref,hold,rollbackRef]=await Promise.all(['claim','deployment','hold','rollback'].map(suffix=>reader.findClaim(prefix+suffix+'.json')));
+  need(claimRef&&ref&&!hold&&(!rollbackRef||options.intent),'RECOVERY_ORIGINAL_NONTERMINAL_RECEIPTS');
+  const claim=JSON.parse((await reader.object(claimRef)).data),receipt=JSON.parse((await reader.object(ref)).data);
+  need(sha40(claim.authorityHead),'RECOVERY_ORIGINAL_PARENT');
+  git(process.cwd(),'merge-base','--is-ancestor',claim.authorityHead,head);
+  const paths=[UNIT_FILE,publication.decisionPath,owner.P.transport];
+  if(!control.i66ScopedFunctionRelease.providerStages.LIVE_DEPLOYED)paths.push(owner.P.cp,owner.P.state);
+  const scopePreserved=paths.every(p=>git(process.cwd(),'rev-parse',claim.authorityHead+':'+p)===git(process.cwd(),'rev-parse',head+':'+p));
+  const live=readFunctionSnapshot(binding.targets.live,binding.targets.region,options.restoredTraffic),src=live.source;
+  const rollback=verifyFunctionalRollback(claim.before,binding,'live');
+  const archiveDigest=sha(scopedArchive('gs://'+src.bucket+'/'+src.object,src.generation));
+  const deployment=validateDirectRollbackOwnership({head,control,binding,facts,claim,receipt,ref,scopePreserved,live,rollback,archiveDigest,publication});
+  equal(checkedBranch(),head,'RECOVERY_FINAL_AUTHORITY');
+  return {status:'PHYSICAL_OWNERSHIP_VERIFIED_READONLY',head,claim:claimRef,deployment,trafficWrites:0};
+}
+
+function singleRollbackRoute(row,target,region){
+  const meta=row.metadata,traffic=row.status?.traffic,service=target.toLowerCase();
+  equal([row.kind,row.apiVersion,meta?.name],['Service','serving.knative.dev/v1',service],'ROLLBACK_SERVICE_IDENTITY');
+  need([C.projectId,'646761409743'].includes(meta.namespace)&&uuid(meta.uid),'ROLLBACK_PROJECT_UID');
+  need(meta.labels?.['cloud.googleapis.com/location']===region,'ROLLBACK_REGION');
+  need(typeof meta.resourceVersion==='string'&&meta.resourceVersion.length>0,'ROLLBACK_RESOURCE_VERSION');
+  need(/^[1-9][0-9]*$/.test(String(meta.generation))&&String(meta.generation)===String(row.status.observedGeneration),'ROLLBACK_OBSERVED_GENERATION');
+  need(row.status.conditions?.some(c=>c.type==='Ready'&&c.status==='True'),'ROLLBACK_SERVICE_READY');
+  need(Array.isArray(traffic)&&traffic.length===1&&traffic[0].percent===100&&!traffic[0].tag,'ROLLBACK_EXCLUSIVE_ROUTE');
+  need(row.spec?.template&&row.spec.traffic?.length===1&&!row.spec.traffic[0].tag&&row.spec.traffic[0].percent===100,'ROLLBACK_EXACT_DESIRED_ROUTE');
+  const revision=traffic[0].revisionName;
+  need(typeof revision==='string'&&revision.startsWith(service+'-'),'ROLLBACK_REVISION_SCOPE');
+  equal(row.spec.traffic[0].latestRevision?row.status.latestReadyRevisionName:row.spec.traffic[0].revisionName,revision,'ROLLBACK_DESIRED_AND_SERVING');
+  return {uid:meta.uid,generation:String(meta.generation),resourceVersion:meta.resourceVersion,revision};
+}
+function directRollbackRequest(row,proof,region){
+  const deployment=proof.deployment,route=singleRollbackRoute(row,deployment.target,region);
+  equal(route.revision,deployment.revision,'ROLLBACK_OWNED_POSTIMAGE');
+  equal([row.status.latestCreatedRevisionName,row.status.latestReadyRevisionName],[route.revision,route.revision],'ROLLBACK_NEWER_REVISION_PENDING');
+  const request=structuredClone(row);delete request.status;
+  request.spec.traffic=[{revisionName:deployment.rollbackRevision,percent:100}];
+  const intent={head:proof.head,claim:proof.claim,deployment:deployment.receipt,route,
+    currentRevision:deployment.revision,rollbackRevision:deployment.rollbackRevision,requestDigest:digest(request),restoredSpecDigest:digest(request.spec)};
+  return {request,intent};
+}
+function verifyRestoredRoute(row,intent,target,region){
+  const current=singleRollbackRoute(row,target,region);
+  equal(current.uid,intent.route.uid,'ROLLBACK_COMPENSATION_SAME_SERVICE');
+  equal(BigInt(current.generation),BigInt(intent.route.generation)+1n,'ROLLBACK_EXACT_SUCCESSOR_GENERATION');
+  equal([current.revision,digest(row.spec),row.status.latestCreatedRevisionName,row.status.latestReadyRevisionName],
+    [intent.rollbackRevision,intent.restoredSpecDigest,intent.currentRevision,intent.currentRevision],'ROLLBACK_EXACT_COMPENSATION');
+  return current;
+}
+async function recoverDirectRollback(buildId,checkOnly){
+  const head=checkedBranch(),binding=scopedCandidate(),control=json(C.control),stages=control.i66ScopedFunctionRelease.providerStages;
+  const pkg=stages.PACKAGE_CERTIFIED;equal(pkg?.buildId,buildId,'ROLLBACK_CERTIFIED_BUILD');
+  const prefix='i66/functional/'+binding.unit+'/'+pkg.sourceSha+'/'+buildId+'/live-',reader=operationalClaimReader();
+  let intentRef=await reader.findClaim(prefix+'rollback-intent.json');
+  const receiptRef=await reader.findClaim(prefix+'rollback.json');
+  if(stages.LIVE_ROLLED_BACK){
+    equal(stages.LIVE_ROLLED_BACK.receipt,receiptRef,'ROLLBACK_CANONICAL_RECEIPT');
+    await reader.object(receiptRef);return {status:'NOOP_ALREADY_RECONCILED',receipt:receiptRef};
+  }
+  need(!receiptRef||intentRef,'ROLLBACK_ORPHAN_RECEIPT');
+  async function requireIdleJourney(){
+    const cursor=await reader.findClaim(prefix+'journey-current.json');
+    if(!cursor)return;
+    const pointer=JSON.parse((await reader.object(cursor)).data);
+    need(uuid(pointer.executionBuildId),'ROLLBACK_JOURNEY_ID');
+    const build=await reader.build(pointer.executionBuildId);
+    need(build.id===pointer.executionBuildId&&['FAILURE','CANCELLED','TIMEOUT','EXPIRED'].includes(build.status),'COMPLETED_OR_RUNNING_JOURNEY_REQUIRES_RECONCILIATION');
+  }
+  await requireIdleJourney();
+  const oldIntent=intentRef?JSON.parse((await reader.object(intentRef)).data):null;
+  const region=binding.targets.region,target=binding.targets.live;
+  const url='https://'+region+'-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/'+C.projectId+'/services/'+target.toLowerCase();
+  const token=readGcloud(['auth','print-access-token']).toString().trim();
+  async function api(method,body,dryRun=false){
+    const response=await fetch(url+(dryRun?'?dryRun=all':''),{method,redirect:'error',signal:AbortSignal.timeout(30000),
+      headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});
+    need(response.ok,'ROLLBACK_PROVIDER_HTTP_'+response.status);return response.json();
+  }
+  const row=await api('GET'),route=singleRollbackRoute(row,target,region);
+  const restored=!!oldIntent&&route.revision===oldIntent.rollbackRevision;
+  if(restored)verifyRestoredRoute(row,oldIntent,target,region);
+  const proof=await checkDirectRollback(buildId,{intent:intentRef,restoredTraffic:restored?route.revision:undefined});
+  equal(proof.head,head,'ROLLBACK_AUTHORITY_CHANGED');
+  const deployment=proof.deployment;
+  if(oldIntent){
+    equal([oldIntent.head,oldIntent.claim,oldIntent.deployment,oldIntent.currentRevision,oldIntent.rollbackRevision],
+      [head,proof.claim,deployment.receipt,deployment.revision,deployment.rollbackRevision],'ROLLBACK_ORIGINAL_INTENT');
+  }
+  let observed=restored?route:null;
+  if(!restored){
+    const {request,intent}=directRollbackRequest(row,proof,region);
+    if(oldIntent)equal(oldIntent,intent,'ROLLBACK_INTENT_DRIFT');
+    const preflight=await api('PUT',request,true);
+    equal([preflight.metadata?.uid,preflight.spec?.traffic],[route.uid,request.spec.traffic],'ROLLBACK_PROVIDER_VALIDATION');
+    equal(singleRollbackRoute(await api('GET'),target,region),route,'ROLLBACK_DRY_RUN_PRESERVED_TRAFFIC');
+    equal(checkedBranch(),head,'ROLLBACK_FRESH_AUTHORITY');
+    if(checkOnly)return {...proof,status:'PROVIDER_DRY_RUN_VERIFIED',resourceVersion:route.resourceVersion};
+    if(!intentRef)intentRef=await retainedFunctionRecord(prefix+'rollback-intent.json',intent);
+    await requireIdleJourney();
+    equal(checkedBranch(),head,'ROLLBACK_AUTHORITY_BEFORE_CAS');
+    let failure;
+    try{await api('PUT',request);}catch(e){failure=e;}
+    // A timeout or lost response permits readback, never an unguarded second PUT.
+    for(let attempt=0;attempt<12;attempt++){
+      const next=await api('GET');
+      if(next.status?.traffic?.[0]?.revisionName===deployment.rollbackRevision&&String(next.status?.observedGeneration)===String(next.metadata?.generation)){
+        observed=verifyRestoredRoute(next,intent,target,region);break;
+      }
+      if(failure)throw failure;
+      await new Promise(resolve=>setTimeout(resolve,1500));
+    }
+    need(observed,'ROLLBACK_RECEIPT_PENDING_REREAD');
+  }else if(checkOnly)return {...proof,status:'COMPENSATION_ALREADY_OBSERVED',trafficWrites:0};
+  const facts={...pkg,publication:deployment.publication,phase:'live',target,revision:deployment.rollbackRevision,
+    trafficPercent:100,rolledBackRevision:deployment.revision,recovery:{claim:proof.claim,deployment:deployment.receipt,intent:intentRef}};
+  const postimage={uid:observed.uid,generation:observed.generation,revision:observed.revision,specDigest:(oldIntent||directRollbackRequest(row,proof,region).intent).restoredSpecDigest};
+  const receipt=await retainedFunctionRecord(prefix+'rollback.json',{...facts,postimage});
+  equal(checkedBranch(),head,'ROLLBACK_REGISTRATION_AUTHORITY_CHANGED');
+  return writeFunctionalStage('LIVE_ROLLED_BACK',{...facts,receipt},stages.LIVE_DEPLOYED?undefined:deployment);
+}
+
 async function rollbackFunctionalPhase(phase,buildId){
   need(['preview','live'].includes(phase),'FUNCTIONAL_ROLLBACK_PHASE');
   checkedBranch();const b=scopedCandidate(),pkg=readFunctionalPackage(buildId),c=json(C.control);
   const stages=c.i66ScopedFunctionRelease.providerStages||{},deployed=stages[phase==='preview'?'PREVIEW_DEPLOYED':'LIVE_DEPLOYED'];
+  if(phase==='live'&&(!deployed||deployed.publication)&&fs.existsSync(require('./gravicentra-i66-frontend-control.cjs').DIRECT_LIVE_PUBLICATION.decisionPath)){
+    return recoverDirectRollback(buildId,false);
+  }
   need(!stages[phase==='preview'?'PREVIEW_VERIFIED':'LIVE_VERIFIED'],'NO_ROLLBACK_AFTER_ACCEPTANCE');
   const target=b.targets[phase],snapshot=readFunctionSnapshot(target,b.targets.region);
   equal([deployed?.revision,deployed?.packageSha256],[snapshot.revision,pkg.artifact.sha256],'OWN_DEPLOYMENT_ONLY');
@@ -1348,6 +1558,7 @@ async function main(args=process.argv.slice(2)){
   if(args[0]==='run-functional-journeys'&&args.length===4){const result=await runFunctionalJourneys(args[1],args[2],args[3]);console.log(JSON.stringify(result));return result;}
   if(args[0]==='functional-journey-worker'&&args.length===2)return functionalJourneyWorker(JSON.parse(args[1]));
   if(args[0]==='verify-functional-journey'&&args.length===4){const result=await acceptFunctionalJourney(args[1],args[2],args[3]);console.log(JSON.stringify(result));return result;}
+  if(args[0]==='check-functional-rollback'&&args[1]==='live'&&args.length===3){const result=await recoverDirectRollback(args[2],true);console.log(JSON.stringify(result));return result;}
   if(args[0]==='rollback-functional-phase'&&args.length===3){const result=await rollbackFunctionalPhase(args[1],args[2]);console.log(JSON.stringify(result));return result;}
   if(args[0]==='functional-phase'&&args.length===3){const result=await executeFunctionalPhase(args[1],args[2]);console.log(JSON.stringify(result));return result;}
   if(args[0]==='package-functional-unit'&&args.length===3)return packageProviderSource(args[1],args[2]);
@@ -1361,5 +1572,5 @@ async function main(args=process.argv.slice(2)){
   if(args[0]==='verify-runtime'&&args.length===2){const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=g.candidateForPhase(json(g.CONTROL),args[1]);return verifyRuntimeAuthority(p,{phase:args[1],action:'worker'});}
   throw Error('I66_NATIVE_OPERATIONAL_USE_BIND_PREPARE_WORKER_VERIFY');
 }
-module.exports={FUNCTIONAL_JOURNEY,FUNCTIONAL_JOURNEY_PINS,validateFunctionalJourneyPlan,functionalJourneyConfig,validateFunctionalJourneyBuild,verifyFunctionalJourneyPins,functionalUiHosting,makeFunctionalJourneyPlan,functionalJourneyTargets,functionalServerTime,functionalMemberValue,functionalJourneyMember,validateFunctionalJourneyWitness,captureFunctionalJourneyWitness,validateFunctionalJourneyReport,functionalJourneyCleanupProof,functionalCleanupAbsent,validateFunctionalJourneyRetryEvidence,verifyPreviousFunctionalJourney,acquireFunctionalJourneyClaim,functionalJourneyWorker,adoptedFunctionalJourney,validateRetainedFunctionalJourney,verifyFunctionalJourneyCleanup,acceptRetainedFunctionalJourney,runFunctionalJourneys,missingOperationalClaim,readFunctionSnapshot,checkServingSnapshot,verifyScopedHosting,readFunctionalPackage,scopedPhysical,assertCompositeFresh,scopedCandidate,packageFunctionalUnit,functionalBuildConfig,observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
+module.exports={recoverDirectRollback,protectOverlappingLiveDeploy,directRollbackRequest,verifyRestoredRoute,validateDirectRollbackOwnership,FUNCTIONAL_JOURNEY,FUNCTIONAL_JOURNEY_PINS,validateFunctionalJourneyPlan,functionalJourneyConfig,validateFunctionalJourneyBuild,verifyFunctionalJourneyPins,functionalUiHosting,makeFunctionalJourneyPlan,functionalJourneyTargets,functionalServerTime,functionalMemberValue,functionalJourneyMember,validateFunctionalJourneyWitness,captureFunctionalJourneyWitness,validateFunctionalJourneyReport,functionalJourneyCleanupProof,functionalCleanupAbsent,validateFunctionalJourneyRetryEvidence,verifyPreviousFunctionalJourney,acquireFunctionalJourneyClaim,functionalJourneyWorker,adoptedFunctionalJourney,validateRetainedFunctionalJourney,verifyFunctionalJourneyCleanup,acceptRetainedFunctionalJourney,runFunctionalJourneys,missingOperationalClaim,readFunctionSnapshot,checkServingSnapshot,verifyScopedHosting,readFunctionalPackage,scopedPhysical,assertCompositeFresh,scopedCandidate,packageFunctionalUnit,functionalBuildConfig,observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(error=>{console.error(String(error.message||'I66_NATIVE_OPERATIONAL_HOLD').split('\n')[0]);process.exitCode=1;});

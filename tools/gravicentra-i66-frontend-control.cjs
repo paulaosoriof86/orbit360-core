@@ -468,6 +468,57 @@ function prepareProviderOutcome(event,{io=require('node:fs'),head,now=new Date()
     [P.transport]:blob(io.readFileSync(P.transport,'utf8')),[oldPath]:blob(oldRaw),[nextPath]:null},changes};
 }
 
+// Archive only immutable history from the physical parent. The live projections,
+// transport, and independently addressable old Git blobs stay available.
+function providerOutcomeBytes(change,checkpoint,io=require('node:fs')){
+  const original=Object.fromEntries(Object.entries(change.changes).map(([p,value])=>[p,serial(value)]));
+  const additionBytes=Object.values(original).reduce((n,value)=>n+4*Math.ceil(Buffer.byteLength(value)/3),0);
+  if(additionBytes<=2_600_000)return original;
+  const compact=value=>JSON.stringify(value)+'\n';
+  const read=p=>{
+    const bytes=io.readFileSync(p,'utf8');
+    assert.equal(blob(bytes),change.expectedPreimages[p],'I66_HISTORY_PARENT_BLOB');
+    return JSON.parse(bytes);
+  };
+  const parent=change.expectedHeadOid;
+  assert.match(parent,/^[a-f0-9]{40}$/);
+  const control=structuredClone(change.changes[P.cp]),state=structuredClone(change.changes[P.state]);
+  const progress=structuredClone(change.changes[checkpoint]),cursor=control.i66ActiveRecoveryCursor;
+  assert.equal(cursor.currentEvidencePath,checkpoint);
+  assert.equal(cursor.currentEvidenceBlobSha,blob(serial(progress)),'I66_PREPARED_CHECKPOINT_BYTES');
+  const oldPath=progress.previousEvidencePath,oldProgress=read(oldPath),oldState=read(P.state);
+  assert.equal(progress.previousEvidenceBlobSha,change.expectedPreimages[oldPath]);
+  assert.deepEqual(progress.archivedProviderSnapshots,oldProgress.archivedProviderSnapshots,'I66_INHERITED_SNAPSHOT_PINS_CHANGED');
+  assert.deepEqual(state.priorProviderContinuationArchive,oldState.priorProviderContinuationArchive,'I66_INHERITED_STATE_PIN_CHANGED');
+  const pin=(file,key,value)=>({commit:parent,path:file,blob:change.expectedPreimages[file],field:key,sha256:hash(compact(value))});
+  // These two explicitly superseded freeze snapshots have no active readers.
+  for(const field of ['priorReleaseFreezeBeforeV20_20261124','priorV19ReleaseAttempt20261124']){
+    if(!Object.hasOwn(progress,field))continue;
+    assert.deepEqual(progress[field],oldProgress[field],'I66_CHECKPOINT_HISTORY_CHANGED');
+    progress.archivedProviderSnapshots={...progress.archivedProviderSnapshots};
+    assert.ok(!Object.hasOwn(progress.archivedProviderSnapshots,field),'I66_HISTORY_PIN_ALREADY_EXISTS');
+    progress.archivedProviderSnapshots[field]=pin(oldPath,field,oldProgress[field]);
+    delete progress[field];
+  }
+  // Retain newly appended rows inline. Each archive points to the parent state,
+  // which also retains its preceding archive pointer, so the full chain survives.
+  const field='priorI66OwnerPlanContinuations',past=oldState[field]||[],history=state[field]||[];
+  if(Buffer.byteLength(compact(past))>64*1024){
+    assert.deepEqual(history.slice(0,past.length),past,'I66_STATE_HISTORY_PREFIX_CHANGED');
+    state.priorProviderContinuationArchive={...pin(P.state,field,past),count:past.length};
+    state[field]=history.slice(past.length);
+  }
+  const checkpointBytes=compact(progress);
+  cursor.currentEvidenceBlobSha=blob(checkpointBytes);
+  const transport=read(P.transport);
+  synchronizeOwnerPlanContinuation(control,state,transport,{archivePrior:false});
+  assertOwnerPlanContinuation(control,state,transport);
+  const bytes={[P.cp]:compact(control),[P.state]:compact(state),[checkpoint]:checkpointBytes};
+  const view={...io,readFileSync:(file,encoding)=>Object.hasOwn(bytes,file)?bytes[file]:io.readFileSync(file,encoding)};
+  assertExecutionProgress(control,progress,view);
+  return bytes;
+}
+
 function commitProviderOutcome(change) {
   const fs=require('node:fs'),os=require('node:os');
   const {execFileSync}=require('node:child_process');
@@ -492,9 +543,10 @@ function commitProviderOutcome(change) {
   const message='release(i66): reconcile verified provider outcome at R'+change.changes[checkpoint].version;
   try{
     const env={...process.env,GIT_INDEX_FILE:path.join(temp,'index')},additions=[];
+    const preparedBytes=providerOutcomeBytes(change,checkpoint,fs);
     git(['read-tree',head],{env});
     for(const p of paths){
-      const bytes=serial(change.changes[p]);
+      const bytes=preparedBytes[p];
       const oid=git(['hash-object','-w','--stdin'],{input:bytes}).toString().trim();assert.equal(oid,blob(bytes));
       git(['update-index','--add','--cacheinfo','100644',oid,p],{env});
       additions.push({path:p,contents:Buffer.from(bytes).toString('base64')});
@@ -535,9 +587,19 @@ function commitProviderOutcome(change) {
     }
     const query='mutation($input:CreateCommitOnBranchInput!){createCommitOnBranch(input:$input){commit{oid}}}';
     const payload=JSON.stringify({query,variables:{input:{branch:{repositoryNameWithOwner:repo,branchName:branch},expectedHeadOid:head,message:{headline:message},fileChanges:{additions}}}});
+    const journal=path.resolve(git(['rev-parse','--git-common-dir']).toString().trim(),'gi-i66-provider-outcomes',head,tree);
+    fs.mkdirSync(journal,{recursive:true,mode:0o700});
+    const fingerprint=JSON.stringify({parent:head,tree,bytes:Buffer.byteLength(payload),sha256:hash(payload)});
     const transient=error=>/ECONNRESET|ETIMEDOUT|EPIPE|ENOTFOUND|EAI_AGAIN|unexpected EOF|connection reset|timed out|timeout|HTTP 50[234]/i.test(String(error?.stderr||'')+' '+String(error?.message||''));
     for(let attempt=0;attempt<3;attempt++){
       const fresh=ref();if(fresh!==head)return verified(fresh);
+      const slot=path.join(journal,String(attempt+1));
+      try{fs.writeFileSync(slot,fingerprint,{flag:'wx',mode:0o600});}
+      catch(error){
+        if(error.code!=='EEXIST')throw error;
+        assert.equal(fs.readFileSync(slot,'utf8'),fingerprint,'I66_SIGNED_CAS_REPLAY_PAYLOAD_CHANGED');
+        continue;
+      }
       try{
         const response=gh(['graphql','--input','-'],payload);
         assert.ok(!response.errors?.length&&response.data?.createCommitOnBranch?.commit?.oid,'I66_SIGNED_EXPECTED_HEAD_CAS_FAILED');
@@ -547,10 +609,15 @@ function commitProviderOutcome(change) {
         // Re-read first; only the exact accepted commit or unchanged parent is
         // admissible. A read failure leaves the retained provider proof pending.
         const observed=ref();if(observed!==head)return verified(observed);
+        // A 499 or broken pipe with unchanged HEAD is an unknown ACK. Stop
+        // here instead of immediately posting the same multi-megabyte body.
+        if(/HTTP 499|EPIPE/i.test(String(error.stderr||'')+' '+error.message))
+          throw Error('I66_SIGNED_CAS_ACK_PENDING parent='+head+' tree='+tree+' bytes='+Buffer.byteLength(payload)+' sha256='+hash(payload));
         if(!transient(error)||attempt===2)throw error;
         Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,200*(attempt+1));
       }
     }
+    const lastObserved=ref();if(lastObserved!==head)return verified(lastObserved);
     throw Error('I66_SIGNED_CAS_UNCONFIRMED_RECOMPOSE_FROM_FRESH_HEAD');
   }finally{fs.rmSync(temp,{recursive:true,force:true});}
 }
@@ -570,7 +637,7 @@ function directLivePublication(io=require('node:fs')){
     assert.equal(receipt.decision[key],true,'DIRECT_LIVE_OWNER_REQUIREMENT_'+key);
   return {...DIRECT_LIVE_PUBLICATION};
 }
-function prepareFunctionalStage(stage,facts,head,io=require('node:fs')){
+function prepareFunctionalStage(stage,facts,head,io=require('node:fs'),recordedAtUtc=new Date().toISOString(),recoveredDeployment){
   const direct=!!facts.publication;
   if(direct){assert.deepEqual(facts.publication,directLivePublication(io),'DIRECT_LIVE_PUBLICATION_BINDING');assert.ok(stage.startsWith('LIVE_'),'DIRECT_LIVE_LIVE_STAGE_ONLY');}
   const track=direct?['PACKAGE_CERTIFIED','LIVE_DEPLOYED','LIVE_VERIFIED']:['PACKAGE_CERTIFIED','PREVIEW_DEPLOYED','PREVIEW_VERIFIED','LIVE_DEPLOYED','LIVE_VERIFIED'];
@@ -590,6 +657,16 @@ function prepareFunctionalStage(stage,facts,head,io=require('node:fs')){
   assert.match(facts.sourceSha,/^[a-f0-9]{40}$/);assert.match(facts.packageSha256,/^[a-f0-9]{64}$/);
   const stages=authority.providerStages||{},prior=stages[stage];
   if(prior){assert.deepEqual(prior,facts,'SCOPED_STAGE_IDENTITY_DRIFT');return {status:'NOOP_ALREADY_RECONCILED',expectedHeadOid:head,changes:{}};}
+  if(recoveredDeployment){
+    assert.ok(direct&&stage==='LIVE_ROLLED_BACK'&&!stages.LIVE_DEPLOYED,'RECOVERY_ONLY_UNREGISTERED_OWN_DEPLOYMENT');
+    assert.deepEqual(facts.recovery.deployment,recoveredDeployment.receipt,'RECOVERY_ORIGINAL_RECEIPT');
+    for(const ref of [facts.recovery.claim,facts.recovery.intent,facts.recovery.deployment,facts.receipt]){
+      assert.match(ref.sha256,/^[a-f0-9]{64}$/);
+      assert.match(ref.generation,/^[1-9][0-9]*$/);
+    }
+    const intermediate=prepareFunctionalStage('LIVE_DEPLOYED',recoveredDeployment,head,io,recordedAtUtc);
+    stages.LIVE_DEPLOYED=intermediate.changes[P.cp].i66ScopedFunctionRelease.providerStages.LIVE_DEPLOYED;
+  }
   const predecessorCount=terminal&&terminal[2]==='ROLLED_BACK'?i+1:i;
   if(direct){
     const previewKeys=Object.keys(stages).filter(key=>key.startsWith('PREVIEW_'));
@@ -624,7 +701,8 @@ function prepareFunctionalStage(stage,facts,head,io=require('node:fs')){
       sourcePins:Object.fromEntries(binding.owners.map(p=>[p,binding.sourcePins[p]]))};
   }
   progress.previousEvidencePath=old;progress.previousEvidenceBlobSha=cursor.currentEvidenceBlobSha;progress.version++;
-  progress.recordedAtUtc=new Date().toISOString();
+  assert.equal(new Date(recordedAtUtc).toISOString(),recordedAtUtc,'SCOPED_RECEIPT_TIMESTAMP');
+  progress.recordedAtUtc=recordedAtUtc;
   progress.currentSuccessorPlan.independentFunctionalRelease=progress.independentFunctionalRelease=cursor.independentFunctionalRelease=authority;
   synchronizeExecutionProgress(progress);
   Object.assign(cursor,{previousEvidencePath:old,previousEvidenceBlobSha:blob(oldRaw),currentEvidencePath:next,currentEvidenceBlobSha:blob(serial(progress))});
@@ -1342,7 +1420,7 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
-module.exports={DIRECT_LIVE_PUBLICATION,directLivePublication,prepareFunctionalStage,prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
+module.exports={providerOutcomeBytes,DIRECT_LIVE_PUBLICATION,directLivePublication,prepareFunctionalStage,prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
   resolveNativeExecutionProgress,assertNativeExecutionProgress,terminalAttemptRecords,assertTerminalAttemptProgress,
   prepareTerminalAttemptReconciliation,assertTerminalAttemptChangeSetPreimages,prepareTerminalCli,
   ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveFinancialAndPlanProjections,assertActiveReleaseProgress,
