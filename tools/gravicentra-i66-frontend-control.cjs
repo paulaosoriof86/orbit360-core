@@ -238,7 +238,310 @@ function assertNativeExecutionProgress(control,progress,io){
     const bound=String(status||'').match(/^V([1-9][0-9]*)_PROVIDER_BILLING_HOLD(?:_|$)/);
     assert.ok(!bound||Number(bound[1])!==native.requestVersion,'I66_NATIVE_PROGRESS_STALE_PROVIDER_BILLING_'+name);
   }
+  assertTerminalAttemptProgress(control,progress,io,native);
   return native;
+}
+// A terminal provider receipt is an independently retained fact, not another
+// copied status. Discover only the active request's scoped receipts so an older
+// cursor cannot hide a consumed claim by omitting its pointer. This grants no
+// retry or release permission; those remain with the existing release owner.
+function terminalAttemptRecords(native,io){
+  assert.equal(typeof io.readdirSync,'function','I66_TERMINAL_RECEIPT_DIRECTORY_REQUIRED');
+  const names=io.readdirSync(dir).filter(name=>new RegExp('^I6_6_REQUEST'+native.requestVersion+'_[A-Z0-9_]+\\.json$').test(name));
+  const records=[];
+  for(const name of names){
+    const receiptPath=dir+name,bytes=io.readFileSync(receiptPath,'utf8'),receipt=JSON.parse(bytes);
+    if(receipt.schema!=='GI_I66_SCOPED_OPERATIONAL_ATTEMPT_AND_SOURCE_CHECKPOINT_V1'||
+        receipt.frozenSource!==native.sourceSha||receipt.frozenArchiveSha256!==native.package.artifact.sha256)continue;
+    const attempt=receipt['request'+native.requestVersion];
+    // The same checkpoint envelope may later record a successful retry or a
+    // different phase. Those facts are not compensated Preview failures.
+    if(attempt?.phase!=='preview'||attempt.status!=='FAILURE')continue;
+    assert.equal(receipt.activeGate,'I6.6','I66_TERMINAL_GATE_DRIFT');
+    assert.equal(receipt.sourceChangedInFrozenRequest,false,'I66_TERMINAL_PRODUCT_CHANGED');
+    assert.equal(receipt.fullI66ProductionAccepted,false,'I66_TERMINAL_FALSE_ACCEPTANCE');
+    assert.ok(attempt&&attempt.phase==='preview'&&attempt.status==='FAILURE','I66_TERMINAL_ATTEMPT_REQUIRED');
+    assert.match(String(attempt.build||''),/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/,'I66_TERMINAL_BUILD_REQUIRED');
+    assert.match(String(attempt.claimGeneration||''),/^[1-9][0-9]*$/,'I66_TERMINAL_CLAIM_REQUIRED');
+    assert.equal(attempt.actualCompensation,'COMPENSATION_READBACK_VERIFIED','I66_TERMINAL_COMPENSATION_UNPROVEN');
+    assert.equal(attempt.configuration,'CLOSED_CONFIG_READBACK_VERIFIED','I66_TERMINAL_CLOSED_UNPROVEN');
+    assert.ok(['EXACT_PREVIOUS_PREVIEW_REVISION_RESTORED','EXACT_PREVIOUS_PREVIEW_REVISION_ALREADY_RESTORED'].includes(attempt.trigger),
+      'I66_TERMINAL_TRIGGER_UNPROVEN');
+    assert.deepEqual(attempt.rollbackFailures,[],'I66_TERMINAL_ROLLBACK_FAILED');
+    for(const key of ['livePromotion','signedPreviewAccepted','canReuseOriginalClaim'])
+      assert.equal(attempt[key],false,'I66_TERMINAL_SCOPE_'+key);
+    for(const key of ['canonicalLeadWrites','externalMessagesSent'])assert.equal(attempt[key],0,'I66_TERMINAL_EFFECT_'+key);
+    assert.match(String(attempt.reason||''),/^[A-Z][A-Z0-9_]+$/,'I66_TERMINAL_FAILURE_CODE_REQUIRED');
+    assert.equal(attempt.records?.privateBucket,'ays-orbit360-firestore-private-backup-646761409743','I66_TERMINAL_PRIVATE_BUCKET');
+    assert.equal(attempt.records.prefix,'i66/operational-attempts/'+attempt.build+'/','I66_TERMINAL_HOLD_BUILD_DRIFT');
+    for(const name of ['hold.json','hold-execution.log']){
+      const object=attempt.records[name];assert.match(String(object?.generation||''),/^[1-9][0-9]*$/,'I66_TERMINAL_OBJECT_GENERATION');
+      assert.match(String(object.sha256||''),/^[a-f0-9]{64}$/,'I66_TERMINAL_OBJECT_DIGEST');
+      assert.ok(Number.isSafeInteger(object.bytes)&&object.bytes>0,'I66_TERMINAL_OBJECT_BYTES');
+      assert.ok(BigInt(object.generation)>BigInt(attempt.claimGeneration),'I66_TERMINAL_OBJECT_PRECEDES_CLAIM');
+    }
+    assert.equal(typeof receipt.releaseNext,'string','I66_TERMINAL_NEXT_REQUIRED');assert.ok(receipt.releaseNext.trim());
+    const projection={schema:'GI_I66_CURRENT_TERMINAL_OPERATIONAL_ATTEMPT_V1',requestVersion:native.requestVersion,
+      phase:attempt.phase,sourceSha:native.sourceSha,artifactDigest:'sha256:'+native.package.artifact.sha256,
+      buildId:attempt.build,status:'FAILURE_COMPENSATED_CLAIM_CONSUMED',failureCode:attempt.reason,
+      claimGeneration:attempt.claimGeneration,canReuseOriginalClaim:false,signedPreviewAccepted:false,livePromotion:false,
+      receipt:{path:receiptPath,gitBlobSha:blob(bytes),sha256:hash(bytes)},
+      next:'For request '+native.requestVersion+' only: '+receipt.releaseNext+' Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.'};
+    records.push({projection,receipt,bytes});
+  }
+  records.sort((a,b)=>BigInt(a.projection.claimGeneration)<BigInt(b.projection.claimGeneration)?-1:1);
+  for(let i=1;i<records.length;i++)assert.ok(records[i-1].projection.claimGeneration!==records[i].projection.claimGeneration&&
+    records[i-1].projection.buildId!==records[i].projection.buildId,'I66_TERMINAL_DUPLICATE_CLAIM');
+  return records;
+}
+function assertTerminalAttemptProgress(control,progress,io,native=resolveNativeExecutionProgress(control,progress,io)){
+  if(!native?.package.readbackCertified||native.disposition!=='CURRENT_REQUEST')return null;
+  const latest=terminalAttemptRecords(native,io).at(-1)?.projection;if(!latest)return null;
+  assert.deepEqual(progress.lastTerminalOperationalAttempt,latest,'I66_TERMINAL_RECEIPT_NOT_RECONCILED');
+  const cursor=control.i66ActiveRecoveryCursor,plan=progress.currentSuccessorPlan;
+  assert.deepEqual(cursor.lastTerminalOperationalAttempt,latest,'I66_TERMINAL_CURSOR_DRIFT');
+  const transport=JSON.parse(io.readFileSync(P.transport,'utf8'));
+  const candidate=transport.operationalReleaseCandidate||transport.scopedBackendPreviewI66?.candidate;
+  const retry=candidate?.providerBinding?.compensatedRetry;
+  // A later explicit retry is validated by its existing runtime owner. Its
+  // admission does not erase this terminal predecessor or reuse its claim.
+  if(retry){
+    assert.equal(retry.schema,'GI_I66_COMPENSATED_RETRY_REFERENCE_V1','I66_TERMINAL_RETRY_REFERENCE_SCHEMA');
+    for(const key of ['phase','requestVersion','sourceSha','artifactDigest'])
+      assert.equal(retry[key],latest[key],'I66_TERMINAL_RETRY_BINDING_'+key);
+    assert.equal(retry.artifactId,candidate.artifactId,'I66_TERMINAL_RETRY_PACKAGE_DRIFT');
+    assert.equal(retry.priorClaim?.generation,latest.claimGeneration,'I66_TERMINAL_RETRY_CLAIM_DRIFT');
+    assert.equal(retry.priorBuildId,latest.buildId,'I66_TERMINAL_RETRY_PREDECESSOR_DRIFT');
+    assert.match(String(retry.admission?.commit||''),/^[a-f0-9]{40}$/,'I66_TERMINAL_RETRY_ADMISSION_COMMIT');
+    assert.ok(/^artifacts\/orbit360-recovery\/release-control\/I6_6_[A-Z0-9_]+\.json$/.test(retry.admission.path),
+      'I66_TERMINAL_RETRY_ADMISSION_PATH');
+    const bytes=io.readFileSync(retry.admission.path,'utf8');
+    assert.equal(blob(bytes),retry.admission.blob,'I66_TERMINAL_RETRY_ADMISSION_BLOB_DRIFT');
+    assert.equal(hash(bytes),retry.admission.sha256,'I66_TERMINAL_RETRY_ADMISSION_HASH_DRIFT');
+    const recorded=JSON.parse(bytes);
+    assert.equal(recorded.schema,'GI_I66_COMPENSATED_RETRY_ADMISSION_V1','I66_TERMINAL_RETRY_ADMISSION_SCHEMA');
+    assert.equal(recorded.status,'EXACT_COMPENSATED_PREVIEW_RETRY_ADMITTED','I66_TERMINAL_RETRY_ADMISSION_STATUS');
+    for(const key of ['phase','requestVersion','sourceSha','artifactId','artifactDigest','priorBuildId','priorClaim','hold'])
+      assert.deepEqual(recorded[key],retry[key],'I66_TERMINAL_RETRY_ADMISSION_BINDING_'+key);
+    assert.deepEqual(recorded.constraints,{productSourceChanges:0,rebuilds:0,livePromotion:false,claimReuse:false,
+      realCustomerWrites:0,realFinancialWrites:0,externalMessagesSent:0},'I66_TERMINAL_RETRY_SCOPE');
+    // This is continuity readback only. Actual provider facts, admission
+    // ancestry, signing and claim acquisition remain runtime-owner gates.
+  }else{
+    assert.deepEqual(plan.operationalPreviewRuntimeHold,latest.receipt,'I66_TERMINAL_PLAN_RECEIPT_DRIFT');
+    const admission=progress['request'+latest.requestVersion+'OperationalPreviewAdmission'];
+    assert.ok(admission,'I66_TERMINAL_ADMISSION_VIEW_REQUIRED');
+    assert.deepEqual(admission.lastRuntimeHold,latest.receipt,'I66_TERMINAL_ADMISSION_RECEIPT_DRIFT');
+    assert.equal(admission.buildId,latest.buildId,'I66_TERMINAL_PREDECESSOR_BUILD_DRIFT');
+    assert.equal(admission.status,latest.status,'I66_TERMINAL_STALE_ADMISSION_STATUS');
+    for(const [name,value] of Object.entries({next:progress.next,immediate:progress.immediateExecution?.next,
+      release:plan.releaseNext,control:control.nextAction,cursor:cursor.next,cursorAction:cursor.nextAction,
+      currentWork:control.i66OperationalContinuation20261115?.currentWork}))
+      assert.equal(value,latest.next,'I66_TERMINAL_STALE_NEXT_'+name);
+  }
+  return latest;
+}
+// Produce the complete prospective metadata transaction for the existing
+// signed CAS writer. No file, ref, provider or business write occurs here.
+function prepareTerminalAttemptReconciliation({authorityHead,receiptPath,receiptBytes,nextEvidencePath,recordedAtUtc},io){
+  assert.match(String(authorityHead||''),/^[a-f0-9]{40}$/,'I66_TERMINAL_EXPECTED_HEAD_REQUIRED');
+  assert.ok(Number.isFinite(Date.parse(recordedAtUtc)),'I66_TERMINAL_TIME_REQUIRED');
+  const raw=new Map(),read=file=>{const bytes=io.readFileSync(file,'utf8');raw.set(file,bytes);return JSON.parse(bytes);};
+  const control=read(P.cp),state=read(P.state),transport=read(P.transport),cursor=control.i66ActiveRecoveryCursor;
+  const previousPath=cursor.currentEvidencePath,progress=read(previousPath);
+  assert.equal(blob(raw.get(previousPath)),cursor.currentEvidenceBlobSha,'I66_TERMINAL_PREVIOUS_CURSOR_DRIFT');
+  assert.ok(/^artifacts\/orbit360-recovery\/release-control\/I6_6_REQUEST[1-9][0-9]*_[A-Z0-9_]+\.json$/.test(receiptPath),'I66_TERMINAL_RECEIPT_PATH');
+  const existing=io.existsSync(receiptPath);if(existing)raw.set(receiptPath,io.readFileSync(receiptPath,'utf8'));
+  const bytes=receiptBytes===undefined?raw.get(receiptPath):receiptBytes;
+  assert.equal(typeof bytes,'string','I66_TERMINAL_RECEIPT_BYTES_REQUIRED');
+  if(existing)assert.equal(bytes,raw.get(receiptPath),'I66_TERMINAL_EXISTING_RECEIPT_IMMUTABLE');
+  const receipt=JSON.parse(bytes);assert.equal(serial(receipt),bytes,'I66_TERMINAL_EXACT_SERIALIZED_RECEIPT_REQUIRED');
+  const view={...io,readFileSync:(file,encoding)=>file===receiptPath?bytes:io.readFileSync(file,encoding),
+    readdirSync:directory=>[...new Set([...io.readdirSync(directory),...(directory===dir?[path.basename(receiptPath)]:[])])]};
+  const native=resolveNativeExecutionProgress(control,progress,view);
+  assert.ok(native?.package.readbackCertified&&native.disposition==='CURRENT_REQUEST','I66_TERMINAL_CURRENT_NATIVE_REQUEST_REQUIRED');
+  const latest=terminalAttemptRecords(native,view).at(-1)?.projection;
+  assert.equal(latest?.receipt.path,receiptPath,'I66_TERMINAL_LATEST_PREDECESSOR_REQUIRED');
+  const preimages=Object.fromEntries([...raw].map(([file,value])=>[file,blob(value)]));
+  if(!existing)preimages[receiptPath]=null;
+  if(progress.lastTerminalOperationalAttempt&&serial(progress.lastTerminalOperationalAttempt)===serial(latest)){
+    assertExecutionProgress(control,progress,view);assertOwnerPlanContinuation(control,state,transport);
+    return {status:'NOOP_ALREADY_RECONCILED',expectedHeadOid:authorityHead,expectedPreimages:preimages,changes:{},terminal:latest};
+  }
+  assert.ok(/^artifacts\/orbit360-recovery\/release-control\/I6_6_CURRENT_EXECUTION_PROGRESS_[0-9]{8}_R[1-9][0-9]*\.json$/.test(nextEvidencePath),
+    'I66_TERMINAL_SUCCESSOR_PATH');
+  assert.equal(io.existsSync(nextEvidencePath),false,'I66_TERMINAL_SUCCESSOR_ALREADY_EXISTS');
+  assert.ok(Number.isSafeInteger(progress.version)&&progress.version>0,'I66_TERMINAL_PROGRESS_VERSION_REQUIRED');
+  assert.equal(Number(nextEvidencePath.match(/_R([1-9][0-9]*)\.json$/)[1]),progress.version+1,'I66_TERMINAL_NEXT_VERSION_REQUIRED');
+  preimages[nextEvidencePath]=null;
+  const oldReleaseNext=progress.currentSuccessorPlan.releaseNext;
+  progress.previousEvidencePath=previousPath;progress.previousEvidenceBlobSha=cursor.currentEvidenceBlobSha;
+  progress.version++;progress.recordedAtUtc=recordedAtUtc;progress.lastTerminalOperationalAttempt=latest;
+  const plan=progress.currentSuccessorPlan;plan.operationalPreviewRuntimeHold=latest.receipt;plan.releaseNext=latest.next;
+  const key='request'+latest.requestVersion+'OperationalPreviewAdmission',admission=progress[key];
+  assert.ok(admission&&admission.sourceSha===latest.sourceSha&&admission.artifactDigest===latest.artifactDigest,'I66_TERMINAL_ADMISSION_PREIMAGE_DRIFT');
+  Object.assign(admission,{status:latest.status,buildId:latest.buildId,lastRuntimeHold:latest.receipt});
+  for(const lane of progress.parallelLanes||[])if(lane.next===oldReleaseNext)lane.next=latest.next;
+  for(const row of progress.shockObjectives.items)if(row.passForShock!==true&&row.next===oldReleaseNext)row.next=latest.next;
+  progress.next=progress.immediateExecution.next=latest.next;
+  synchronizeExecutionProgress(progress);progress.executionSynchronization=executionSnapshot(transport);
+  Object.assign(cursor,{previousEvidencePath:previousPath,previousEvidenceBlobSha:cursor.currentEvidenceBlobSha,
+    currentEvidencePath:nextEvidencePath,currentEvidenceBlobSha:blob(serial(progress)),lastTerminalOperationalAttempt:latest,
+    next:latest.next,nextAction:latest.next});
+  control.nextAction=latest.next;
+  control.i66OperationalContinuation20261115.currentWork=latest.next;
+  synchronizeOwnerPlanContinuation(control,state,transport);
+  const changes={[nextEvidencePath]:progress,[P.cp]:control,[P.state]:state,...(!existing?{[receiptPath]:receipt}:{})};
+  const prospective={...view,readFileSync:(file,encoding)=>Object.hasOwn(changes,file)?serial(changes[file]):view.readFileSync(file,encoding)};
+  assertExecutionProgress(control,progress,prospective);assertOwnerPlanContinuation(control,state,transport);
+  return {status:'ATOMIC_METADATA_RECONCILIATION_PREPARED',expectedHeadOid:authorityHead,expectedPreimages:preimages,changes,terminal:latest};
+}
+function assertTerminalAttemptChangeSetPreimages(changeSet,{head,...io}){
+  assert.equal(head,changeSet.expectedHeadOid,'I66_TERMINAL_HEAD_CAS_CHANGED');
+  for(const [file,expected] of Object.entries(changeSet.expectedPreimages)){
+    const actual=io.existsSync(file)?blob(io.readFileSync(file,'utf8')):null;
+    assert.equal(actual,expected,'I66_TERMINAL_PREIMAGE_CAS_CHANGED_'+file);
+  }
+  return true;
+}
+// This runs in the authenticated operator checkout after a build finishes and
+// on interrupted-session resume. Only verified provider receipts reach it.
+function prepareProviderOutcome(event,{io=require('node:fs'),head,now=new Date().toISOString()}={}) {
+  const git=require('node:child_process').execFileSync;
+  head=head||git('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+  const cp=JSON.parse(io.readFileSync(P.cp,'utf8')),state=JSON.parse(io.readFileSync(P.state,'utf8'));
+  const transport=JSON.parse(io.readFileSync(P.transport,'utf8')),cursor=cp.i66ActiveRecoveryCursor;
+  const oldPath=cursor.currentEvidencePath,oldRaw=io.readFileSync(oldPath,'utf8');
+  const prog=JSON.parse(oldRaw);
+  assert.equal(blob(oldRaw),cursor.currentEvidenceBlobSha,'I66_TERMINAL_CURRENT_CHECKPOINT');
+  assert.match(event.buildId,/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/);
+  assert.ok(['PROVIDER_SUCCESS_VERIFIED','PROVIDER_FAILURE_COMPENSATED','PROVIDER_FAILURE_HOLD'].includes(event.status));
+  assert.ok(['preview','live'].includes(event.phase));
+  const candidates=[transport.operationalReleaseCandidate,transport.scopedBackendPreviewI66?.candidate,transport.lastConsumedOperationalCandidate].filter(Boolean);
+  assert.ok(candidates.some(p=>p.sourceSha===event.sourceSha&&p.artifactDigest===event.artifactDigest&&p.providerBinding?.requestVersion===event.requestVersion),'I66_TERMINAL_WRONG_CANDIDATE');
+  const existing=prog.providerTerminalOutcomes||{};
+  if(existing[event.buildId]){
+    assert.deepEqual(existing[event.buildId],event,'I66_TERMINAL_CHANGED_PROVIDER_FACT');
+    assert.deepEqual(cursor.providerTerminalOutcomes,existing,'I66_TERMINAL_CURSOR_RECEIPTS');
+    assertOwnerPlanContinuation(cp,state,transport);
+    return {status:'NOOP_ALREADY_RECONCILED',changes:{},expectedHeadOid:head};
+  }
+  // Reconcile an already-retained compensated receipt through its causal owner,
+  // consuming a single checkpoint for the controller, state and new observation.
+  const native=resolveNativeExecutionProgress(cp,prog,io);
+  const prior=native?.disposition==='CURRENT_REQUEST'?terminalAttemptRecords(native,io).find(x=>x.projection.buildId===event.buildId):null;
+  if(prior){
+    assert.equal(event.status,'PROVIDER_FAILURE_COMPENSATED');
+    assert.equal(event.claim.generation,prior.projection.claimGeneration);
+    assert.equal(event.hold.generation,prior.receipt['request'+event.requestVersion].records['hold.json'].generation);
+    assert.equal(event.hold.sha256,prior.receipt['request'+event.requestVersion].records['hold.json'].sha256);
+  }
+  const nextPath=oldPath.replace(/_R\d+\.json$/, '_R'+(prog.version+1)+'.json');
+  assert.notEqual(nextPath,oldPath);assert.ok(!io.existsSync(nextPath),'I66_TERMINAL_CHECKPOINT_IN_USE');
+  const prepared=prior?prepareTerminalAttemptReconciliation({authorityHead:head,receiptPath:prior.projection.receipt.path,nextEvidencePath:nextPath,recordedAtUtc:now},io):null;
+  const control=prepared?.changes[P.cp]||cp,recovery=prepared?.changes[P.state]||state;
+  const progress=prepared?.changes[nextPath]||prog,active=control.i66ActiveRecoveryCursor;
+  if(!prepared?.changes[nextPath]){
+    progress.previousEvidencePath=oldPath;progress.previousEvidenceBlobSha=cursor.currentEvidenceBlobSha;
+    progress.version++;progress.recordedAtUtc=now;
+    active.previousEvidencePath=oldPath;active.previousEvidenceBlobSha=cursor.currentEvidenceBlobSha;
+  }
+  progress.providerTerminalOutcomes={...existing,[event.buildId]:event};
+  active.providerTerminalOutcomes=progress.providerTerminalOutcomes;
+  progress.currentSuccessorPlan.lastProviderOutcome=active.lastProviderOutcome=event;
+  if(!prior){
+    const next=event.status==='PROVIDER_SUCCESS_VERIFIED' ?
+      (event.phase==='preview'?'Verify this signed Preview receipt and promote the same artifact under the current physical release guard.':'Read back the signed LIVE receipt and continue the next admitted functional unit.') :
+      'Preserve the consumed claim. Reconcile the verified provider outcome and its rollback before a new attempt of this scope.';
+    progress.currentSuccessorPlan.releaseNext=progress.immediateExecution.next=progress.next=next;
+    active.nextAction=active.next=control.nextAction=next;
+    if(control.i66OperationalContinuation20261115)control.i66OperationalContinuation20261115.currentWork=next;
+  }
+  synchronizeExecutionProgress(progress);
+  active.currentEvidencePath=nextPath;active.currentEvidenceBlobSha=blob(serial(progress));
+  synchronizeOwnerPlanContinuation(control,recovery,transport);
+  const changes={[P.cp]:control,[P.state]:recovery,[nextPath]:progress};
+  const view={...io,readFileSync:(p,e)=>Object.hasOwn(changes,p)?serial(changes[p]):io.readFileSync(p,e)};
+  assertExecutionProgress(control,progress,view);assertOwnerPlanContinuation(control,recovery,transport);
+  return {status:'ATOMIC_METADATA_RECONCILIATION_PREPARED',expectedHeadOid:head,expectedPreimages:{
+    [P.cp]:blob(io.readFileSync(P.cp,'utf8')),[P.state]:blob(io.readFileSync(P.state,'utf8')),
+    [P.transport]:blob(io.readFileSync(P.transport,'utf8')),[oldPath]:blob(oldRaw),[nextPath]:null},changes};
+}
+
+function commitProviderOutcome(change) {
+  const fs=require('node:fs'),os=require('node:os');
+  const {execFileSync}=require('node:child_process');
+  const repo='paulaosoriof86/orbit360-core',branch='recovery/fase-a-clean-20260831',remote='https://github.com/'+repo+'.git';
+  const head=change.expectedHeadOid,paths=Object.keys(change.changes).sort();
+  assert.match(head,/^[a-f0-9]{40}$/);
+  assert.deepEqual(paths.filter(p=>p!==P.cp&&p!==P.state).length,1);
+  const checkpoint=paths.find(p=>p!==P.cp&&p!==P.state);
+  assert.match(checkpoint,/^artifacts\/orbit360-recovery\/release-control\/I6_6_CURRENT_EXECUTION_PROGRESS_[0-9]{8}_R[1-9][0-9]*\.json$/);
+  assert.ok(paths.includes(P.cp)&&paths.includes(P.state));
+  const git=(args,options={})=>execFileSync('git',args,{stdio:['pipe','pipe','pipe'],maxBuffer:16*1024*1024,...options});
+  const gh=(args)=>JSON.parse(execFileSync('gh',['api',...args],{encoding:'utf8'}));
+  const ref=()=>gh(['repos/'+repo+'/git/ref/heads/'+branch]).object.sha;
+  assert.equal(ref(),head,'I66_TERMINAL_RECOMPOSE_FROM_FRESH_HEAD');
+  assertTerminalAttemptChangeSetPreimages(change,{head:git(['rev-parse','HEAD']).toString().trim(),...fs});
+  for(const [p,expected] of Object.entries(change.expectedPreimages)){
+    const row=git(['ls-tree',head,'--',p]).toString().trim();
+    assert.equal(row?row.split(/\s+/)[2]:null,expected,'I66_TERMINAL_VERSIONED_PREIMAGE_'+p);
+  }
+  const account=gh(['user']);assert.equal(account.login,'paulaosoriof86');
+  const key=process.env.GRAVICENTRA_I66_SIGNING_KEY;assert.ok(key&&path.isAbsolute(key),'I66_SIGNING_KEY_REQUIRED');
+  const publicKey=fs.readFileSync(key+'.pub','utf8').trim().split(/\s+/).slice(0,2).join(' ');
+  assert.ok(gh(['users/'+account.login+'/ssh_signing_keys']).some(k=>k.key.trim().split(/\s+/).slice(0,2).join(' ')===publicKey),'I66_PROVIDER_REGISTERED_SIGNER_REQUIRED');
+  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'gi-i66-signed-cas-'));
+  const email=account.id+'+'+account.login+'@users.noreply.github.com';
+  const message='release(i66): reconcile verified provider outcome at R'+change.changes[checkpoint].version;
+  try{
+    const env={...process.env,GIT_INDEX_FILE:path.join(temp,'index')};
+    git(['read-tree',head],{env});
+    for(const p of paths){
+      const bytes=serial(change.changes[p]);
+      const oid=git(['hash-object','-w','--stdin'],{input:bytes}).toString().trim();assert.equal(oid,blob(bytes));
+      git(['update-index','--add','--cacheinfo','100644',oid,p],{env});
+    }
+    const tree=git(['write-tree'],{env}).toString().trim();
+    const sha=git(['-c','user.name='+account.login,'-c','user.email='+email,'-c','gpg.format=ssh','-c','user.signingkey='+key,'commit-tree','-S',tree,'-p',head,'-m',message]).toString().trim();
+    fs.writeFileSync(path.join(temp,'allowed'),email+' '+publicKey+'\n',{mode:0o600});
+    git(['-c','gpg.ssh.allowedSignersFile='+path.join(temp,'allowed'),'verify-commit',sha]);
+    assert.equal(git(['rev-list','--parents','-1',sha]).toString().trim(),sha+' '+head);
+    assert.equal(git(['rev-parse',sha+'^{tree}']).toString().trim(),tree);
+    assert.equal(git(['log','-1','--format=%s',sha]).toString().trim(),message);
+    fs.writeFileSync(path.join(temp,'pre-push'),'#!/bin/sh\nset -eu\nread -r local_ref local_sha remote_ref remote_sha\ntest "$local_sha" = "'+sha+'" && test "$remote_ref" = "refs/heads/'+branch+'" && test "$remote_sha" = "'+head+'" || exit 1\nif read -r extra; then exit 1; fi\n',{mode:0o700});
+    assert.equal(ref(),head,'I66_TERMINAL_RECOMPOSE_FROM_FRESH_HEAD');
+    try{git(['-c','core.hooksPath='+temp,'-c','credential.helper=','-c','credential.helper=!gh auth git-credential','push','--porcelain',remote,sha+':refs/heads/'+branch]);}
+    catch(error){if(ref()!==sha)throw Error('I66_SIGNED_CAS_UNCONFIRMED_RECOMPOSE_FROM_FRESH_HEAD');}
+    const commit=gh(['repos/'+repo+'/git/commits/'+sha]);
+    assert.equal(commit.verification.verified,true,'I66_GITHUB_VERIFICATION_REQUIRED');
+    assert.deepEqual(commit.parents.map(p=>p.sha),[head]);assert.equal(commit.tree.sha,tree);
+    assert.equal(commit.message.replace(/\n$/,''),message);assert.equal(ref(),sha);
+    return {sha,tree,parent:head,message,verified:true};
+  }finally{fs.rmSync(temp,{recursive:true,force:true});}
+}
+
+function prepareTerminalCli(args=process.argv.slice(2)){
+  assert.equal(args.length,3,'I66_TERMINAL_USE_PREPARE_TERMINAL_RECEIPT_NEW_DIRECTORY');
+  assert.equal(args[0],'prepare-terminal','I66_TERMINAL_UNKNOWN_ACTION');
+  const fs=require('node:fs'),{execFileSync,spawnSync}=require('node:child_process');
+  const authorityHead=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+  const control=JSON.parse(fs.readFileSync(P.cp,'utf8')),current=control.i66ActiveRecoveryCursor.currentEvidencePath;
+  for(const file of [P.cp,P.state,P.transport,current])assert.equal(fs.readFileSync(file,'utf8'),
+    execFileSync('git',['show',authorityHead+':'+file],{encoding:'utf8',maxBuffer:64*1024*1024}),'I66_TERMINAL_CANONICAL_METADATA_WORKTREE_DRIFT');
+  const progress=JSON.parse(fs.readFileSync(current,'utf8')),receiptPath=args[1],receiptBytes=fs.readFileSync(receiptPath,'utf8');
+  const committed=spawnSync('git',['cat-file','-e',authorityHead+':'+receiptPath],{stdio:'pipe'}).status===0;
+  if(committed)assert.equal(receiptBytes,execFileSync('git',['show',authorityHead+':'+receiptPath],{encoding:'utf8',maxBuffer:64*1024*1024}),
+    'I66_TERMINAL_EXISTING_RECEIPT_IMMUTABLE');
+  const date=current.match(/_([0-9]{8})_R[0-9]+\.json$/)?.[1]||new Date().toISOString().slice(0,10).replaceAll('-','');
+  const nextEvidencePath=dir+'I6_6_CURRENT_EXECUTION_PROGRESS_'+date+'_R'+(progress.version+1)+'.json';
+  const io={...fs,existsSync:file=>file===receiptPath?committed:fs.existsSync(file)};
+  const prepared=prepareTerminalAttemptReconciliation({authorityHead,receiptPath,receiptBytes,nextEvidencePath,recordedAtUtc:new Date().toISOString()},io);
+  fs.mkdirSync(args[2],{recursive:false,mode:0o700});
+  fs.writeFileSync(path.join(args[2],'changeset.json'),serial(prepared),{flag:'wx',mode:0o600});
+  console.log(JSON.stringify({status:prepared.status,expectedHeadOid:prepared.expectedHeadOid,paths:Object.keys(prepared.changes),
+    output:path.join(args[2],'changeset.json'),canonicalRefWrites:0,providerWrites:0}));
+  return prepared;
 }
 const observerTargetKeys=['generation','sourceSha','buildId','artifactId','artifactDigest','hostingVersion'];
 const observerCursorKeys=cursor=>Object.keys(cursor).filter(key=>/^(lastObserverResults|lastFiveRoleMatrix|lastPerformance|lastFinancialUiReadback)/.test(key));
@@ -925,7 +1228,9 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
-module.exports={P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
-  resolveNativeExecutionProgress,assertNativeExecutionProgress,
+module.exports={prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
+  resolveNativeExecutionProgress,assertNativeExecutionProgress,terminalAttemptRecords,assertTerminalAttemptProgress,
+  prepareTerminalAttemptReconciliation,assertTerminalAttemptChangeSetPreimages,prepareTerminalCli,
   ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveFinancialAndPlanProjections,assertActiveReleaseProgress,
   compositeReceipt,closeCompositeFiles,READONLY_PROFILES,readonlyObserverPaths,readonlyObserverTarget,resolveReadonlyObserver,verifyReadonlyObserver};
+if(require.main===module)try{prepareTerminalCli();}catch(error){console.error(String(error.message).split('\n')[0]);process.exitCode=1;}

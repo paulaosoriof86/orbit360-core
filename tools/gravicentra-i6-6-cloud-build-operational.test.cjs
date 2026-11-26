@@ -266,3 +266,22 @@ test('assigned-role native preflight fetches the canonical remote and requires t
   assert.deepEqual(actions[0],['fetch','--no-tags','--quiet',n.C.repositoryUrl,'refs/heads/'+n.C.branch]);
   assert.ok(actions.some(args=>args[0]==='merge-base'&&args[2]===p.sourceSha&&args[3]===head));
 });
+
+test('resume distinguishes a missing claim, an active worker, and a compensated terminal attempt',async()=>{
+  const p=candidate().p, artifactDigest=p.artifactDigest, sourceSha=p.sourceSha;
+  const claim={schema:'GI_I66_NATIVE_OPERATIONAL_CLAIM_V1',executionProvider:n.C.provider,phase:'preview',sourceSha,
+    artifactId:p.artifactId,artifactDigest,authorityHead:'b'.repeat(40),planSha256:'a'.repeat(64),buildId:EXEC_UUID};
+  const ref={uri:'gs://'+n.C.bucket+'/'+n.lockName(p,'preview'),generation:'12',bytes:100,sha256:'a'.repeat(64)};
+  const holdRef={uri:'gs://'+n.C.bucket+'/i66/operational-attempts/'+EXEC_UUID+'/hold.json',generation:'15',bytes:110,sha256:'b'.repeat(64)};
+  const hold={...claim,schema:'GI_I66_NATIVE_OPERATIONAL_HOLD_V1',claim:ref,code:'QA_FAILED',rollback:{proof:{status:'COMPENSATION_READBACK_VERIFIED'}}};
+  const build={id:EXEC_UUID,projectId:n.C.projectId,source:{gitSource:{revision:claim.authorityHead}},
+    serviceAccount:'projects/'+n.C.projectId+'/serviceAccounts/'+n.C.serviceAccount,status:'WORKING'};
+  const io={findClaim:async name=>name.endsWith('hold.json')?holdRef:ref,object:async r=>({data:JSON.stringify(r===ref?claim:hold)}),build:async()=>build};
+  assert.equal(await n.observeOperationalClaim(p,'preview',{...io,findClaim:async()=>null}),null);
+  assert.equal((await n.observeOperationalClaim(p,'preview',io)).status,'ATTEMPT_RUNNING');
+  build.status='FAILURE';assert.equal((await n.observeOperationalClaim(p,'preview',io)).status,'PROVIDER_FAILURE_COMPENSATED');
+  hold.rollback=null;assert.equal((await n.observeOperationalClaim(p,'preview',io)).status,'PROVIDER_FAILURE_HOLD');
+  hold.artifactDigest='sha256:'+'0'.repeat(64);
+  await assert.rejects(()=>n.observeOperationalClaim(p,'preview',io),/TERMINAL_HOLD_BINDING/);
+  await assert.rejects(()=>n.observeOperationalClaim(p,'preview',{...io,findClaim:async name=>name.endsWith('hold.json')?null:ref}),/READBACK_PENDING/);
+});

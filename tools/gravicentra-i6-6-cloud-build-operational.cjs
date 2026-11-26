@@ -557,14 +557,123 @@ async function verify(plan,id,out){
     directFormsChecks:result.signed.focusedReports.directForms.checks,financialStages:48,...(result.proof.committed?{committed:result.proof.committed}:{}),fullI66ProductionAccepted:false};
   write(path.join(out,'receipt.json'),receipt);console.log('I66_NATIVE_OPERATIONAL_RETAINED_READBACK_PASS '+JSON.stringify({phase:plan.phase,buildId:id,status:receipt.status,artifactDigest:p.artifactDigest}));return receipt;
 }
+// A consumed Cloud Build claim is an immutable pointer to the attempt. Read the
+// provider again before planning a retry, including after a lost terminal ACK.
+async function observeOperationalClaim(p, phase, io) {
+  const name = lockName(p, phase);
+  const ref = await io.findClaim(name);
+  if (!ref) return null;
+  const claim = JSON.parse((await io.object(ref)).data);
+  const version = p.providerBinding.requestVersion;
+  equal([claim.schema,claim.executionProvider,claim.phase,claim.sourceSha,claim.artifactId,claim.artifactDigest],
+    ['GI_I66_NATIVE_OPERATIONAL_CLAIM_V1',C.provider,phase,p.sourceSha,p.artifactId,p.artifactDigest], 'CONSUMED_CLAIM_BINDING');
+  need(uuid(claim.buildId) && sha40(claim.authorityHead) && sha64(claim.planSha256), 'CONSUMED_CLAIM_IDENTITY');
+  const build = await io.build(claim.buildId);
+  equal([build.id,build.projectId,build.source?.gitSource?.revision,build.serviceAccount],
+    [claim.buildId,C.projectId,claim.authorityHead,'projects/'+C.projectId+'/serviceAccounts/'+C.serviceAccount], 'TERMINAL_BUILD_IDENTITY');
+  if (['PENDING','QUEUED','WORKING'].includes(build.status))
+    return {status:'ATTEMPT_RUNNING',buildId:build.id};
+  if (build.status === 'SUCCESS') {
+    const plan = planFromBuild(build);
+    const verified = await io.verifySuccess(plan, build.id);
+    equal([verified.sourceSha,verified.artifactDigest,verified.executionBuildId,verified.phase],
+      [p.sourceSha,p.artifactDigest,build.id,phase], 'TERMINAL_SIGNED_PROOF');
+    return {status:'PROVIDER_SUCCESS_VERIFIED',requestVersion:version,phase,claim:ref,buildId:build.id,
+      sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,proof:verified.proof,signedProof:verified.signedProof,
+      outcome:verified.status};
+  }
+  need(['FAILURE','TIMEOUT','CANCELLED','EXPIRED','INTERNAL_ERROR'].includes(build.status), 'KNOWN_TERMINAL_OUTCOME');
+  const holdRef = await io.findClaim('i66/operational-attempts/'+build.id+'/hold.json');
+  need(holdRef, 'CONSUMED_CLAIM_TERMINAL_HOLD_READBACK_PENDING');
+  const hold = JSON.parse((await io.object(holdRef)).data);
+  equal([hold.schema,hold.executionProvider,hold.buildId,hold.phase,hold.sourceSha,hold.artifactId,hold.artifactDigest,hold.planSha256,hold.claim],
+    ['GI_I66_NATIVE_OPERATIONAL_HOLD_V1',C.provider,build.id,phase,p.sourceSha,p.artifactId,p.artifactDigest,claim.planSha256,ref], 'TERMINAL_HOLD_BINDING');
+  const compensated=hold.rollback?.proof?.status==='COMPENSATION_READBACK_VERIFIED';
+  return {status:compensated?'PROVIDER_FAILURE_COMPENSATED':'PROVIDER_FAILURE_HOLD',
+    requestVersion:version,phase,sourceSha:p.sourceSha,artifactDigest:p.artifactDigest,claim:ref,buildId:build.id,
+    outcome:build.status,code:hold.code,hold:holdRef};
+}
+
+function operationalClaimReader(out) {
+  const io=gcloudReadIo();
+  return {...io,
+    async findClaim(name) {
+      const uri='gs://'+C.bucket+'/'+name;
+      const call=spawnSync('gcloud',['storage','objects','describe',uri,'--project='+C.projectId,'--raw','--format=json'],
+        {encoding:'utf8',maxBuffer:4*1024*1024});
+      if(call.status!==0){
+        // A permissions or transport error must never be interpreted as an unused claim.
+        if(/HTTPError 404|status.?=.?404|NOT_FOUND|matched no objects/i.test(call.stderr||''))return null;
+        throw Error('I66_OPERATIONAL_CLAIM_PROVIDER_UNAVAILABLE');
+      }
+      const meta=JSON.parse(call.stdout),generation=String(meta.generation);
+      equal([meta.bucket,meta.name],[C.bucket,name],'TERMINAL_EXACT_PROVIDER_OBJECT');
+      const data=await io.bytes(name,generation);
+      return {uri,generation,bytes:data.length,sha256:sha(data)};
+    },
+    build:id=>io.api('https://cloudbuild.googleapis.com/v1/projects/'+C.projectId+'/locations/'+C.region+'/builds/'+id),
+    async verifySuccess(plan,id){
+      const scratch=fs.mkdtempSync(path.join(os.tmpdir(),'gi-i66-terminal-'));
+      try{return await verify(plan,id,path.join(scratch,'readback'));}
+      finally{fs.rmSync(scratch,{recursive:true,force:true});}
+    }
+  };
+}
+async function reconcileBeforeExecution(phase,out,expectedCandidate) {
+  const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),owner=require('./gravicentra-i66-frontend-control.cjs');
+  const tr=json(g.CONTROL),fresh=git(process.cwd(),'ls-remote',C.repositoryUrl,'refs/heads/'+C.branch).split(/\s+/)[0];
+  equal(fresh,git(process.cwd(),'rev-parse','HEAD'),'RECONCILIATION_REQUIRES_FRESH_AUTHORITY');
+  const p=expectedCandidate||g.candidateForPhase(tr,phase),event=await observeOperationalClaim(p,phase,operationalClaimReader(out));
+  if(!event)return null;
+  if(event.status==='ATTEMPT_RUNNING')return event;
+  const change=owner.prepareProviderOutcome(event);
+  if(change.status!=='NOOP_ALREADY_RECONCILED')owner.commitProviderOutcome(change);
+  return {status:'CONSUMED_CLAIM_RECONCILED',buildId:event.buildId,outcome:event.status};
+}
+
+async function runOperationalCycle(phase,out) {
+  const g=require('./gravicentra-i6-6-operational-release-candidate.cjs');
+  const candidate=g.candidateForPhase(json(g.CONTROL),phase);
+  const prior=await reconcileBeforeExecution(phase,out,candidate);
+  if(prior)return prior;
+  const plan=makePlan(process.cwd(),phase);
+  fs.mkdirSync(out,{recursive:false});
+  const cfg=path.join(out,'cloudbuild.json');
+  write(cfg,configFor(plan));write(path.join(out,'plan.json'),plan);
+  let failure;
+  try{
+    execFileSync('gcloud',['builds','submit',C.repositoryUrl,'--git-source-revision='+plan.authorityHead,
+      '--region='+C.region,'--project='+C.projectId,'--config='+cfg,'--quiet'],{stdio:'inherit'});
+  }catch(error){failure=error;}
+  // Poll the actual claim even when submit lost its ACK or exited with failure.
+  // The next invocation performs this same reconciliation before any submit.
+  const cwd=process.cwd(),temp=fs.mkdtempSync(path.join(os.tmpdir(),'gi-i66-close-')),checkout=path.join(temp,'authority');
+  let observed;
+  try{
+    git(cwd,'fetch','--quiet',C.repositoryUrl,'refs/heads/'+C.branch);
+    git(cwd,'worktree','add','--quiet','--detach',checkout,git(cwd,'rev-parse','FETCH_HEAD'));
+    process.chdir(checkout);
+    observed=await reconcileBeforeExecution(phase,path.join(out,'terminal-readback'),candidate);
+  }finally{
+    process.chdir(cwd);
+    if(fs.existsSync(path.join(checkout,'.git')))git(cwd,'worktree','remove',checkout);
+    fs.rmSync(temp,{recursive:true,force:true});
+  }
+  if(observed)return observed;
+  if(failure)throw failure;
+  throw Error('I66_TERMINAL_PROVIDER_CLAIM_MISSING');
+}
+
 async function main(args=process.argv.slice(2)){
   if(args[0]==='bind'&&args.length===4){const binding=bindingFromHosting(process.cwd(),json(args[1]),json(args[2]),git(process.cwd(),'rev-parse','HEAD'));write(args[3],binding);console.log('I66_NATIVE_BINDING_PREPARED_NOT_AUTHORIZED');return binding;}
-  if(args[0]==='prepare'&&args.length===3){const p=makePlan(process.cwd(),args[1]);fs.mkdirSync(args[2],{recursive:false});write(path.join(args[2],'plan.json'),p);write(path.join(args[2],'cloudbuild.json'),configFor(p));console.log('I66_NATIVE_OPERATIONAL_PREPARED_NO_EXECUTION '+digest(p));return p;}
+  if(args[0]==='run'&&args.length===3)return runOperationalCycle(args[1],args[2]);
+  if(args[0]==='resume'&&args.length===3)return reconcileBeforeExecution(args[1],args[2]);
+  if(args[0]==='prepare'&&args.length===3){const prior=await reconcileBeforeExecution(args[1],args[2]);if(prior){console.log(JSON.stringify(prior));return prior;}const p=makePlan(process.cwd(),args[1]);fs.mkdirSync(args[2],{recursive:false});write(path.join(args[2],'plan.json'),p);write(path.join(args[2],'cloudbuild.json'),configFor(p));console.log('I66_NATIVE_OPERATIONAL_PREPARED_NO_EXECUTION '+digest(p));return p;}
   if(args[0]==='worker'&&args.length===2)return worker(JSON.parse(args[1]));
   if(args[0]==='verify'&&args.length===4)return verify(json(args[1]),args[2],args[3]);
   if(args[0]==='retain-make'&&args.length===2)return retainMake(args[1]);
   if(args[0]==='verify-runtime'&&args.length===2){const g=require('./gravicentra-i6-6-operational-release-candidate.cjs'),p=g.candidateForPhase(json(g.CONTROL),args[1]);return verifyRuntimeAuthority(p,{phase:args[1],action:'worker'});}
   throw Error('I66_NATIVE_OPERATIONAL_USE_BIND_PREPARE_WORKER_VERIFY');
 }
-module.exports={C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
+module.exports={observeOperationalClaim,reconcileBeforeExecution,operationalClaimReader,C,F,MECHANISM_PATHS,PRODUCT_PATHS,PHASES,ACTIONS,native,provider,uuid,executionId,artifactRef,validateMechanism,validateBinding,verifyPinnedOwners,ensureHistory,fetchAuthorityHead,validatePlan,prefix,configFor,validateBuild,sdkHeaders,verifyRuntimeAuthority,blockNames,workflowBlocks,workflowTimeoutMs,deploymentTimeoutMs,runtimeBlocks,mechanismManifest,bindingFromHosting,makePlan,validatePackageMetadata,planFromBuild,validatePreviewMetadata,readPreviewAcceptance,readNativeFiles,verifiedPackage,admitRuntime,packageTarForBinding,signedCasIo,candidateAt,mandatoryChecks,validateOperationalProof,readFinancialPreview,lockName,ENV_OUTPUTS,consumeNativeEnv,branchGuard,retainMake,worker,gcloudReadIo,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(error=>{console.error(String(error.message||'I66_NATIVE_OPERATIONAL_HOLD').split('\n')[0]);process.exitCode=1;});

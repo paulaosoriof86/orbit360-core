@@ -27,7 +27,7 @@
     "activeGate": "I6.6",
     "closedHistoricalGate": "B4-007",
     "latestProvenLiveSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
-    "currentWork": "Continue I6.6 through the active R88 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+    "currentWork": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
     "latestHostingPreviewEvidence": "artifacts/orbit360-recovery/release-control/I6_6_NETWORK_DIAGNOSTICS_PREVIEW_BUILD_20261117.json",
     "latestHostingPreviewSource": "1b65a790530d49fe1d1fb451f02838fd9a713c53",
     "operationsEvidenceReview": "artifacts/orbit360-recovery/release-control/I6_6_OPS_EVIDENCE_AND_PREVIEW_BINDING_REVIEW_20261116.json",
@@ -6775,7 +6775,7 @@
     "i63LiveReadbackPass": true,
     "i63DeterministicDiffReady": true
   },
-  "nextAction": "Continue I6.6 through the active R88 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+  "nextAction": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
   "postproductionExitProgress": {
     "formalPercent": 60,
     "frozenMiniGates": 6,
@@ -26448,8 +26448,8 @@
   },
   "i66ActiveRecoveryCursor": {
     "status": "FROZEN_I66_SHOCK_EXECUTION_CONTINUES_NO_GATE_REPLACEMENT",
-    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R88.json",
-    "currentEvidenceBlobSha": "b6e614204e9a10bfae2b270bc513c13abcd6838f",
+    "currentEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R89.json",
+    "currentEvidenceBlobSha": "32444158fb3df63f9216368eb99bb8c1d45d0aa6",
     "frozenPlanPath": "artifacts/orbit360-recovery/release-control/I6_6_PLAN_CHOQUE_FUNCIONAL_FINANCIERO_20261122.md",
     "frozenPlanBlobSha": "fbfd54d229a13101fbfb0dfc6e92a5fa524999b6",
     "fullInventoryPath": "artifacts/orbit360-recovery/release-control/I6_6_INVENTARIO_INTEGRAL_295_20261122.md",
@@ -26466,12 +26466,12 @@
     "financialRowsAppliedThisIteration": 104,
     "lastEvidenceDateLocal": "2026-11-25",
     "noNormativeProjectSourceChange": true,
-    "next": "Continue I6.6 through the active R88 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+    "next": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
     "lastFunctionalLiveUatRunId": 45074429319,
     "lastFunctionalLiveUatJobId": 137352857627,
     "lastFunctionalLiveScope": "TWO_ROLE_RENEWAL_INSURER_SYNTHETIC_PASS_REAL_ISSUANCE_AND_DOCUMENT_HOLD",
-    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R87.json",
-    "previousEvidenceBlobSha": "c085a819b3ca8301ace59bfccc21fd5cbe7aae68",
+    "previousEvidencePath": "artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R88.json",
+    "previousEvidenceBlobSha": "b6e614204e9a10bfae2b270bc513c13abcd6838f",
     "lastFunctionalLiveUatStatus": "LIVE_PHYSICAL_STEPS_PASS_FIVE_ROLE_FINAL_COVERAGE_FAIL_CLOSED",
     "lastFinancialProtectedPreflightRunId": 45332501697,
     "lastFinancialSourceStatus": "155_EXISTING_PAYMENTS_465_RECORDS_CAPTURE_VERIFIED_2_CANONICAL_CALLS_6_APPLICATION_CASES_DOC07_ALREADY_APPLIED_DATE_REVIEW_OPEN",
@@ -26502,7 +26502,7 @@
     "moduleReleasedThisIterationScope": "R88 retains the historical-fixture predeploy failure and binds the corrected test to its original governance epoch. Functional Preview and LIVE proof remain pending.",
     "lastLivePromotionAttemptRunId": 45391827840,
     "lastLivePromotionAttemptStatus": "ROLLED_BACK",
-    "nextAction": "Continue I6.6 through the active R88 lanes: L3 preserves certified package35 and its exact existing Hosting Preview, with five-function Cloud Build Preview admitted; execute exact backend, signed Preview, financial48 and same-artifact LIVE/COMMITTED gates; L2 preserves the verified Ops/direct and display candidates for subsequent admission and signed runtime proof; L4 preserves the155 APPLIED_DIRECT obligations and the separately confirmed unique-payment incident with PDF pending; L5 retains the existing leads and server-to-Make boundary. Package and Hosting transport certification do not certify signed functional Preview, LIVE or whole-gate acceptance.",
+    "nextAction": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates.",
     "lastFunctionalPreviewRunId": 45542808183,
     "lastFunctionalPreviewStatus": "BUILD_AND_224_HOSTING_PASS_MAKE_PREVIEW_PASS_SIGNED_ROLE_GUARD_FAILED_COMPENSATION_VERIFIED",
     "lastBuildAttemptStatus": "IMMUTABLE_PACKAGE_RETAINED_READBACK_PASS_NO_DEPLOY",
@@ -26514,7 +26514,73 @@
     "lastBuildAttemptProvider": "GOOGLE_CLOUD_BUILD",
     "lastBuildAttemptId": "792b85b8-f1fb-4353-9ef8-b9f1e1f94065",
     "lastHostingPreviewAttemptId": "cab7f997-b499-4b84-9ed1-e546b33af1b2",
-    "lastHostingPreviewAttemptStatus": "EXACT_EXISTING_PREVIEW_RETAINED_READBACK_PASS_SIGNED_QA_PENDING"
+    "lastHostingPreviewAttemptStatus": "EXACT_EXISTING_PREVIEW_RETAINED_READBACK_PASS_SIGNED_QA_PENDING",
+    "lastTerminalOperationalAttempt": {
+      "schema": "GI_I66_CURRENT_TERMINAL_OPERATIONAL_ATTEMPT_V1",
+      "requestVersion": 35,
+      "phase": "preview",
+      "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+      "artifactDigest": "sha256:1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+      "buildId": "9723b53c-8f8b-4f6e-80b6-960c2fcb8674",
+      "status": "FAILURE_COMPENSATED_CLAIM_CONSUMED",
+      "failureCode": "INGRESS_CONFIGURATION_PROOF_PENDING",
+      "claimGeneration": "1795629238200879",
+      "canReuseOriginalClaim": false,
+      "signedPreviewAccepted": false,
+      "livePromotion": false,
+      "receipt": {
+        "path": "artifacts/orbit360-recovery/release-control/I6_6_REQUEST35_PREVIEW_COMPENSATED_AND_DOCUMENT_PERSISTENCE_20261125.json",
+        "gitBlobSha": "7fa7cfccd3cad9375c1b1c8bdd77502e8998631a",
+        "sha256": "54274b0a125d6dc69d1d1ac74cb4c34b7a69bb67a87e1280476c7ac43d32bb68"
+      },
+      "next": "For request 35 only: Admit the exact compensated retry through the release owner, preserving the consumed claim. Coordinate Make scenario evidence in the protected window. Resume existing LIVE promotion only after signed Preview and readback. Preserve its certified package and Hosting bytes. Independently scoped functional releases proceed from the current physical composition and their own signed gates."
+    },
+    "providerTerminalOutcomes": {
+      "9723b53c-8f8b-4f6e-80b6-960c2fcb8674": {
+        "status": "PROVIDER_FAILURE_COMPENSATED",
+        "requestVersion": 35,
+        "phase": "preview",
+        "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+        "artifactDigest": "sha256:1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+        "claim": {
+          "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/operational-locks/request-35-preview-16e3a70baf4e31ef8453173990f32a398c65e59b-1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec.json",
+          "generation": "1795629238200879",
+          "bytes": 737,
+          "sha256": "94dc51ff44392d5f9e65ce15006a631d78fea0f3eab74aa74da016c9cebfd579"
+        },
+        "buildId": "9723b53c-8f8b-4f6e-80b6-960c2fcb8674",
+        "outcome": "FAILURE",
+        "code": "I66_CLOUD_BUILD_COMMAND_FAILED_gi-i66-operational-execution.log",
+        "hold": {
+          "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/operational-attempts/9723b53c-8f8b-4f6e-80b6-960c2fcb8674/hold.json",
+          "generation": "1795630563546835",
+          "bytes": 21617,
+          "sha256": "2431e63d63d007d89800c63c7d59b8a33fdd86c778aacd9048de0d10d2a62684"
+        }
+      }
+    },
+    "lastProviderOutcome": {
+      "status": "PROVIDER_FAILURE_COMPENSATED",
+      "requestVersion": 35,
+      "phase": "preview",
+      "sourceSha": "16e3a70baf4e31ef8453173990f32a398c65e59b",
+      "artifactDigest": "sha256:1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec",
+      "claim": {
+        "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/operational-locks/request-35-preview-16e3a70baf4e31ef8453173990f32a398c65e59b-1c562090b276b5aee913f9109aed5903f0450ffb582d89e0347a69853c1223ec.json",
+        "generation": "1795629238200879",
+        "bytes": 737,
+        "sha256": "94dc51ff44392d5f9e65ce15006a631d78fea0f3eab74aa74da016c9cebfd579"
+      },
+      "buildId": "9723b53c-8f8b-4f6e-80b6-960c2fcb8674",
+      "outcome": "FAILURE",
+      "code": "I66_CLOUD_BUILD_COMMAND_FAILED_gi-i66-operational-execution.log",
+      "hold": {
+        "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/operational-attempts/9723b53c-8f8b-4f6e-80b6-960c2fcb8674/hold.json",
+        "generation": "1795630563546835",
+        "bytes": 21617,
+        "sha256": "2431e63d63d007d89800c63c7d59b8a33fdd86c778aacd9048de0d10d2a62684"
+      }
+    }
   },
   "i66PreversionedControlViewBlob": "de401082f688ce1c59f025f6f39e3c947dceaa35",
   "i66FrontendReleaseHead": {

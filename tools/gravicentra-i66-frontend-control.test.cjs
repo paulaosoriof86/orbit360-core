@@ -34,7 +34,7 @@ function nativeContinuationFixture(){
     historicalBillingReceipt:{status:'V7_PROVIDER_BILLING_HOLD_SIGNED_RUNTIME_PENDING',provider:'GITHUB_ACTIONS'}};
   const cp={i66ActiveRecoveryCursor:{currentEvidencePath:evidencePath}},transport={frontendPreviewRequest:request};
   const files=new Map();
-  const io={readFileSync:path=>{
+  const io={readdirSync:()=>[],readFileSync:path=>{
     if(path===P.transport)return serial(transport);
     assert.ok(files.has(path),'UNEXPECTED_NATIVE_FIXTURE_READ:'+path);return files.get(path);
   }};
@@ -444,7 +444,7 @@ function observedNativeProgressFixture(){
   const f=progressModel(evidencePath),transport={frontendPreviewRequest:structuredClone(f.progress.executionSynchronization.previewRequest)};
   const bind=()=>{f.cp.i66ActiveRecoveryCursor.currentEvidencePath=evidencePath;
     f.cp.i66ActiveRecoveryCursor.currentEvidenceBlobSha=blob(serial(f.progress));};
-  const io={readFileSync:(p,enc)=>p===evidencePath?serial(f.progress):p===P.transport?serial(transport):fs.readFileSync(p,enc)};
+  const io={readdirSync:()=>[],readFileSync:(p,enc)=>p===evidencePath?serial(f.progress):p===P.transport?serial(transport):fs.readFileSync(p,enc)};
   bind();return {...f,io,bind,evidencePath,verify:()=>owner.assertExecutionProgress(f.cp,f.progress,io)};
 }
 test('native continuation reproduces the pinned R84 provider drift despite internally consistent projections',()=>{
@@ -477,7 +477,7 @@ function multihopNativeProgressFixture(){
   const original=fs.readFileSync(evidencePath,'utf8'),originalBlob=blob(original),f=progressModel(evidencePath);
   const p=f.progress,transport={frontendPreviewRequest:structuredClone(p.executionSynchronization.previewRequest)};
   const files=new Map([[evidencePath,original]]),reads=[];
-  const io={readFileSync:(path,enc)=>{reads.push(path);
+  const io={readdirSync:()=>[],readFileSync:(path,enc)=>{reads.push(path);
     return path===P.transport?serial(transport):files.has(path)?files.get(path):fs.readFileSync(path,enc);}};
   const refs={packagePending:p.pendingImmutableBuild.nativeExecutionEvidence,packagePlan:p.currentSuccessorPlan.providerExecution,
     hostingPending:p.pendingImmutableBuild.hostingPreviewContinuation,hostingPlan:p.currentSuccessorPlan.hostingPreviewExecution,
@@ -670,3 +670,142 @@ for(const [field,mutate] of [
   ['generation',f=>f.transport.frontendReleaseSequence++],
   ['versioned head removal',f=>delete f.cp.i66FrontendReleaseHead]
 ])test('rejects drift in '+field,()=>{const f=model();mutate(f);assert.throws(f.verify);});
+
+const TERMINAL_BASE='bce6289b94db02c6cd5520c50dccfa3c280ab474';
+const TERMINAL_PATH='artifacts/orbit360-recovery/release-control/I6_6_REQUEST35_PREVIEW_COMPENSATED_AND_DOCUMENT_PERSISTENCE_20261125.json';
+const TERMINAL_NEXT='artifacts/orbit360-recovery/release-control/I6_6_CURRENT_EXECUTION_PROGRESS_20261124_R89.json';
+function terminalFixture(){
+  const {execFileSync}=require('node:child_process'),files=new Map();
+  const gitBytes=file=>execFileSync('git',['show',TERMINAL_BASE+':'+file],{encoding:'utf8',maxBuffer:64*1024*1024});
+  for(const file of [P.cp,P.state,P.transport,TERMINAL_PATH])files.set(file,gitBytes(file));
+  const initialControl=JSON.parse(files.get(P.cp)),evidencePath=initialControl.i66ActiveRecoveryCursor.currentEvidencePath;
+  files.set(evidencePath,gitBytes(evidencePath));
+  const basePaths=new Set(execFileSync('git',['ls-tree','-r','--name-only',TERMINAL_BASE,'--',require('node:path').dirname(P.cp)],{encoding:'utf8'})
+    .trim().split('\n')),receiptNames=[...basePaths].map(p=>require('node:path').basename(p));
+  const io={readFileSync:(file,encoding)=>files.has(file)?files.get(file):fs.readFileSync(file,encoding),
+    readdirSync:()=>[...new Set([...receiptNames,...[...files.keys()].map(p=>require('node:path').basename(p))])],
+    existsSync:file=>files.has(file)||(file.startsWith(require('node:path').dirname(P.cp)+'/')?basePaths.has(file):fs.existsSync(file))};
+  const args={authorityHead:TERMINAL_BASE,receiptPath:TERMINAL_PATH,nextEvidencePath:TERMINAL_NEXT,recordedAtUtc:'2026-11-25T20:40:00.000Z'};
+  const current=()=>{const control=JSON.parse(io.readFileSync(P.cp));return{control,state:JSON.parse(io.readFileSync(P.state)),
+    transport:JSON.parse(io.readFileSync(P.transport)),progress:JSON.parse(io.readFileSync(control.i66ActiveRecoveryCursor.currentEvidencePath))};};
+  return {files,io,args,initialControl,evidencePath,current,prepare:()=>owner.prepareTerminalAttemptReconciliation(args,io),
+    apply:set=>{for(const [file,value] of Object.entries(set.changes))files.set(file,serial(value));},
+    verify:()=>{const {control,progress}=current();return owner.assertExecutionProgress(control,progress,io);}};
+}
+test('terminal receipt reproduces the actual bce/R88 drift that the previous owner accepted',()=>{
+  const f=terminalFixture(),before=serial([...f.files]),{control,progress}=f.current();
+  const Module=require('node:module'),filename=require.resolve('./gravicentra-i66-frontend-control.cjs'),prior=new Module(filename,module);
+  prior.filename=filename;prior.paths=Module._nodeModulePaths(require('node:path').dirname(filename));
+  prior._compile(require('node:child_process').execFileSync('git',['show',TERMINAL_BASE+':tools/gravicentra-i66-frontend-control.cjs'],{encoding:'utf8'}),filename);
+  assert.doesNotThrow(()=>prior.exports.assertExecutionProgress(control,progress,f.io));
+  assert.throws(f.verify,/I66_TERMINAL_RECEIPT_NOT_RECONCILED/);
+  assert.equal(serial([...f.files]),before);
+});
+test('terminal producer derives a complete atomic metadata correction from the real consumed claim',()=>{
+  const f=terminalFixture(),before=f.current(),original=serial([...f.files]),set=f.prepare();
+  assert.equal(set.status,'ATOMIC_METADATA_RECONCILIATION_PREPARED');assert.equal(set.expectedHeadOid,TERMINAL_BASE);
+  assert.deepEqual(Object.keys(set.changes).sort(),[P.cp,P.state,TERMINAL_NEXT].sort());
+  assert.equal(set.terminal.buildId,'9723b53c-8f8b-4f6e-80b6-960c2fcb8674');
+  assert.equal(set.terminal.claimGeneration,'1795629238200879');
+  assert.equal(set.terminal.receipt.gitBlobSha,'7fa7cfccd3cad9375c1b1c8bdd77502e8998631a');
+  assert.equal(serial([...f.files]),original,'preparation has no writes');
+  assert.equal(owner.assertTerminalAttemptChangeSetPreimages(set,{head:TERMINAL_BASE,...f.io}),true);
+  f.apply(set);assert.doesNotThrow(f.verify);
+  const after=f.current();assert.equal(after.progress.version,89);
+  assert.equal(after.progress.previousEvidencePath,f.evidencePath);
+  assert.equal(after.control.i66ActiveRecoveryCursor.currentEvidenceBlobSha,blob(serial(after.progress)));
+  assert.deepEqual(after.transport,before.transport,'frozen transport and package retained');
+  for(const key of ['officialProgress','financialWork','releasedFrontend','pendingImmutableBuild'])assert.deepEqual(after.progress[key],before.progress[key],key);
+  assert.deepEqual(after.progress.shockObjectives.items.map(r=>r.passForShock),before.progress.shockObjectives.items.map(r=>r.passForShock));
+  for(const key of ['opsNext','financeNext','leadsNext','emailNext'])assert.equal(after.progress.currentSuccessorPlan[key],before.progress.currentSuccessorPlan[key],key);
+  for(const lane of before.progress.parallelLanes.filter(l=>l.next!==before.progress.currentSuccessorPlan.releaseNext))
+    assert.deepEqual(after.progress.parallelLanes.find(l=>l.id===lane.id),lane,'independent lane '+lane.id);
+  assert.equal(after.progress.lastTerminalOperationalAttempt.canReuseOriginalClaim,false);
+  assert.equal(after.progress.lastTerminalOperationalAttempt.signedPreviewAccepted,false);
+  assert.equal(after.progress.lastTerminalOperationalAttempt.livePromotion,false);
+  assert.doesNotThrow(()=>owner.assertOwnerPlanContinuation(after.control,after.state,after.transport));
+});
+test('terminal reconciliation second execution is a true NOOP without another checkpoint',()=>{
+  const f=terminalFixture();f.apply(f.prepare());const before=serial([...f.files]);
+  const set=f.prepare();assert.equal(set.status,'NOOP_ALREADY_RECONCILED');assert.deepEqual(set.changes,{});
+  assert.equal(serial([...f.files]),before);assert.doesNotThrow(f.verify);
+});
+test('terminal changeset rejects a moved writer HEAD or any concurrent authority preimage',()=>{
+  const f=terminalFixture(),set=f.prepare(),before=serial([...f.files]);
+  assert.throws(()=>owner.assertTerminalAttemptChangeSetPreimages(set,{head:'9'.repeat(40),...f.io}),/I66_TERMINAL_HEAD_CAS_CHANGED/);
+  f.files.set(P.transport,f.files.get(P.transport)+' ');
+  assert.throws(()=>owner.assertTerminalAttemptChangeSetPreimages(set,{head:TERMINAL_BASE,...f.io}),/I66_TERMINAL_PREIMAGE_CAS_CHANGED/);
+  f.files.set(P.transport,JSON.parse(before).find(([file])=>file===P.transport)[1]);
+  f.files.set(TERMINAL_NEXT,'{}\n');
+  assert.throws(()=>owner.assertTerminalAttemptChangeSetPreimages(set,{head:TERMINAL_BASE,...f.io}),/I66_TERMINAL_PREIMAGE_CAS_CHANGED/);
+});
+test('a newly retained terminal receipt and its cursor projections are one prepared transaction',()=>{
+  const f=terminalFixture(),bytes=f.files.get(TERMINAL_PATH),read=f.io.readFileSync,list=f.io.readdirSync,exists=f.io.existsSync;
+  f.files.delete(TERMINAL_PATH);f.io.existsSync=file=>file===TERMINAL_PATH?false:exists(file);
+  f.io.readdirSync=directory=>list(directory).filter(name=>name!==require('node:path').basename(TERMINAL_PATH));
+  f.io.readFileSync=(file,encoding)=>{assert.notEqual(file,TERMINAL_PATH,'absent receipt must use provided verified bytes');return read(file,encoding);};
+  const set=owner.prepareTerminalAttemptReconciliation({...f.args,receiptBytes:bytes},f.io);
+  assert.deepEqual(Object.keys(set.changes).sort(),[TERMINAL_PATH,TERMINAL_NEXT,P.cp,P.state].sort());
+  assert.equal(set.expectedPreimages[TERMINAL_PATH],null);assert.equal(set.expectedPreimages[TERMINAL_NEXT],null);
+});
+test('terminal receipt and active projections reject partial publication and renewed stale next actions',()=>{
+  for(const mutate of [
+    f=>{const cp=JSON.parse(f.files.get(P.cp));delete cp.i66ActiveRecoveryCursor.lastTerminalOperationalAttempt;f.files.set(P.cp,serial(cp));},
+    f=>{const cp=JSON.parse(f.files.get(P.cp));cp.nextAction='Execute the old admitted Preview immediately';f.files.set(P.cp,serial(cp));}
+  ]){const f=terminalFixture();f.apply(f.prepare());mutate(f);assert.throws(f.verify,/I66_TERMINAL_/);}
+  const f=terminalFixture();f.apply(f.prepare());f.files.set(TERMINAL_PATH,f.files.get(TERMINAL_PATH)+' ');
+  assert.throws(f.verify,/I66_TERMINAL_RECEIPT_NOT_RECONCILED/);
+});
+test('terminal reconciliation refuses unproved compensation and preserves a different request artifact',()=>{
+  const f=terminalFixture(),receipt=JSON.parse(f.files.get(TERMINAL_PATH));receipt.request35.actualCompensation='NOT_VERIFIED';
+  f.files.set(TERMINAL_PATH,serial(receipt));assert.throws(f.prepare,/I66_TERMINAL_COMPENSATION_UNPROVEN/);
+  const other=terminalFixture(),unrelated=JSON.parse(other.files.get(TERMINAL_PATH));unrelated.frozenSource='7'.repeat(40);
+  other.files.set(TERMINAL_PATH,serial(unrelated));assert.doesNotThrow(other.verify);
+});
+function advanceTerminalFixtureToRetry(f,status){
+  f.apply(f.prepare());const {control,progress,transport}=f.current(),candidate=transport.scopedBackendPreviewI66.candidate;
+  const terminal=progress.lastTerminalOperationalAttempt,retained=JSON.parse(f.files.get(TERMINAL_PATH)).request35;
+  const ref={schema:'GI_I66_COMPENSATED_RETRY_REFERENCE_V1',phase:'preview',requestVersion:35,sourceSha:candidate.sourceSha,
+    artifactId:candidate.artifactId,artifactDigest:candidate.artifactDigest,priorBuildId:terminal.buildId,
+    priorClaim:{uri:'gs://ays-orbit360-firestore-private-backup-646761409743/i66/operational-locks/request-35-preview-'+candidate.sourceSha+'-'+candidate.artifactDigest.slice(7)+'.json',
+      generation:terminal.claimGeneration,sha256:'a'.repeat(64),bytes:500},
+    hold:{uri:'gs://'+retained.records.privateBucket+'/'+retained.records.prefix+'hold.json',...retained.records['hold.json']}};
+  const receipt={schema:'GI_I66_COMPENSATED_RETRY_ADMISSION_V1',status:'EXACT_COMPENSATED_PREVIEW_RETRY_ADMITTED',recordedAtUtc:'2026-11-25T21:00:00.000Z',
+    ...Object.fromEntries(Object.entries(ref).filter(([key])=>key!=='schema')),
+    constraints:{productSourceChanges:0,rebuilds:0,livePromotion:false,claimReuse:false,realCustomerWrites:0,realFinancialWrites:0,externalMessagesSent:0}};
+  const receiptPath='artifacts/orbit360-recovery/release-control/I6_6_COMPENSATED_RETRY_TEST_ADMISSION_20261125.json',bytes=serial(receipt);
+  f.files.set(receiptPath,bytes);ref.admission={path:receiptPath,commit:'9'.repeat(40),blob:blob(bytes),sha256:require('node:crypto').createHash('sha256').update(bytes).digest('hex')};
+  candidate.providerBinding.compensatedRetry=ref;
+  const retryBuildId='eeeeeeee-1111-2222-3333-ffffffffffff';
+  progress.request35OperationalPreviewAdmission={...progress.request35OperationalPreviewAdmission,status,
+    ...(status==='PREVIEW_RETRY_ADMITTED'?{}:{buildId:retryBuildId})};
+  progress.next=progress.immediateExecution.next=progress.currentSuccessorPlan.releaseNext='Continue the recorded successor attempt through the existing signed runtime gates.';
+  control.nextAction=control.i66ActiveRecoveryCursor.next=control.i66ActiveRecoveryCursor.nextAction=control.i66OperationalContinuation20261115.currentWork=progress.next;
+  if(status==='SIGNED_PREVIEW_PASS_LIVE_PENDING'){
+    candidate.status='EXACT_PREVIEW_SIGNED_LIVE_AUTHORIZED';candidate.previewQa={executionProvider:'CLOUD_BUILD',runId:retryBuildId,status:'SIGNED_DRIVERS_DURABLE_READBACK_RELOAD_RESTORE_PASS'};
+    transport.operationalReleaseCandidate=candidate;delete transport.scopedBackendPreviewI66;
+    const success=JSON.parse(f.files.get(TERMINAL_PATH));success.request35={phase:'preview',status:'SUCCESS',build:retryBuildId,signedPreviewAccepted:true};
+    f.files.set('artifacts/orbit360-recovery/release-control/I6_6_REQUEST35_RETRY_SUCCESS_TEST_20261125.json',serial(success));
+  }
+  control.i66ActiveRecoveryCursor.currentEvidenceBlobSha=blob(serial(progress));
+  f.files.set(control.i66ActiveRecoveryCursor.currentEvidencePath,serial(progress));
+  f.files.set(P.cp,serial(control));f.files.set(P.transport,serial(transport));
+  const state=JSON.parse(f.files.get(P.state));owner.synchronizeOwnerPlanContinuation(control,state,transport);f.files.set(P.state,serial(state));
+  return {ref,receiptPath,retryBuildId};
+}
+for(const status of ['PREVIEW_RETRY_ADMITTED','PREVIEW_RETRY_RUNNING','SIGNED_PREVIEW_PASS_LIVE_PENDING'])
+test('terminal history survives '+status+' without freezing the active retry on the failed build',()=>{
+  const f=terminalFixture(),history=f.files.get(TERMINAL_PATH);advanceTerminalFixtureToRetry(f,status);
+  assert.doesNotThrow(f.verify);assert.equal(f.files.get(TERMINAL_PATH),history);
+  const before=serial([...f.files]),noop=f.prepare();assert.equal(noop.status,'NOOP_ALREADY_RECONCILED');
+  assert.deepEqual(noop.changes,{});assert.equal(serial([...f.files]),before);
+  assert.equal(f.current().progress.lastTerminalOperationalAttempt.buildId,'9723b53c-8f8b-4f6e-80b6-960c2fcb8674');
+  assert.equal(f.current().progress.lastTerminalOperationalAttempt.canReuseOriginalClaim,false);
+});
+test('an arbitrary retry marker or edited retry admission cannot hide the terminal predecessor',()=>{
+  const f=terminalFixture(),{receiptPath}=advanceTerminalFixtureToRetry(f,'PREVIEW_RETRY_RUNNING');
+  f.files.set(receiptPath,f.files.get(receiptPath)+' ');assert.throws(f.verify,/I66_TERMINAL_RETRY_ADMISSION_BLOB_DRIFT/);
+  const g=terminalFixture();advanceTerminalFixtureToRetry(g,'PREVIEW_RETRY_ADMITTED');
+  const tr=JSON.parse(g.files.get(P.transport));tr.scopedBackendPreviewI66.candidate.providerBinding.compensatedRetry.priorBuildId='aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+  g.files.set(P.transport,serial(tr));assert.throws(g.verify,/I66_TERMINAL_RETRY_PREDECESSOR_DRIFT/);
+});
