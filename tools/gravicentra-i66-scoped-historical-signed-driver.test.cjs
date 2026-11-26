@@ -13,7 +13,10 @@ function backend(role){const p=path.join(__dirname,'gravicentra-i6-6-siga-histor
 function input(phase='preview'){
  const control=JSON.parse(fs.readFileSync(path.join(root,'artifacts/orbit360-recovery/release-control/CONTROL_PLANE.json'))),bytes=fs.readFileSync(path.join(root,'artifacts/orbit360-recovery/release-control/I6_6_SCOPED_FUNCTION_RELEASE.json')),binding=JSON.parse(bytes),unit=control.i66ScopedFunctionRelease,facts=clone(unit.providerStages.PACKAGE_CERTIFIED);
  const hosting={version:binding.predecessor.hostingVersion,buildId:binding.predecessor.buildId,sourceSha:binding.predecessor.sourceSha,markerSha256:'a'.repeat(64)};
- if(phase==='live'){unit.providerStages.LIVE_DEPLOYED={...clone(unit.providerStages.PREVIEW_DEPLOYED),target:binding.targets.live,revision:'orbit360cobrosreconciliationcommand-99999-qa'};unit.providerStages.PREVIEW_VERIFIED={packageSha256:facts.packageSha256};}
+ if(phase==='live'&&!unit.providerStages.LIVE_DEPLOYED){
+  unit.providerStages.LIVE_DEPLOYED={...clone(unit.providerStages.PREVIEW_DEPLOYED),target:binding.targets.live,revision:'orbit360cobrosreconciliationcommand-99999-qa'};
+  unit.providerStages.PREVIEW_VERIFIED={packageSha256:facts.packageSha256};
+ }
  const uiHosting={...hosting,origin:phase==='preview'?control.i66FrontendReleaseHead.previewUrl:'https://app.aysseguros.com',basis:'SCOPED_HOSTING_PREDECESSOR'};
  const value={phase,uiHosting,origin:uiHosting.origin,binding,facts,hosting,revision:unit.providerStages[phase==='preview'?'PREVIEW_DEPLOYED':'LIVE_DEPLOYED'].revision};return{value,control,bytes,context:D.validateScopedHistoricalContext(value,control,bytes)};
 }
