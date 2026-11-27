@@ -4,7 +4,7 @@
   "authority": "FAIL_CLOSED_FINDING_CONTINUITY",
   "sourceLedgerPath": "artifacts/orbit360-recovery/release-control/I6_FINDINGS_LEDGER_20260924.json",
   "sourceLedgerPreviousBlobSha": "b923461bc7b0bbff0df597187f0053228029e7b4",
-  "expectedLedgerNextBlobSha": "dea24211cf5f2e0191a4513dd7d3b9346381182e",
+  "expectedLedgerNextBlobSha": "d34675ea45f8d2153ffd3d35a4d2775f7a36867b",
   "policy": {
     "allLedgerFindingsMustAppearExactlyOnce": true,
     "newHumanFindingsMustBeIndividualLedgerEntries": true,

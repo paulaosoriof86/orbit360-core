@@ -13716,6 +13716,40 @@
         "Preserve existing payment IDs and independent settlement status. Re-inspect after concurrent changes.",
         "Reconcile RC-01 through RC-14 and all affected projections on reload. Keep identifiable evidence private."
       ]
+    },
+    "GI-HO-08": {
+      "id": "GI-HO-08",
+      "gate": "I6.6",
+      "classification": "RISK",
+      "related": [
+        "GI-AUD-11",
+        "GI-AUD-12",
+        "GI-AUD-13",
+        "GI-AUD-14"
+      ],
+      "dependencyOf": "GI-HO-07",
+      "status": "RECEIVED_OPEN",
+      "protectedCobrosBlob": "f673af776484431295aa7e4b20ae26d3b09eab7e",
+      "registeredDeployment": "d2f8d8c1673450fc79bc8240ceb2dcf814873a5f",
+      "functionalReleaseAccepted": false,
+      "scope": "HOLD reassignment combined with inference on the previous receipt and bulk inference for affected records. Independent ordinary payments remain available.",
+      "enforcement": "Work release and financial-operation scope only. Runtime protection awaits a verified artifact.",
+      "requirements": [
+        "Transactional verification of physical ID, receipt aliases, edition and economic identity before any payment mutation.",
+        "Preserve existing SIGA or dated evidence for reconciliation. Exclude inactive or superseded obligations from inference.",
+        "One economic projection with distinct report, inference, payment, application and settlement.",
+        "Replay an identical actor, operation, context and payload only from the original committed receipt.",
+        "FR-01 through FR-11 plus affected RC-01 through RC-14. Reject contradictory anchor or unsupported advance. Re-read versions after concurrent writes."
+      ],
+      "accompanyingScope": {
+        "relatedHandoff": "GI-HO-07",
+        "classification": [
+          "ALREADY_EXISTS",
+          "EXTEND"
+        ],
+        "gates": "DUP-01 through DUP-08",
+        "scope": "Individual audited logical retirement via the existing administrative owner. Before commit, check policy edition, authentic obligation, current Firestore versions and all protected relations. Preserve payment and history. Reconcile distributed payments first."
+      }
     }
   }
 }
