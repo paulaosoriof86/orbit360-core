@@ -632,7 +632,7 @@ async function worker(plan){
     let committed;
     if(plan.phase==='live'){
       git(cwd,'fetch','--quiet',C.repositoryUrl,'refs/heads/'+C.branch);const h=git(cwd,'rev-parse','FETCH_HEAD'),control=JSON.parse(gitBytes(cwd,h,C.control)),head=control.i66FrontendReleaseHead;
-      const jp=require('./gravicentra-i66-frontend-control.cjs').genName(head.generation,'JOURNAL'),journal=JSON.parse(gitBytes(cwd,h,jp));
+      const jp=require('./gravicentra-i66-frontend-control.cjs').releaseJournalPath(head.generation,head.focalHosting),journal=JSON.parse(gitBytes(cwd,h,jp));
       equal(journal.phase,'COMMITTED','FINAL_TRANSACTION_COMMITTED');equal(journal.liveProof,signed,'FINAL_SIGNED_LIVE_PROOF');equal(head.sourceSha,p.sourceSha,'FINAL_PHYSICAL_SOURCE');
       const signedCommit=await pkg.requestJson('https://api.github.com/repos/'+C.repository+'/commits/'+journal.receipt.commit,{headers:{Accept:'application/vnd.github+json'}},{operation:'PROVIDER_JSON'});equal(signedCommit.commit?.verification?.verified,true,'FINAL_GITHUB_SIGNATURE');
       committed={head:h,phase:'COMMITTED',receiptCommit:journal.receipt.commit,receiptBlob:journal.receipt.blob,generation:journal.generation};

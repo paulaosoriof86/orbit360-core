@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto');
 const {execFileSync,spawn}=require('node:child_process');
-const {P,genName,serial,blob,closeFiles,physicalGuard,closeCompositeFiles,compositeReceipt}=require('./gravicentra-i66-frontend-control.cjs');
+const {P,genName,releaseJournalPath,serial,blob,closeFiles,physicalGuard,closeCompositeFiles,compositeReceipt}=require('./gravicentra-i66-frontend-control.cjs');
 const {promote,acceptComposite}=require('./gravicentra-i66-frontend-promotion-transaction.cjs');
 const {hosting}=require('./gravicentra-i66-frontend-hosting-io.cjs');
 const repository='paulaosoriof86/orbit360-core',branch='recovery/fase-a-clean-20260831';
@@ -315,7 +315,7 @@ async function resolveFinancialQa(phase,{env=process.env,api:readApi=github,io=f
   }
   const [cp,state,tr,raw]=await Promise.all([file(P.cp),file(P.state),file(P.transport),file(P.authority),file(P.ledger)]);
   const current=cp.i66FrontendReleaseHead;assert.ok(current);
-  const [currentReceipt]=await Promise.all([file(genName(current.generation,'RECEIPT')),file(genName(current.generation,'JOURNAL')),
+  const [currentReceipt]=await Promise.all([file(genName(current.generation,'RECEIPT')),file(releaseJournalPath(current.generation,current.focalHosting)),
     ...(current.scope==='COMPOSITE'?[file(genName(current.generation,'LIVE_PROOF'))]:[])]);
   if(currentReceipt.financialUi)await Promise.all([file(currentReceipt.financialUi.receiptPath),
     file(currentReceipt.financialPreviewUi.receiptPath)]);

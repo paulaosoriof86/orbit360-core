@@ -842,6 +842,11 @@ test('a focal Hosting close consumes its own signed request and preserves the co
   }
   assert.deepEqual(next.lastConsumedFocalHostingRelease.request,req);
   assert.equal(head.compositionTree,focal.compositionTree);
+  assert.equal(readInitial(genName(req.generation,'JOURNAL')).phase,'ROLLED_BACK');
+  assert.equal(Object.hasOwn(files,genName(req.generation,'JOURNAL')),false);
+  assert.equal(head.journalPath,genName(req.generation,'FOCAL_HOSTING_JOURNAL'));
+  assert.deepEqual(files[head.journalPath],body);
+  assert.equal(owner.releaseJournalPath(3,undefined),genName(3,'JOURNAL'));
   const progress=files[genName(req.generation,'FOCAL_PROGRESS')];
   assert.deepEqual(progress.releaseExecution.sourceQa,req.qa);
   assert.equal(Object.hasOwn(progress.releaseExecution,'frontendPreviewRequestVersion'),false);

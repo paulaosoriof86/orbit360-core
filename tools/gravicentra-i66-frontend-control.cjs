@@ -10,6 +10,12 @@ const serial=v=>JSON.stringify(v,null,2)+'\n';
 const blob=body=>crypto.createHash('sha1').update('blob '+Buffer.byteLength(body)+'\0').update(body).digest('hex');
 const hash=body=>crypto.createHash('sha256').update(body).digest('hex');
 const genName=(n,suffix)=>{assert.ok(Number.isSafeInteger(n)&&n>0);return dir+'I6_6_FRONTEND_E'+String(n).padStart(5,'0')+'_'+suffix+'.json';};
+function releaseJournalPath(generation,focalHosting){
+  if(!focalHosting)return genName(generation,'JOURNAL');
+  assert.equal(focalHosting.schema,'GI_I66_FOCAL_HOSTING_REQUEST_V1');
+  assert.equal(focalHosting.generation,generation);
+  return genName(generation,'FOCAL_HOSTING_JOURNAL');
+}
 function executionSnapshot(transport){
   const r=transport.frontendPreviewRequest,s=transport.scopedBackendPreviewI66,p=transport.operationalReleaseCandidate;
   return {transportStatus:transport.status,previewRequest:r?{version:r.version,sourceQaHead:r.sourceQaHead,
@@ -1015,7 +1021,7 @@ function physicalGuard(control,state,transport,io){
   const read=p=>io.readFileSync(p,'utf8');
   assert.equal(head.receiptPath,genName(head.generation,'RECEIPT'));
   assert.equal(blob(read(head.receiptPath)),head.receiptGitBlobSha);
-  const receipt=JSON.parse(read(head.receiptPath)),journal=JSON.parse(read(genName(head.generation,'JOURNAL')));
+  const receipt=JSON.parse(read(head.receiptPath)),journal=JSON.parse(read(releaseJournalPath(head.generation,head.focalHosting)));
   assert.equal(journal.phase,'COMMITTED');assert.equal(journal.receipt.blob,head.receiptGitBlobSha);
   assert.equal(journal.receipt.commit,head.receiptCommit);assert.equal(journal.receipt.verified,true);
   assert.deepEqual(receipt.target,journal.request.target);assert.deepEqual(receipt.previous,journal.request.previous);
@@ -1026,6 +1032,7 @@ function physicalGuard(control,state,transport,io){
   if(target.focalHosting){
     require('./gravicentra-i6-6-cloud-build-preview.cjs').focalArtifactIdentity(target);
     assert.equal(head.compositionTree,target.focalHosting.compositionTree,'FOCAL_HOSTING_HEAD_TREE');
+    assert.equal(head.journalPath,releaseJournalPath(head.generation,target.focalHosting),'FOCAL_HOSTING_HEAD_JOURNAL');
     assert.equal(head.generation,target.focalHosting.generation,'FOCAL_HOSTING_HEAD_GENERATION');
     assert.notEqual(receipt.scope,'COMPOSITE','FOCAL_HOSTING_SCOPE');
     assert.equal(journal.request.scope,'FRONTEND_ONLY','FOCAL_HOSTING_SCOPE');
@@ -1126,6 +1133,7 @@ function closeFiles(read,j,body){
     assert.equal(authorized.protectedPreviewRequestVersion,transport.frontendPreviewRequest.version);
     assert.equal(transport.forbidBackendFunctionDeploy,true);assert.equal(transport.forbidFirestoreRulesDataAuthWrites,true);
     head.focalHosting=structuredClone(focal);head.compositionTree=focal.compositionTree;
+    head.journalPath=releaseJournalPath(n,focal);
   }
   cp.i66FrontendReleaseHead=head;cp.currentExecutionDecisionPointer='i66FrontendReleaseHead';
   cp.i66OperationalContinuation20261115={...cp.i66OperationalContinuation20261115,latestProvenLiveSource:t.sourceSha,
@@ -1203,7 +1211,7 @@ function closeFiles(read,j,body){
   c.currentEvidenceBlobSha=blob(serial(progress));
   synchronizeOwnerPlanContinuation(cp,state,transport);
   if(j.request.scope!=='COMPOSITE')assertActiveReleaseProgress(cp,progress,transport);
-  return {...changes,[P.cp]:cp,[P.state]:state,[P.transport]:transport,[P.ledger]:ledger,[progressPath]:progress,[genName(n,'JOURNAL')]:body};
+  return {...changes,[P.cp]:cp,[P.state]:state,[P.transport]:transport,[P.ledger]:ledger,[progressPath]:progress,[releaseJournalPath(n,focal)]:body};
 }
 function compositeReceipt(j,runId){
   const {validateCompositeProof}=require('./gravicentra-i66-frontend-promotion-transaction.cjs');
@@ -1440,7 +1448,7 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
   }
   const [control,state,transport]=await Promise.all([file(P.cp),file(P.state),file(P.transport),file(P.ledger)]);
   const head=control.i66FrontendReleaseHead;assert.ok(head,'READONLY_OBSERVER_REMOTE_PHYSICAL_HEAD_MISSING');
-  const [currentReceipt]=await Promise.all([file(genName(head.generation,'RECEIPT')),file(genName(head.generation,'JOURNAL')),
+  const [currentReceipt]=await Promise.all([file(genName(head.generation,'RECEIPT')),file(releaseJournalPath(head.generation,head.focalHosting)),
     ...(head.scope==='COMPOSITE'?[file(genName(head.generation,'LIVE_PROOF'))]:[])]);
   if(currentReceipt.financialUi)await Promise.all([file(currentReceipt.financialUi.receiptPath),
     file(currentReceipt.financialPreviewUi.receiptPath)]);
@@ -1467,7 +1475,7 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
-module.exports={providerOutcomeBytes,DIRECT_LIVE_PUBLICATION,directLivePublication,prepareFunctionalStage,prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
+module.exports={releaseJournalPath,providerOutcomeBytes,DIRECT_LIVE_PUBLICATION,directLivePublication,prepareFunctionalStage,prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
   resolveNativeExecutionProgress,assertNativeExecutionProgress,terminalAttemptRecords,assertTerminalAttemptProgress,
   prepareTerminalAttemptReconciliation,assertTerminalAttemptChangeSetPreimages,prepareTerminalCli,
   ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveFinancialAndPlanProjections,assertActiveReleaseProgress,
