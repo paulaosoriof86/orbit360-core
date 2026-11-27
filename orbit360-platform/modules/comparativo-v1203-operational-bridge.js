@@ -21,7 +21,7 @@ Orbit.modules = Orbit.modules || {};
   function esc(v) { return U && U.esc ? U.esc(String(v == null ? '' : v)) : String(v || ''); }
   function clean(v) { return String(v == null ? '' : v).trim(); }
   function num(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
-  function money(v, cur) { return U && U.money ? U.money(v, cur) : cur + ' ' + num(v).toLocaleString('es-GT'); }
+  function money(v, cur) { return Q.communicationMoney(num(v),cur); }
   function query() { const hash = String(location.hash || ''); return new URLSearchParams(hash.includes('?') ? hash.slice(hash.indexOf('?') + 1) : ''); }
   function quote(id) { return id ? S().get('cotizaciones', id) : null; }
   function comparison(id) { return id ? S().get('comparativos', id) : null; }
@@ -112,19 +112,23 @@ Orbit.modules = Orbit.modules || {};
     if (!reason) return;
     recalc('manual', quoteId, reason);
   }
-  function prepare() {
+  async function prepare() {
     const cmp = current(); if (!cmp || !cmp.clienteId) return toast('Asocia el comparativo a un cliente existente.');
-    const prepared = Q.prepareCommunication(cmp.id, 'auto'); if (!prepared.ok) return toast('No se pudo preparar la comunicación.');
-    Orbit.notify.pedir(cmp.clienteId, { tipo:'Comparativo preparado', icon:'⚖️', asunto:'Comparativo de ' + (cmp.producto || cmp.ramo), mensaje:prepared.message, adjunto:'Comparativo-' + (cmp.producto || cmp.ramo) + '.pdf' });
-    toast('Comunicación preparada. La entrega debe confirmarse en el proveedor.');
+    const prepared = await Q.prepareCommunication(cmp.id,'auto',cmp.clienteId);
+    if (!prepared.ok) return toast('Revisa el destinatario y las propuestas: ' + prepared.errors.join(', '));
+    Orbit.notify.pedir(cmp.clienteId,{tipo:'Comparativo preparado',icon:'⚖️',asunto:prepared.subject,mensaje:prepared.message,autorizar:prepared.autorizar});
   }
   async function accept(quoteId) {
     const cmp = current(), q = quote(quoteId); if (!cmp || !valid(q)) return toast('La propuesta seleccionada no está validada.');
     if (!cmp.clienteId || !client(cmp.clienteId)) return toast('Convierte el prospecto en cliente antes de solicitar emisión.');
+    if (!(cmp.cotizacionIds || []).includes(q.id)) return toast('La propuesta no pertenece al comparativo.');
+    const review = await Q.reviewCommunication(cmp.id,cmp.clienteId);
+    if (!review.ok) return toast('Revisa las propuestas y el destinatario antes de registrar la aceptación.');
     const phrase = clean(await U.prompt('Escribe exactamente: CLIENTE ACEPTA', { title:'Confirmar propuesta aceptada' }));
     if (phrase !== 'CLIENTE ACEPTA') return toast('Confirmación cancelada.');
     const reason = clean(await U.prompt('Registra cómo y cuándo confirmó el cliente:', { title:'Evidencia de aceptación' }));
     if (!reason) return;
+    if (!current() || current().id !== cmp.id || !review.sigueVigente()) return toast('El comparativo cambió. Revisa de nuevo la aceptación.');
     const g = q.gastos || {}, t = q.impuestos || {};
     const result = Orbit.issuance && Orbit.issuance.createRequest ? Orbit.issuance.createRequest({
       clienteId:cmp.clienteId, asesorId:q.asesorId, aseguradoraId:q.aseguradoraId,
@@ -142,7 +146,7 @@ Orbit.modules = Orbit.modules || {};
     const cmp = current(), quotes = currentQuotes(), rec = Q.recommendation(quotes, cmp.criterioRecomendacion, cmp.recomendacion); if (!cmp || !quotes.length) return;
     const chosen = rec.ok && quotes.find(q => q.id === rec.quoteId), tenant = Orbit.tenant && Orbit.tenant.nombre || 'Orbit 360';
     const w = window.open('', '_blank'); if (!w) return;
-    w.document.write(`<html><head><title>Comparativo ${esc(cmp.producto||cmp.ramo)}</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Arial,sans-serif;color:#1E2227}h1{color:#C5162E}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #ddd;padding:7px}th{background:#1E2227;color:#fff}.n{text-align:right}.rec{border-left:3px solid #C5162E;padding:10px 14px;margin-top:14px;background:#f8f8f8}.foot{font-size:10px;color:#777;margin-top:16px}</style></head><body><h1>Comparativo de seguros · ${esc(cmp.producto||cmp.ramo)}</h1><p>${esc((client(cmp.clienteId)||{}).nombre||cmp.prospectoNombre||'Prospecto')} · ${esc(cmp.pais)} / ${esc(cmp.moneda)}</p><table><thead><tr><th>Concepto</th>${quotes.map(q=>`<th class="n">${esc(q.aseguradoraNombreSnapshot)}</th>`).join('')}</tr></thead><tbody>${[['primaTotal','Prima total'],['primaNeta','Prima neta'],['gastos','Gastos'],['impuestos','Impuestos'],['cuotas','Forma de pago']].map(row=>`<tr><td><b>${row[1]}</b></td>${quotes.map(q=>`<td class="n">${commonValue(q,row[0])}</td>`).join('')}</tr>`).join('')}</tbody></table>${chosen?`<div class="rec"><b>Sugerencia consultiva:</b> ${esc(chosen.aseguradoraNombreSnapshot)}. ${esc(rec.explicacion)}</div>`:''}<p class="foot">Documento informativo de ${esc(tenant)}. Las propuestas están sujetas a suscripción, vigencia y condiciones de la aseguradora.</p></body></html>`);
+    w.document.write(`<html><head><title>Comparativo ${esc(cmp.producto||cmp.ramo)}</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Arial,sans-serif;color:#1E2227}h1{color:#C5162E}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #ddd;padding:7px}th{background:#1E2227;color:#fff}.n{text-align:right}.rec{border-left:3px solid #C5162E;padding:10px 14px;margin-top:14px;background:#f8f8f8}.foot{font-size:10px;color:#777;margin-top:16px}</style></head><body><h1>Comparativo de seguros · ${esc(cmp.producto||cmp.ramo)}</h1><p>${esc((client(cmp.clienteId)||{}).nombre||cmp.prospectoNombre||'Prospecto')} · ${esc(cmp.pais)} / ${esc(cmp.moneda)}</p><table><thead><tr><th>Concepto</th>${quotes.map(q=>`<th class="n">${esc(q.aseguradoraNombreSnapshot)}</th>`).join('')}</tr></thead><tbody>${[['primaTotal','Prima total'],['primaNeta','Prima neta'],['gastos','Gastos'],['impuestos','Impuestos'],['cuotas','Forma de pago']].map(row=>`<tr><td><b>${row[1]}</b></td>${quotes.map(q=>`<td class="n">${commonValue(q,row[0])}</td>`).join('')}</tr>`).join('')}</tbody></table>${chosen?`<div class="rec"><b>Sugerencia consultiva:</b> ${esc(chosen.aseguradoraNombreSnapshot)}. ${esc(rec.explicacion)}</div>`:''}<p class="foot">Borrador consultivo de ${esc(tenant)}. Las propuestas están sujetas a suscripción, vigencia y condiciones de la aseguradora.</p></body></html>`);
     w.document.close(); setTimeout(()=>w.print(),300);
   }
   function history() {

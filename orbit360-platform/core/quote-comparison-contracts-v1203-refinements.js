@@ -135,6 +135,7 @@ window.Orbit = window.Orbit || {};
       return { ok:false, errors:check.errors, warnings:check.warnings, quote };
     }
     const before = Orbit.store.get('cotizaciones', quote.id);
+    Q.recordReview(quote,before,options.communicationReview);
     if (before) Orbit.store.update('cotizaciones', quote.id, quote);
     else Orbit.store.insert('cotizaciones', quote);
     if (Orbit.access && Orbit.access.audit) {
@@ -174,7 +175,9 @@ window.Orbit = window.Orbit || {};
   Q.createComparison = function (input, options) {
     input = input || {};
     options = options || {};
-    const quotes = [].concat(input.cotizaciones || input.cotizacionIds || []).map(quoteById).filter(Boolean);
+    const selected = [].concat(input.cotizaciones || input.cotizacionIds || []).map(quoteById);
+    if (selected.some(q => !q) && !options.allowDraft) return {ok:false,errors:['cotizacion_seleccionada_ausente']};
+    const quotes = selected.filter(Boolean);
     const internal = quotes.filter(isInternalEstimate);
     const invalid = quotes.filter(q => !isInternalEstimate(q) && !Q.validateQuote(q, { requireValidated:true }).ok);
     if ((internal.length || invalid.length) && options.allowDraft !== true) {

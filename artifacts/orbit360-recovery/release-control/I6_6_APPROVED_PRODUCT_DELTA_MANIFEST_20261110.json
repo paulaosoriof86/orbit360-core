@@ -4445,6 +4445,53 @@
           "gitBlobSha": "1f2cb4ca5340858400a5755a4747519d9ffbcc45"
         }
       ]
+    },
+    {
+      "id": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_SOURCE_20261127.json",
+      "sourceStatus": "SOURCE_VERIFIED_PENDING_PACKAGE_AND_SERVED_ROLE_TESTS",
+      "scope": "Quote and comparison recipient, reviewed content and final notification checks. Consultative drafting remains available.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/notify.js",
+          "gitBlobSha": "6b1f88031bac02c603f7b9e5c7fcc7771e13902a"
+        },
+        {
+          "path": "orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js",
+          "gitBlobSha": "7612488cd8bc4d0b4527c595e4fed8cb4c7011b5"
+        },
+        {
+          "path": "orbit360-platform/core/quote-comparison-contracts-v1203.js",
+          "gitBlobSha": "8d003a0fe21fdae459a6bae3357fcc3ad4f35509"
+        },
+        {
+          "path": "orbit360-platform/modules/comparativo-v1203-operational-bridge.js",
+          "gitBlobSha": "6239f8bbf5b1a4aad922d4a3d78d1407b20e13f6"
+        },
+        {
+          "path": "orbit360-platform/modules/comparativo.js",
+          "gitBlobSha": "434e23ebfe2921e067b213e9220a2338e180393e"
+        },
+        {
+          "path": "orbit360-platform/modules/correo.js",
+          "gitBlobSha": "a9a27f678fd80e3ad190af5afdb6cfe24038e556"
+        },
+        {
+          "path": "orbit360-platform/modules/cotizador-v1203-source-gate.js",
+          "gitBlobSha": "97ed72d26cae3ddf5a189271f8d99e99ddaa0fa5"
+        },
+        {
+          "path": "orbit360-platform/modules/cotizador.js",
+          "gitBlobSha": "37351dfc4c22b27cce0e854370d77e2be4510f14"
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-quote-communication.test.cjs",
+          "gitBlobSha": "5e96ceb2611b3d96e9e0d1dc2cd7d541bf9ba934"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

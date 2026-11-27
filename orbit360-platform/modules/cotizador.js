@@ -230,7 +230,7 @@ Orbit.modules.cotizador = (function () {
             <tr><td>IVA (${ivaPais(st.pais)}%)</td><td class="num">${U.money(f.res.iva, cur)}</td></tr>
           </table>
           <button class="btn ghost sm" style="margin-top:9px;width:100%" data-cprint="${i}">🖨 Imprimir cotización</button>
-          <button class="btn ghost sm" style="margin-top:6px;width:100%" data-csend="${i}">📲 Enviar al cliente</button>
+          <button class="btn ghost sm" style="margin-top:6px;width:100%" data-csend="${i}">Borrador consultivo</button>
         </div>`).join('')}</div>
       <div class="cfg-note" style="margin-top:13px">📊 Cálculo con rangos por valor, prima mínima, recargo por fraccionamiento, gastos e IVA por país. Las <b>tasas son configurables por aseguradora</b> — ajusta a las tuyas.</div>`;
     host.querySelectorAll('[data-csel]').forEach(c => c.addEventListener('change', e => con[+c.dataset.csel].sel = e.target.checked));
@@ -250,12 +250,8 @@ Orbit.modules.cotizador = (function () {
       <p style="margin-top:24px;color:#888;font-size:12px">Documento informativo. Coberturas sujetas a condiciones de la póliza vigente.</p></body></html>`);
     w.document.close(); setTimeout(() => w.print(), 350);
   }
-  function enviarCot(f, cur) {
-    const cid = st.clienteId || (Orbit.store.all('clientes')[0] || {}).id;
-    if (!cid) { Orbit.ui.toast('Selecciona un cliente para enviar la cotización.'); return; }
-    const msg = 'Hola, te comparto la cotización de ' + st.ramo + ' con ' + f.nombre + ':\n\n' +
-      '• Prima total: ' + U.money(f.res.total, cur) + '\n• Prima neta: ' + U.money(f.res.neta, cur) + '\n\nQuedo atento para avanzar con la emisión cuando gustes.';
-    Orbit.notify.pedir(cid, { tipo: 'Cotización enviada', icon: '🧮', asunto: 'Cotización de ' + st.ramo + ' · ' + f.nombre, mensaje: msg, adjunto: 'Cotizacion-' + f.nombre + '.pdf' });
+  function enviarCot() {
+    Orbit.ui.toast('Valida la propuesta y su documento en Cotizador antes de preparar la comunicación.');
   }
   return { render };
 })();

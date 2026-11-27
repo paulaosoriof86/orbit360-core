@@ -134,9 +134,16 @@ Orbit.modules.correo = (function () {
       ${pre.vinculo ? `<div class="cfg-note" style="margin-top:10px">🔗 Se vinculará a <b>${U.esc(pre.vinculo.label)}</b> · queda en el expediente.</div>` : ''}
       <div class="muted" style="font-size:11px;margin-top:8px">${cfg.conectado ? 'El correo queda registrado para envío; la confirmación depende del proveedor.' : 'Sin cuenta conectada: el correo queda preparado y vinculado al expediente, pero no enviado.'}</div>`;
     const back = drawer('✏ Redactar correo', html, () => {
-      C().enviar({ para: back.querySelector('#rd-para').value, asunto: back.querySelector('#rd-asunto').value, cuerpo: back.querySelector('#rd-cuerpo').value, clienteId: pre.clienteId, vinculo: pre.vinculo, adjuntos: adj.slice() });
-      back.remove(); carpeta = 'enviados'; selId = null; toast(cfg.conectado ? '✓ Correo registrado para proveedor conectado' : '✓ Correo preparado · envío pendiente de cuenta conectada'); render(host);
+      const para = back.querySelector('#rd-para').value, asunto = back.querySelector('#rd-asunto').value;
+      const cuerpo = back.querySelector('#rd-cuerpo').value;
+      if (pre.autorizar && !pre.autorizar({clienteId:pre.clienteId,canal:'correo',destino:para,asunto,mensaje:cuerpo,adjuntos:adj})) {
+        toast('Vuelve a revisar el destinatario, el contenido y los documentos en Cotizador o Comparativo.');
+        return;
+      }
+      C().enviar({para,asunto,cuerpo,clienteId:pre.clienteId,vinculo:pre.vinculo,adjuntos:adj.slice()});
+      back.remove(); carpeta = 'enviados'; selId = null; toast(cfg.conectado ? '✓ Correo registrado para proveedor conectado' : '✓ Correo preparado · envío pendiente de cuenta conectada'); if (host) render(host);
     }, cfg.conectado ? 'Registrar para envío' : 'Preparar correo');
+    back.querySelector('#rd-cuerpo').value = pre.cuerpo || '';
     const adj = [];
     function paintAdj() { back.querySelector('#rd-adj').innerHTML = adj.map((a, i) => `<span class="mail-chip">📎 ${U.esc(a)} <span data-rm="${i}" style="cursor:pointer;color:var(--danger)">✕</span></span>`).join(''); back.querySelectorAll('[data-rm]').forEach(x => x.addEventListener('click', () => { adj.splice(+x.dataset.rm, 1); paintAdj(); })); }
     back.querySelector('#rd-file').addEventListener('change', e => { [...e.target.files].forEach(f => adj.push(f.name)); paintAdj(); });

@@ -217,7 +217,8 @@ Orbit.quoteContracts = (function () {
     return {
       id:clean(input.id) || id('cot'), tenantId:clean(input.tenantId || tenantId()),
       cotizacionOrigen:origin, aseguradoraId:clean(input.aseguradoraId), aseguradoraNombreSnapshot:clean(input.aseguradoraNombreSnapshot || (asg && asg.nombre)),
-      pais:dims.pais, moneda:dims.moneda, producto:dims.producto, ramo:dims.ramo, plan:dims.plan,
+      riesgoId:clean(input.riesgoId || input.vehiculoId), oportunidadId:clean(input.oportunidadId || input.negocioId), vigenciaHasta:clean(input.vigenciaHasta),
+      pais:dims.pais, moneda:clean(input.moneda).toUpperCase(), producto:dims.producto, ramo:dims.ramo, plan:dims.plan,
       familiaProducto:dims.familiaProducto, subtipoProducto:dims.subtipoProducto, segmento:dims.segmento, tipoRiesgo:dims.tipoRiesgo, tipoVehiculo:dims.tipoVehiculo, usoVehiculo:dims.usoVehiculo,
       clienteId:clean(input.clienteId), prospectoId:clean(input.prospectoId), prospectoNombre:clean(input.prospectoNombre || input.cliente), asesorId:clean(input.asesorId),
       datosRiesgo:clone(input.datosRiesgo || {}), primaNeta:net, gastos:expenses, impuestos:taxes, primaTotal:total, primaMensual:num(input.primaMensual) || total/installments,
@@ -254,6 +255,7 @@ Orbit.quoteContracts = (function () {
     const quote = normalizeQuote(input, options), check = validateQuote(quote, { requireValidated:false });
     if (!check.ok && options.allowDraft !== true) return { ok:false, errors:check.errors, warnings:check.warnings, quote };
     const before = S().get('cotizaciones', quote.id);
+    recordReview(quote,before,options.communicationReview);
     if (before) S().update('cotizaciones', quote.id, quote); else S().insert('cotizaciones', quote);
     if (A().audit) A().audit(before ? 'actualizar_cotizacion' : 'crear_cotizacion', 'cotizaciones', quote.id, before, quote, options.motivo || 'Cotización normalizada', { estadoValidacion:quote.estadoValidacion, sourceRef:sourceEvidence(quote) });
     return { ok:true, quote:S().get('cotizaciones', quote.id) || quote, warnings:check.warnings, draft:!check.ok };
@@ -321,11 +323,15 @@ Orbit.quoteContracts = (function () {
     if (errors.length && options.allowDraft !== true) return { ok:false, errors, quotes };
     const first = quotes[0] || {}, comparison = {
       id:clean(input.id) || id('cmp'), tenantId:clean(input.tenantId || tenantId()),
+      riesgoId:clean(first.riesgoId), oportunidadId:clean(first.oportunidadId),
       pais:first.pais || clean(input.pais), moneda:first.moneda || clean(input.moneda), producto:first.producto || clean(input.producto), ramo:first.ramo || clean(input.ramo),
       clienteId:first.clienteId || clean(input.clienteId), prospectoId:first.prospectoId || clean(input.prospectoId), prospectoNombre:first.prospectoNombre || clean(input.prospectoNombre), asesorId:first.asesorId || clean(input.asesorId),
-      cotizacionIds:quotes.map(q => q.id), schemaComparativoId:clean(input.schemaComparativoId || ('schema_' + slug((first.pais || input.pais) + '_' + (first.producto || input.producto || first.ramo || input.ramo)) + '_v1')),
+      cotizacionIds:quotes.map(q => q.id), revisionesPropuestas:quotes.map(q => {
+        const stored = S().get('cotizaciones',q.id);
+        return stored && stored.comunicacionRevisada || null;
+      }), schemaComparativoId:clean(input.schemaComparativoId || ('schema_' + slug((first.pais || input.pais) + '_' + (first.producto || input.producto || first.ramo || input.ramo)) + '_v1')),
       criterioRecomendacion:input.criterioRecomendacion || 'equilibrio', recomendacion:rec.ok ? rec.quoteId : '', explicacion:rec.ok ? rec.explicacion : '', seleccionManual:input.criterioRecomendacion === 'manual', versionReglas:'v1.203',
-      estado:COMMERCIAL_STATES.has(input.estado) ? input.estado : 'borrador', fechaGeneracion:clean(input.fechaGeneracion || now()), fechaEnvio:clean(input.fechaEnvio), archivoPdfRef:clean(input.archivoPdfRef), plantillaWhatsAppId:clean(input.plantillaWhatsAppId),
+      estado:input.estado === 'preparado' ? 'generado' : COMMERCIAL_STATES.has(input.estado) ? input.estado : 'borrador', fechaGeneracion:clean(input.fechaGeneracion || now()), fechaEnvio:clean(input.fechaEnvio), archivoPdfRef:clean(input.archivoPdfRef), plantillaWhatsAppId:clean(input.plantillaWhatsAppId),
       alertasCalidad:Array.from(new Set([].concat(input.alertasCalidad || [], errors, rec.ok ? [] : rec.errors || []))),
       trazabilidad:Object.assign({ creadoAt:clean(input.creadoAt) || now(), actualizadoAt:now(), actor:actor(), origenModulo:'Comparativo' }, clone(input.trazabilidad || {}))
     };
@@ -336,17 +342,132 @@ Orbit.quoteContracts = (function () {
     }
     return { ok:!errors.length, comparison:S().get('comparativos', comparison.id) || comparison, quotes, recommendation:rec, errors };
   }
-  function prepareCommunication(comparisonId, channel) {
-    const cmp = S().get('comparativos', comparisonId);
-    if (!cmp) return { ok:false, errors:['comparativo_no_encontrado'] };
-    const quotes = (cmp.cotizacionIds || []).map(quoteById).filter(Boolean);
-    const rec = recommendation(quotes, cmp.criterioRecomendacion, cmp.recomendacion);
-    const lines = quotes.map(q => '• ' + q.aseguradoraNombreSnapshot + ': ' + q.moneda + ' ' + Math.round(q.primaTotal).toLocaleString('es-GT')).join('\n');
-    const selected = rec.ok && quotes.find(q => q.id === rec.quoteId);
-    const message = 'Comparativo de ' + (cmp.producto || cmp.ramo || 'seguros') + ' con ' + quotes.length + ' opciones:\n\n' + lines + (selected ? '\n\nSugerencia consultiva: ' + selected.aseguradoraNombreSnapshot + '. ' + rec.explicacion : '\n\nLas propuestas requieren revisión antes de elegir.');
-    S().update('comparativos', cmp.id, { estado:'preparado', canalPreparado:channel || 'auto', preparadoAt:now(), actualizadoAt:now() });
-    if (A().audit) A().audit('preparar_comparativo_cliente', 'comparativos', cmp.id, cmp, S().get('comparativos', cmp.id), 'Comunicación preparada; entrega no confirmada', { channel:channel || 'auto' });
-    return { ok:true, comparison:S().get('comparativos', cmp.id), message, recommendation:rec };
+  function communicationMoney(value, currency) {
+    if (!/^[A-Z]{3}$/.test(currency) || !Number.isFinite(value)) return '';
+    return currency + ' ' + value.toLocaleString('es-GT', { minimumFractionDigits:2, maximumFractionDigits:20 });
+  }
+
+  // Stable comparison uses the actual reviewed values, including nested coverage and conditions.
+  function stableContent(value) {
+    if (Array.isArray(value)) return value.map(stableContent);
+    if (!value || typeof value !== 'object') return value;
+    return Object.fromEntries(Object.keys(value).sort().map(key => [key, stableContent(value[key])]));
+  }
+  function quoteContent(quote) {
+    const { comunicacionRevisada, estadoComercial, preparadoAt, trazabilidad, ...content } = quote;
+    return JSON.stringify(stableContent(content));
+  }
+  function reviewedDocument(q) {
+    const doc = q.fuenteDocumentoId && S().get('documentos', q.fuenteDocumentoId);
+    if (!doc || doc.id !== q.fuenteDocumentoId || doc.eliminado || doc.archivado ||
+        !q.versionFuente || clean(doc.versionFuente || doc.version) !== q.versionFuente) return null;
+    const partyKey = q.clienteId ? 'clienteId' : 'prospectoId';
+    for (const key of [partyKey,'pais','tenantId','aseguradoraId','moneda']) {
+      if (!q[key] || doc[key] !== q[key]) return null;
+    }
+    const risk = clean(doc.riesgoId || doc.vehiculoId), opportunity = clean(doc.oportunidadId || doc.negocioId);
+    if (!risk || !opportunity || risk !== q.riesgoId || opportunity !== q.oportunidadId) return null;
+    const expiry = clean(doc.vigenciaHasta || doc.validityTo);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(expiry) || !Number.isFinite(Date.parse(expiry)) ||
+        new Date(expiry).toISOString().slice(0,10) !== expiry || expiry < today() ||
+        (q.vigenciaHasta && q.vigenciaHasta !== expiry) || !activeDateRange(doc)) return null;
+    return doc;
+  }
+  function documentContent(doc) {
+    // The dossier remains the owner of the document. Store only its digest in the quote.
+    return JSON.stringify(stableContent(doc));
+  }
+  async function reviewDigest(value) {
+    const bytes = new TextEncoder().encode(value);
+    const digest = await window.crypto.subtle.digest('SHA-256',bytes);
+    return Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
+  }
+  async function reviewForCommunication(input) {
+    const q = Orbit.quoteContracts.normalizeQuote(input);
+    const doc = reviewedDocument(q);
+    if (!doc || !A().can || !A().can('cotizador','edit') ||
+        !A().canView || !A().canView('documentos',doc,'cotizador') ||
+        !Orbit.quoteContracts.validateQuote(q,{requireValidated:true}).ok) return null;
+    return reviewDigest(JSON.stringify([quoteContent(q),documentContent(doc)]));
+  }
+  function recordReview(quote,before,review) {
+    quote.comunicacionRevisada = typeof review === 'string' && /^[a-f0-9]{64}$/.test(review) ?
+      review : before && before.comunicacionRevisada || null;
+  }
+  function communicationState(collection, entityId, recipientId) {
+    const fail = reason => ({ ok:false, errors:[reason] });
+    const entity = S().get(collection, entityId);
+    const module = collection === 'comparativos' ? 'comparativo' : 'cotizador';
+    const user = A().actorUser && A().actorUser(), role = A().activeRole && A().activeRole();
+    if (!entity || entity.id !== entityId || !recipientId || recipientId !== entity.clienteId ||
+        !user || !user.id || !role || !A().can || !A().can(module,'edit')) return fail('destinatario_o_permiso_invalido');
+    const read = (table, row) => row && row.pais && row.pais === entity.pais && row.tenantId &&
+      row.tenantId === tenantId() && A().canView && A().canView(table,row,module) && A().canView(table,row,
+        ({clientes:'clientes',negocios:'negocios',cotizaciones:'cotizador',comparativos:'comparativo'})[table] || module);
+    const recipient = S().get('clientes',recipientId);
+    if (!read(collection,entity) || !read('clientes',recipient) || recipient.id !== recipientId ||
+        recipient.eliminado || recipient.archivado || entity.prospectoId && recipient.prospectoId !== entity.prospectoId)
+      return fail('destinatario_fuera_de_alcance');
+    const ids = collection === 'comparativos' ? entity.cotizacionIds : [entity.id];
+    if (!Array.isArray(ids) || ids.length < (collection === 'comparativos' ? 2 : 1) || new Set(ids).size !== ids.length)
+      return fail('seleccion_incompleta');
+    const quotes = ids.map(id => S().get('cotizaciones',id));
+    const reviews = [];
+    for (const [i,q] of quotes.entries()) {
+      if (!read('cotizaciones',q) || q.id !== ids[i] || q.clienteId !== recipientId ||
+          q.prospectoId !== entity.prospectoId || !q.moneda || q.moneda !== entity.moneda ||
+          q.producto !== entity.producto || q.ramo !== entity.ramo ||
+          q.riesgoId !== entity.riesgoId || q.oportunidadId !== entity.oportunidadId ||
+          ['perdido','vencido'].includes(q.estadoComercial) || !QUOTE_ORIGINS.has(q.cotizacionOrigen) ||
+          !Orbit.quoteContracts.validateQuote(q,{requireValidated:true}).ok) return fail('propuesta_no_elegible');
+      const doc = reviewedDocument(q), approval = q.comunicacionRevisada;
+      if (!read('documentos',doc) || !approval) return fail('revision_documental_pendiente');
+      if (collection === 'comparativos' && (!Array.isArray(entity.revisionesPropuestas) ||
+          entity.revisionesPropuestas.length !== ids.length || entity.revisionesPropuestas[i] !== approval))
+        return fail('comparativo_requiere_revision');
+      reviews.push({approval,bytes:JSON.stringify([quoteContent(q),documentContent(doc)])});
+    }
+    const opportunity = S().get('negocios',entity.oportunidadId);
+    if (!read('negocios',opportunity) || opportunity.id !== entity.oportunidadId || opportunity.clienteId !== recipientId ||
+        opportunity.archivado || opportunity.eliminado || !entity.riesgoId) return fail('oportunidad_incompatible');
+    if ((opportunity.riesgoId || opportunity.vehiculoId) &&
+        (opportunity.riesgoId || opportunity.vehiculoId) !== entity.riesgoId) return fail('riesgo_incompatible');
+    const recommendation = collection === 'comparativos' ? Orbit.quoteContracts.recommendation(quotes,entity.criterioRecomendacion,entity.recomendacion) : null;
+    if (recommendation && !recommendation.ok) return fail('recomendacion_invalida');
+    const subject = (collection === 'comparativos' ? 'Comparativo de ' : 'Cotización de ') + entity.producto;
+    const message = subject + '\n\n' + quotes.map(q => '• ' + q.aseguradoraNombreSnapshot + ': ' + communicationMoney(q.primaTotal,q.moneda)).join('\n');
+    const email = clean(recipient.email), phone = String(recipient.telefono || recipient.whatsapp || '').replace(/[^0-9]/g,'');
+    if (!email && !phone) return fail('contacto_requerido');
+    const version = JSON.stringify(stableContent({ user:user.id,role,recipientId,email,phone,subject,message,reviews,ids,opportunity:opportunity.id,criterion:entity.criterioRecomendacion,choice:entity.recomendacion }));
+    return {ok:true,subject,message,email,phone,version,reviews,recommendation};
+  }
+  async function reviewCommunication(entityId, recipientId, collection = 'comparativos') {
+    if (!['comparativos','cotizaciones'].includes(collection)) return {ok:false,errors:['origen_invalido']};
+    const initial = communicationState(collection,entityId,recipientId);
+    if (!initial.ok) return initial;
+    for (const review of initial.reviews) {
+      if (await reviewDigest(review.bytes) !== review.approval) return {ok:false,errors:['propuesta_modificada']};
+    }
+    if (communicationState(collection,entityId,recipientId).version !== initial.version)
+      return {ok:false,errors:['contexto_modificado']};
+    const autorizar = attempt => {
+      const live = communicationState(collection,entityId,recipientId);
+      if (!live.ok || live.version !== initial.version || attempt.clienteId !== recipientId ||
+          attempt.asunto !== live.subject || attempt.mensaje !== live.message ||
+          (attempt.adjuntos || []).length) return false;
+      if (attempt.canal === 'correo') return !!live.email && attempt.destino === live.email;
+      return attempt.canal === 'whatsapp' && !!live.phone && attempt.destino === live.phone;
+    };
+    return {ok:true,subject:initial.subject,message:initial.message,recommendation:initial.recommendation,autorizar,
+      sigueVigente:() => communicationState(collection,entityId,recipientId).version === initial.version};
+  }
+  async function prepareCommunication(entityId, channel, recipientId, collection = 'comparativos') {
+    const reviewed = await reviewCommunication(entityId,recipientId,collection);
+    if (!reviewed.ok) return reviewed;
+    if (!reviewed.sigueVigente()) return {ok:false,errors:['contexto_modificado']};
+    const patch = collection === 'comparativos' ? {estado:'preparado'} : {estadoComercial:'preparado'};
+    S().update(collection,entityId,Object.assign(patch,{preparadoAt:now()}));
+    return Object.assign(reviewed,{comparison:S().get(collection,entityId)});
   }
   function quoteForLegacy(quote) {
     quote = normalizeQuote(quote);
@@ -369,6 +490,6 @@ Orbit.quoteContracts = (function () {
     dimensions, dimensionsMatch, sourceGroups, matchingValidatedGroups, tariffCandidates,
     validateTariffConfig, automaticAvailability, calculateAutomatic,
     normalizeQuote, validateQuote, persistQuote, recommendation, createComparison,
-    prepareCommunication, quoteById, quoteForLegacy
+    prepareCommunication, reviewCommunication, reviewForCommunication, recordReview, communicationMoney, quoteById, quoteForLegacy
   };
 })();

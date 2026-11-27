@@ -53,7 +53,7 @@ check('PERSIST_STORE', contains(ref, ["Orbit.store.get('cotizaciones'", "Orbit.s
 check('CONTRACT_STRUCTURED', contains(contract, ['gastos:expenses', 'impuestos:taxes', 'primaNeta:net', 'primaTotal:total']), 'Contrato normalizado conserva desglose estructurado', files.contract);
 check('RATE_DEFAULT_DENY', contains(contract, ['automaticAvailability', 'configuracion_tarifa_validada_no_disponible', 'fuentes_validadas_insuficientes']), 'Cálculo automático bloqueado sin fuente/tarifa validadas', files.contract);
 check('COT_STORE_IDS', contains(cot, ['Q.persistQuote', "S().insert('quoteTransfers'", 'cotizacionIds']), 'Cotizador persiste y transfiere IDs canónicos', files.cotizador);
-check('COT_PREPARED', contains(cot, ["tipo:'Cotización preparada'", "estadoComercial:'preparado'"]), 'Cotizador diferencia preparado de enviado', files.cotizador);
+check('COT_PREPARED', contains(cot, ["tipo:'Cotización preparada'", "Q.prepareCommunication(q.id"]) && contains(contract, ["estadoComercial:'preparado'", "reviewCommunication(entityId"]), 'Cotizador diferencia preparado de enviado', files.cotizador);
 check('CMP_VALID_ONLY', contains(cmp, ['Q.validateQuote(q, { requireValidated:true }).ok', 'La propuesta seleccionada no está validada']), 'Comparativo solo opera con cotizaciones validadas', files.comparativo);
 check('CMP_ISSUANCE', contains(cmp, ['acceptedOffer', 'Solicitud de emisión creada en Ops', 'Aún no existe una póliza emitida']), 'Aceptación crea solicitud de emisión y no póliza', files.comparativo);
 check('RENEWAL_PREPARED', contains(ren, ['Preparar campaña de renovación', 'seguimiento(s) preparados; no enviados']), 'Renovaciones no simula envíos', files.renewals);

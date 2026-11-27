@@ -14,14 +14,14 @@ Orbit.notify = (function () {
   function _tel(cli) { return String(cli.telefono || cli.whatsapp || '').replace(/[^0-9]/g, ''); }
 
   /* Entrega actual sin proveedor confirmado. Devuelve el estado preparado/abierto. */
-  function _deliver(cli, canal, asunto, mensaje, adjunto) {
+  function _deliver(cli, canal, asunto, mensaje, adjunto, autorizar) {
     if (canal === 'whatsapp') {
       window.open('https://wa.me/' + _tel(cli) + '?text=' + encodeURIComponent(mensaje), '_blank');
       return 'WhatsApp Web abierto';
     }
     // correo: usa el compositor Orbit si existe
     if (Orbit.modules && Orbit.modules.correo && Orbit.modules.correo.redactar) {
-      Orbit.modules.correo.redactar({ para: cli.email || '', clienteId: cli.id, asunto: asunto || '', cuerpo: mensaje, adjunto: adjunto || '' });
+      Orbit.modules.correo.redactar({ para: cli.email || '', clienteId: cli.id, asunto: asunto || '', cuerpo: mensaje, adjunto: adjunto || '', autorizar });
       return 'Correo preparado';
     }
     window.open('mailto:' + (cli.email || '') + '?subject=' + encodeURIComponent(asunto || '') + '&body=' + encodeURIComponent(mensaje), '_blank');
@@ -36,7 +36,12 @@ Orbit.notify = (function () {
     if (!cli) { Orbit.ui && Orbit.ui.toast && Orbit.ui.toast('Cliente no encontrado'); return null; }
     let canal = opts.canal || 'auto';
     if (canal === 'auto') canal = _tel(cli) ? 'whatsapp' : 'correo';
-    const usado = _deliver(cli, canal, opts.asunto, opts.mensaje || '', opts.adjunto);
+    if (opts.autorizar && !opts.autorizar({clienteId,canal,asunto:opts.asunto,mensaje:opts.mensaje,
+        destino:canal === 'whatsapp' ? _tel(cli) : String(cli.email || '').trim(),adjuntos:opts.adjunto ? [opts.adjunto] : []})) {
+      Orbit.ui.toast('El destinatario o la propuesta cambió. Revisa la comunicación de nuevo.');
+      return null;
+    }
+    const usado = _deliver(cli, canal, opts.asunto, opts.mensaje || '', opts.adjunto, opts.autorizar);
     // traza en expediente sin afirmar entrega confirmada por proveedor
     S().insert('actividades', {
       id: 'act' + Date.now() + Math.floor(Math.random() * 99),
@@ -86,7 +91,7 @@ Orbit.notify = (function () {
     back.querySelectorAll('[name="nc-canal"]').forEach(r => r.addEventListener('change', () => { $('#nc-asunto-w').style.display = $('#nc-msg') && back.querySelector('[name="nc-canal"]:checked').value === 'correo' ? '' : 'none'; }));
     $('#nc-send').addEventListener('click', () => {
       const canal = (back.querySelector('[name="nc-canal"]:checked') || {}).value || 'whatsapp';
-      const res = cliente(clienteId, { canal, asunto: $('#nc-asunto') ? $('#nc-asunto').value : opts.asunto, mensaje: $('#nc-msg').value, tipo: opts.tipo, icon: opts.icon, adjunto: opts.adjunto });
+      const res = cliente(clienteId, { canal, asunto: $('#nc-asunto') ? $('#nc-asunto').value : opts.asunto, mensaje: $('#nc-msg').value, autorizar:opts.autorizar, tipo: opts.tipo, icon: opts.icon, adjunto: opts.adjunto });
       close(); if (opts.onSent) opts.onSent(res);
     });
   }

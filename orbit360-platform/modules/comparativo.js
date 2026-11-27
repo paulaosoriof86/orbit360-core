@@ -176,7 +176,7 @@ Orbit.modules.comparativo = (function () {
       ${datosIniciales()}
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
         <b style="font-family:var(--f-display);font-size:16px">${props.length ? '⚖️ ' + props.length + ' aseguradoras · ' + meta.ramo : '⚖️ Nuevo comparativo'}</b>
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" id="cp-add">➕ Propuesta manual</button>${props.length ? `<button class="btn ghost sm" id="cp-save">💾 Guardar</button><button class="btn ghost sm" id="cp-send">📲 Enviar al cliente</button><button class="btn primary sm" id="cp-print">🖨 Imprimir</button>` : ''}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" id="cp-add">➕ Propuesta manual</button>${props.length ? `<button class="btn ghost sm" id="cp-save">💾 Guardar</button><button class="btn ghost sm" id="cp-send">Borrador consultivo</button><button class="btn primary sm" id="cp-print">🖨 Imprimir</button>` : ''}</div>
       </div>
       <div id="cp-out" class="cz-cards">${props.map((p, i) => card(p, i === winI, i, cur)).join('') || '<div class="muted" style="padding:30px 0;text-align:center;grid-column:1/-1">Sin propuestas todavía.</div>'}</div>
       ${props.length > 1 ? tabla(cur, rk) : ''}
@@ -392,19 +392,11 @@ Orbit.modules.comparativo = (function () {
         ${cobRows}
       </tbody></table>
       ${top ? `<div class="rec"><b>🧠 Recomendación (${meta.criterio}):</b> ${U.esc(top.nombre)} — opción sugerida según el criterio de ${meta.criterio === 'precio' ? 'mejor precio' : meta.criterio === 'cobertura' ? 'mejor cobertura' : 'equilibrio precio/cobertura'}.</div>` : ''}
-      <p class="ft">Documento informativo emitido por ${tenant}. Coberturas sujetas a condiciones de póliza vigentes. Las propuestas pueden variar según suscripción de la aseguradora.</p></body></html>`);
+      <p class="ft">Borrador consultivo de ${tenant}. Coberturas sujetas a condiciones de póliza vigentes. Las propuestas pueden variar según suscripción de la aseguradora.</p></body></html>`);
     w.document.close(); setTimeout(() => w.print(), 350);
   }
   function enviarCliente() {
-    if (!props.length) { Orbit.ui.toast('Agrega al menos una propuesta.'); return; }
-    const rk = ranking(), ganador = props[(rk[0] || {}).i] || props[0];
-    const cur = (props[0] || {}).cur || 'GTQ';
-    // elegir cliente: el del meta si existe, o pedir
-    const cid = meta.clienteId || (S().all('clientes')[0] || {}).id;
-    const resumen = props.map((p, i) => '• ' + (p.aseguradora || 'Propuesta ' + (i + 1)) + ': ' + Orbit.ui.money(p.total || 0, cur)).join('\n');
-    const msg = 'Hola, te comparto el comparativo de ' + (meta.ramo || 'seguros') + ' con ' + props.length + ' opciones:\n\n' + resumen + '\n\nNuestra recomendación: ' + (ganador.aseguradora || 'la mejor relación valor/precio') + '. Quedo atento para avanzar con la que prefieras.';
-    if (!cid) { Orbit.ui.toast('No hay cliente para asociar. Crea o selecciona uno.'); return; }
-    Orbit.notify.pedir(cid, { tipo: 'Comparativo enviado', icon: '⚖️', asunto: 'Comparativo de ' + (meta.ramo || 'seguros') + ' · ' + props.length + ' opciones', mensaje: msg, adjunto: 'Comparativo-' + (meta.ramo || 'seguros') + '.pdf' });
+    Orbit.ui.toast('Este comparativo es un borrador consultivo. Valida sus propuestas en Cotizador para preparar la comunicación.');
   }
   function rgbaHex(hex, a) { let h = hex.replace('#', ''); if (h.length === 3) h = h.split('').map(x => x + x).join(''); const n = parseInt(h, 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
   function acceptanceSnapshot() {

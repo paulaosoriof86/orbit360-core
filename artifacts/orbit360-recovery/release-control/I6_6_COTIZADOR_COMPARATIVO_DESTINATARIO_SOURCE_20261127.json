@@ -1,0 +1,90 @@
+{
+  "gate": "I6.6",
+  "changeId": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127",
+  "stage": "SOURCE",
+  "classification": "DEFECT_REPRODUCED",
+  "base": "ef19e2db521b1f23d1d33ad94c2dbbfbcb215718",
+  "servedSource": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+  "servedHostingVersion": "332999a55b189108",
+  "pins": [
+    {
+      "path": "orbit360-platform/core/notify.js",
+      "beforeBlob": "fff4dde919e329e52685c40c42aece4f57bfbdad",
+      "gitBlobSha": "6b1f88031bac02c603f7b9e5c7fcc7771e13902a",
+      "sha256": "baaa3e63a94f0c40210505b943369045d84c4a66f3faa8a7fd0b44a72a554935"
+    },
+    {
+      "path": "orbit360-platform/core/quote-comparison-contracts-v1203-refinements.js",
+      "beforeBlob": "8da9767f36f2538145e2a714b1f9fdb77b80078a",
+      "gitBlobSha": "7612488cd8bc4d0b4527c595e4fed8cb4c7011b5",
+      "sha256": "785e03ee66a5d2be39c57ce2e26a0fd6c967c7d54005c7968ca6b80ddee6e4d9"
+    },
+    {
+      "path": "orbit360-platform/core/quote-comparison-contracts-v1203.js",
+      "beforeBlob": "c3342d5fc94661a9f23563e4b1c644346dd10fb3",
+      "gitBlobSha": "8d003a0fe21fdae459a6bae3357fcc3ad4f35509",
+      "sha256": "2bc6d1fa010f39791dc6dffb119f54b5d3a8e2488afa2242c9d1e4e9c6ddbc69"
+    },
+    {
+      "path": "orbit360-platform/modules/comparativo-v1203-operational-bridge.js",
+      "beforeBlob": "cf3dce3d88f31de23b00dbfe0066831637f2766a",
+      "gitBlobSha": "6239f8bbf5b1a4aad922d4a3d78d1407b20e13f6",
+      "sha256": "8f6a28b95acabf48e3428d741b4730dd7779d3f9c8cef178e769f52b7148835d"
+    },
+    {
+      "path": "orbit360-platform/modules/comparativo.js",
+      "beforeBlob": "982881a4c1e2f95be95428bd3f9f23360a9a2d5f",
+      "gitBlobSha": "434e23ebfe2921e067b213e9220a2338e180393e",
+      "sha256": "defd1ca22dc4acca0a390383774515fe8f79a5573006440c5da7faa5f2e323bd"
+    },
+    {
+      "path": "orbit360-platform/modules/correo.js",
+      "beforeBlob": "6475f4c66c74abdc4224329c37c9a3024b3c4c85",
+      "gitBlobSha": "a9a27f678fd80e3ad190af5afdb6cfe24038e556",
+      "sha256": "7407533d02602b5f0f0c2d81d24fe5bafaf92b1464e324a17bce639b5f5285e3"
+    },
+    {
+      "path": "orbit360-platform/modules/cotizador-v1203-source-gate.js",
+      "beforeBlob": "87882325e73c6e66e5e82fbef4246208a22b719a",
+      "gitBlobSha": "97ed72d26cae3ddf5a189271f8d99e99ddaa0fa5",
+      "sha256": "085f61ec33b003d9bf9243a11a32aac2e532f3da48ebe273f5db2ebbb965996d"
+    },
+    {
+      "path": "orbit360-platform/modules/cotizador.js",
+      "beforeBlob": "bed763e25072d7cd59333b6a4a655ba5c32219f8",
+      "gitBlobSha": "37351dfc4c22b27cce0e854370d77e2be4510f14",
+      "sha256": "285b5a288c200cf9b0047e22ee5dd221dd11fd99a4e098ddc9882be01366c962"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-quote-communication.test.cjs",
+      "beforeBlob": null,
+      "gitBlobSha": "5e96ceb2611b3d96e9e0d1dc2cd7d541bf9ba934",
+      "sha256": "3c359aac3c40e79e58e86bf1c8dfefd2d7239f13a017425b36728fdea915b6d5"
+    },
+    {
+      "path": "tools/orbit360-validar-cierre-cotizador-comparativo-v1215.mjs",
+      "beforeBlob": "8f4ac84fc04322ca2a143012a80d60d0577f253d",
+      "gitBlobSha": "72c8b4ab2d99d8f4a2ef9181f61701da8970df2d",
+      "sha256": "3fe1fb5ceef994ae50efd9560a383ed5edc5c2e98b56e7c7df320acd0183ceff"
+    }
+  ],
+  "sourceQa": {
+    "focusedPassed": 24,
+    "originalContract": "PASS",
+    "insurerQuoteSchema": "PASS",
+    "legacyClosureBaseline": {
+      "pass": 38,
+      "fail": 3,
+      "warn": 2
+    },
+    "legacyClosureAfter": {
+      "pass": 38,
+      "fail": 3,
+      "warn": 2
+    }
+  },
+  "authenticatedLiveReachability": "PENDING",
+  "newRuntimeAcceptance": false,
+  "providerCommunicationsDuringQa": 0,
+  "financialWrites": 0
+}
