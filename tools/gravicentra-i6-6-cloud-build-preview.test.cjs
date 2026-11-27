@@ -106,3 +106,62 @@ test('archive extraction rejects symlinks before extracting any candidate bytes'
     for(let i=0;i<224;i++)fs.writeFileSync(path.join(input,'bundle','x'+i+'.js'),'test');fs.symlinkSync('/tmp',path.join(input,'bundle','escape'));const tar=path.join(root,'unsafe.tar.gz');execFileSync('tar',['-czf',tar,'-C',input,'bundle','evidence']);assert.throws(()=>owner.safeUnpack(tar,out),/NO_ARCHIVE_LINKS/);assert.deepEqual(fs.readdirSync(out),[]);
   }finally{fs.rmSync(root,{recursive:true,force:true});}
 });
+
+function scopedPreviewFixture(){
+  const source='1'.repeat(40),mechanism='2'.repeat(40),compositionTree='3'.repeat(40);
+  const request={schema:'GI_I66_FOCAL_HOSTING_REQUEST_V1',scope:'HOSTING_ONLY',sourceSha:source,generation:4};
+  const requestDigest=pkg.digest(request),baselineVersion='sites/'+C.projectId+'/versions/previous';
+  const pp={schema:'GI_I66_FOCAL_HOSTING_PACKAGE_V1',sourceSha:source,sourceTreeSha:'4'.repeat(40),compositionTree,
+    mechanismSha:mechanism,request,requestDigest,requestVersion:4,baseline:{hostingVersion:baselineVersion,files:224}};
+  const channel='gi-i66-e4-'+requestDigest.slice(0,12),id='aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+  const p={schema:owner.focalPreviewSchema,provider:C.provider,scope:'HOSTING_PREVIEW_ONLY',mechanismSha:mechanism,sourceSha:source,
+    requestVersion:4,packagePlan:pp,packageBuildId:id,channel,packageArtifact:{uri:'gs://'+C.bucket+'/i66/packages/focal-hosting/'+requestDigest+'/'+source+'/'+id+'/'+pkg.F.archive,generation:'10',sha256:'7'.repeat(64),bytes:1024}};
+  const row=(id,version,url)=>({name:'sites/'+C.projectId+'/channels/'+id,url,release:{version:{name:'sites/'+C.projectId+'/versions/'+version}}});
+  const before={channels:[row('live','previous','https://'+C.projectId+'.web.app'),row(C.channel,'protected',C.origin)]};
+  const origin='https://'+C.projectId+'--'+channel+'-abc.web.app';
+  const next=row(channel,'next',origin),after={channels:[...structuredClone(before.channels),next]};
+  const b={id:'eeeeeeee-dddd-4ccc-8bbb-aaaaaaaaaaaa'};
+  const proof={schema:'GI_I66_FOCAL_HOSTING_PREVIEW_PROOF_V1',executionBuildId:b.id,packageBuildId:id,planDigest:pkg.digest(p),
+    requestDigest,compositionTree,packageArtifact:p.packageArtifact,origin,hostingVersion:next.release.version.name,buildId:'gi-focal-fixture',
+    siteManifestSha256:'8'.repeat(64),scope:p.scope,claimBuildId:b.id,claim:{uri:'gs://'+C.bucket+'/'+owner.lockName(p),generation:'20',sha256:'9'.repeat(64),bytes:120}};
+  const read={origin,files:224,manifestSha256:proof.siteManifestSha256,marker:{sourceSha:source,buildId:proof.buildId}};
+  return {p,b,before,after,proof,read};
+}
+test('native focal Preview uses a dedicated artifact, claim, channel and provider proof',()=>{
+  const {p,b,before,after,proof,read}=scopedPreviewFixture();
+  const cfg=owner.configFor(p);
+  assert.deepEqual(cfg.tags,['i66-focal-hosting-preview','i66-focal-e4']);
+  assert.ok(!JSON.stringify(cfg).includes('request-35/'));
+  assert.match(cfg.artifacts.objects.location,/preview\/focal-hosting\//);
+  assert.equal(owner.checkFocalProof(p,b,proof,before,after,read),proof);
+});
+for(const [name,modify] of Object.entries({
+  'request35 channel':x=>x.p.channel=C.channel,
+  'request35 archive':x=>x.p.packageArtifact.uri=x.p.packageArtifact.uri.replace('focal-hosting/'+x.p.packagePlan.requestDigest,'request-35'),
+  'drifting LIVE predecessor':x=>x.before.channels[0].release.version.name+='foreign',
+  'a protected channel change':x=>x.after.channels[1].expireTime='changed',
+  'a pre-existing focal channel without ownership':x=>x.before.channels.push(x.after.channels[2]),
+  'an incomplete provider inventory':x=>x.before.nextPageToken='more',
+  'a substituted preview host':x=>{x.after.channels[2].url=x.read.origin=x.proof.origin=C.origin;},
+  'a different package generation':x=>x.proof.packageArtifact={...x.p.packageArtifact,generation:'11'},
+  'a missing served file':x=>x.read.files--,
+  'a foreign claim':x=>x.proof.claim.uri=x.proof.claim.uri.replace('focal-hosting','request-35')
+}))test('focal Preview rejects '+name,()=>{
+  const x=scopedPreviewFixture();modify(x);
+  assert.throws(()=>{owner.validatePlan(x.p);owner.checkFocalProof(x.p,x.b,x.proof,x.before,x.after,x.read);});
+});
+test('an uncertain focal Preview reuses physical bytes or reserves one identical retry only after a terminal failure',()=>{
+  const {p,b,before,after}=scopedPreviewFixture();
+  const claim={schema:'GI_I66_FOCAL_PREVIEW_CLAIM_V1',planDigest:pkg.digest(p),buildId:b.id,
+    requestDigest:p.packagePlan.requestDigest,channel:p.channel,packageBuildId:p.packageBuildId,packageArtifact:p.packageArtifact,before};
+  const ended={id:b.id,status:'FAILURE',finishTime:'2026-11-27T12:10:00Z'};
+  const dry=(raw,original=ended,log='worker terminated before creating the channel',sealed=claim)=>
+    owner.focalRecoveryAction(p,sealed,owner.focalInventory(p,raw),original,log);
+  assert.equal(dry(after),'READBACK_EXISTING');assert.equal(dry(before),'RESERVE_IDENTICAL_RETRY');
+  assert.throws(()=>dry(before,{...ended,status:'WORKING'}),/TERMINAL_ORIGINAL/);
+  assert.throws(()=>dry(before,{...ended,status:'SUCCESS'}),/TERMINAL_ORIGINAL/);
+  assert.throws(()=>dry(before,ended,'HTTP Error: 429, channel quota'),/QUOTA/);
+  assert.throws(()=>dry(after,ended,'',{...claim,buildId:'different'}),/ORIGINAL_BUILD/);
+  const partial=structuredClone(after);delete partial.channels[2].release;
+  assert.throws(()=>dry(partial),/PARTIAL_CHANNEL/);
+});

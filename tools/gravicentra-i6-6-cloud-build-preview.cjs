@@ -74,7 +74,39 @@ function focalArtifactIdentity(binding){
   need(object===uri&&generation(version)&&extra.length===0,'FOCAL_PACKAGE_GENERATION');
   return {uri,generation:version,sha256:binding.artifactDigest.slice(7)};
 }
+const focalPreviewSchema='GI_I66_FOCAL_HOSTING_PREVIEW_V1';
+const focalPreviewMembers=[F.proof,F.before,F.after,F.readback];
+const isFocalPreview=p=>p?.schema===focalPreviewSchema;
+const membersFor=p=>isFocalPreview(p)?focalPreviewMembers:Object.values(F);
+const focalChannel=pp=>'gi-i66-e'+pp.requestVersion+'-'+pp.requestDigest.slice(0,12);
+function validateFocalPreviewPlan(p){
+  const focal=require('./gravicentra-i6-6-focal-hosting-composition.cjs');
+  const pp=focal.checkPlan(p.packagePlan);
+  equal(Object.keys(p).sort(),['schema','provider','scope','mechanismSha','sourceSha','requestVersion','packagePlan','packageBuildId','packageArtifact','channel'].sort(),'FOCAL_PREVIEW_FIELDS');
+  equal(p.scope,'HOSTING_PREVIEW_ONLY','FOCAL_SCOPE');equal(p.provider,C.provider,'FOCAL_PROVIDER');
+  equal(pp.request.schema,'GI_I66_FOCAL_HOSTING_REQUEST_V1','FOCAL_PACKAGE_REQUEST');
+  equal(pp.request.scope,'HOSTING_ONLY','FOCAL_PACKAGE_SCOPE');
+  equal(p.channel,focalChannel(pp),'FOCAL_CHANNEL');need(sha40(p.mechanismSha),'FOCAL_MECHANISM');
+  equal([p.sourceSha,p.requestVersion],[pp.sourceSha,pp.requestVersion],'FOCAL_SOURCE_GENERATION');
+  objectRef(p.packageArtifact);
+  focalArtifactIdentity({sourceSha:p.sourceSha,buildRunId:p.packageBuildId,artifactDigest:'sha256:'+p.packageArtifact.sha256,
+    artifactId:p.packageArtifact.uri+'#'+p.packageArtifact.generation,compositionTree:pp.compositionTree,
+    focalHosting:{schema:pp.request.schema,generation:pp.requestVersion,requestDigest:pp.requestDigest,compositionTree:pp.compositionTree}});
+  return p;
+}
+function makeFocalPreviewPlan(repo,pp,receipt){
+  const head=git(repo,'rev-parse','HEAD'),focal=require('./gravicentra-i6-6-focal-hosting-composition.cjs');
+  equal(focal.plan(repo,head),{...pp,mechanismSha:head},'FOCAL_SIGNED_REQUEST_DRIFT');
+  equal([receipt.provider,receipt.status,receipt.scope,receipt.cloudBuild.status],[C.provider,'IMMUTABLE_PACKAGE_RETAINED_READBACK_PASS_NO_DEPLOY',pkg.C.scope,'SUCCESS'],'FOCAL_CERTIFIED_PACKAGE');
+  equal([receipt.planSha256,receipt.sourceSha,receipt.mechanismSha,receipt.requestDigest,receipt.compositionTree],
+    [digest(pp),pp.sourceSha,pp.mechanismSha,pp.requestDigest,pp.compositionTree],'FOCAL_CERTIFICATE');
+  const {uri,generation,sha256,bytes}=receipt.artifact;
+  return validateFocalPreviewPlan({schema:focalPreviewSchema,scope:'HOSTING_PREVIEW_ONLY',provider:C.provider,mechanismSha:head,
+    sourceSha:pp.sourceSha,requestVersion:pp.requestVersion,packagePlan:pp,packageBuildId:receipt.cloudBuild.id,
+    packageArtifact:{uri,generation,sha256,bytes},channel:focalChannel(pp)});
+}
 function validatePlan(p){
+  if(isFocalPreview(p))return validateFocalPreviewPlan(p);
   equal(p.schema,C.planSchema,'PLAN_SCHEMA');equal(p.provider,C.provider,'PROVIDER');equal(p.scope,C.scope,'SCOPE');equal(p.mode,C.mode,'EXISTING_CHANNEL_MODE');
   equal([p.repository,p.branch,p.projectId,p.projectNumber,p.region,p.serviceAccount,p.bucket],[C.repository,C.branch,C.projectId,C.projectNumber,C.region,C.serviceAccount,C.bucket],'EXECUTION_BOUNDARY');
   pkg.validatePlan(p.packagePlan);need(uuid(p.packageBuildId)&&sha40(p.mechanismSha),'EXACT_EXECUTION_SOURCE');
@@ -91,8 +123,8 @@ function validatePlan(p){
   equal(Object.keys(p).sort(),['schema','provider','scope','mode','repository','branch','projectId','projectNumber','region','serviceAccount','bucket','mechanismSha','sourceSha','requestVersion','packagePlan','packageBuildId','packageArtifact','rollover','imports','pins','constraints'].sort(),'UNKNOWN_PLAN_FIELD');
   return p;
 }
-function prefix(p,id){need(uuid(id)||id==='$BUILD_ID','EXECUTION_UUID');return 'i66/preview/request-'+p.requestVersion+'/'+p.sourceSha+'/'+id+'/';}
-function lockName(p){return 'i66/preview-locks/request-'+p.requestVersion+'-'+p.sourceSha+'-'+p.packageArtifact.sha256+'.json';}
+function prefix(p,id){need(uuid(id)||id==='$BUILD_ID','EXECUTION_UUID');if(isFocalPreview(p))return 'i66/preview/focal-hosting/'+p.packagePlan.requestDigest+'/'+p.packageBuildId+'/'+id+'/';return 'i66/preview/request-'+p.requestVersion+'/'+p.sourceSha+'/'+id+'/';}
+function lockName(p){if(isFocalPreview(p))return 'i66/preview-locks/focal-hosting/'+p.packagePlan.requestDigest+'.json';return 'i66/preview-locks/request-'+p.requestVersion+'-'+p.sourceSha+'-'+p.packageArtifact.sha256+'.json';}
 function configFor(p){
   validatePlan(p);
   return {steps:[{id:C.stepId,name:C.image,entrypoint:'node',args:[C.tool,'worker',JSON.stringify(p)],
@@ -101,11 +133,14 @@ function configFor(p){
     serviceAccount:'projects/'+C.projectId+'/serviceAccounts/'+C.serviceAccount,timeout:'1800s',logsBucket:'gs://'+C.bucket+'/i66/cloud-build-logs',
     options:{logging:'GCS_ONLY',sourceProvenanceHash:['SHA256'],machineType:'E2_STANDARD_2'},
     substitutions:{_I66_PROVIDER:C.provider,_I66_SOURCE_SHA:p.sourceSha,_I66_MECHANISM_SHA:p.mechanismSha,_I66_REQUEST_VERSION:String(p.requestVersion)},
-    tags:['i66-existing-preview-only','i66-request-'+p.requestVersion],artifacts:{objects:{location:'gs://'+C.bucket+'/'+prefix(p,'$BUILD_ID'),paths:Object.values(F)}}};
+    tags:isFocalPreview(p)?['i66-focal-hosting-preview','i66-focal-e'+p.requestVersion]:['i66-existing-preview-only','i66-request-'+p.requestVersion],artifacts:{objects:{location:'gs://'+C.bucket+'/'+prefix(p,'$BUILD_ID'),paths:membersFor(p)}}};
 }
-function validateBuild(p,b,{finished=true}={}){
+function validateBuild(p,b,{finished=true,claimRecovery=false}={}){
   validatePlan(p);need(uuid(b.id),'EXECUTION_UUID');need([C.projectId,C.projectNumber].some(id=>b.name==='projects/'+id+'/locations/'+C.region+'/builds/'+b.id),'BUILD_RESOURCE');
-  equal(b.projectId,C.projectId,'BUILD_PROJECT');equal(b.status,finished?'SUCCESS':'WORKING','BUILD_STATUS');
+  equal(b.projectId,C.projectId,'BUILD_PROJECT');if(claimRecovery){
+    need(isFocalPreview(p)&&['SUCCESS','FAILURE','INTERNAL_ERROR','TIMEOUT','CANCELLED','EXPIRED'].includes(b.status),'FOCAL_ORIGINAL_BUILD_NOT_TERMINAL');
+    finished=b.status==='SUCCESS';
+  }else equal(b.status,finished?'SUCCESS':'WORKING','BUILD_STATUS');
   const c=configFor(p);for(const k of ['serviceAccount','timeout','logsBucket','substitutions','tags'])equal(b[k],c[k],'CONFIG_'+k);
   for(const k of ['logging','sourceProvenanceHash','machineType'])equal(b.options?.[k],c.options[k],'OPTIONS_'+k);
   for(const k of ['env','volumes','secretEnv'])need(!b.options?.[k]?.length,'NO_GLOBAL_OVERRIDE');
@@ -119,13 +154,13 @@ function validateBuild(p,b,{finished=true}={}){
   need(JSON.stringify(s.env)===JSON.stringify(e.env)||JSON.stringify(s.env)===JSON.stringify(env),'STEP_ENV');
   need(!s.allowFailure&&!s.allowExitCodes?.length&&!s.secretEnv?.length&&!s.script&&!s.dir&&!s.volumes?.length,'NO_STEP_BYPASS');
   equal(Object.keys(b.artifacts||{}),['objects'],'ONLY_NATIVE_ARTIFACTS');
-  need([c.artifacts.objects.location,c.artifacts.objects.location.replace('$BUILD_ID',b.id)].includes(b.artifacts.objects.location),'ARTIFACT_PATH');equal(b.artifacts.objects.paths,Object.values(F),'EXACT_ARTIFACTS');
+  need([c.artifacts.objects.location,c.artifacts.objects.location.replace('$BUILD_ID',b.id)].includes(b.artifacts.objects.location),'ARTIFACT_PATH');equal(b.artifacts.objects.paths,membersFor(p),'EXACT_ARTIFACTS');
   need(Number.isFinite(Date.parse(b.startTime))&&Number.isFinite(Date.parse(b.createTime)),'ACTUAL_BUILD_TIME');
   if(finished){
     equal(s.status,'SUCCESS','EXECUTED_STEP_REQUIRED');need(Number.isFinite(Date.parse(b.finishTime))&&Date.parse(b.finishTime)>=Date.parse(b.startTime),'FINISH_TIME');
     need(Date.parse(s.timing?.startTime)>=Date.parse(b.startTime)&&Date.parse(s.timing?.endTime)>=Date.parse(s.timing?.startTime)&&Date.parse(s.timing?.endTime)<=Date.parse(b.finishTime),'STEP_TIME');
     equal(b.results?.buildStepImages?.length,1,'IMAGE_COUNT');need(/^sha256:[a-f0-9]{64}$/.test(b.results.buildStepImages[0]),'IMAGE_DIGEST');
-    equal(Number(b.results.numArtifacts),Object.keys(F).length,'NATIVE_ARTIFACT_COUNT');
+    equal(Number(b.results.numArtifacts),membersFor(p).length,'NATIVE_ARTIFACT_COUNT');
     const uri='gs://'+C.bucket+'/'+prefix(p,b.id)+'artifacts-'+b.id+'.json';need(b.results.artifactManifest===uri||(b.results.artifactManifest.startsWith(uri+'#')&&generation(b.results.artifactManifest.slice(uri.length+1))),'NATIVE_MANIFEST');
     need(typeof b.logUrl==='string'&&b.logUrl.startsWith('https://console.cloud.google.com/cloud-build/builds')&&b.logUrl.includes(b.id),'REAL_LOG_URL');
   }
@@ -149,7 +184,7 @@ async function cloudIo(headers){
     },
     async uploadClaim(name,value){const r=await response('https://storage.googleapis.com/upload/storage/v1/b/'+C.bucket+'/o?uploadType=media&ifGenerationMatch=0&name='+encodeURIComponent(name),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value)+'\n'});return r.json();}};
 }
-async function readPackage(p,io,dir){
+async function readPackage(p,io,dir,sourceRepo){
   fs.mkdirSync(dir,{recursive:false});
   const pp=p.packagePlan,id=p.packageBuildId;
   const b=await io.api('https://cloudbuild.googleapis.com/v1/projects/'+C.projectId+'/locations/'+C.region+'/builds/'+id);pkg.validateBuild(pp,b);
@@ -161,7 +196,10 @@ async function readPackage(p,io,dir){
   for(const [file,row] of rows){const meta=await io.metadata(pkg.artifactPrefix(pp,id)+file,row.generation);pkg.validateObject(pp,id,meta,file);equal(String(meta.generation),row.generation,'PACKAGE_OBJECT_GENERATION');
     const data=await io.bytes(meta.name,row.generation),hex=crypto.createHash('md5').update(data).digest('hex'),base64=Buffer.from(hex,'hex').toString('base64');
     need([hex,base64].includes(row.md5),'NATIVE_PACKAGE_HASH');if(meta.md5Hash)equal(meta.md5Hash,base64,'GCS_NATIVE_HASH');files[file]=data;objects[file]=meta;write(path.join(dir,file),data);}
-  const proof=JSON.parse(files[pkg.F.proof]);pkg.validateWorkerProof(pp,b,proof,files,objects);
+  const proof=JSON.parse(files[pkg.F.proof]);if(isFocalPreview(p)){
+    const baseline=await io.object(pp.request.baselineArchive);
+    require('./gravicentra-i6-6-focal-hosting-composition.cjs').verifyContent(pp,b,proof,files,dir,baseline.data,sourceRepo);
+  }else pkg.validateWorkerProof(pp,b,proof,files,objects);
   const archive=objects[pkg.F.archive];equal({uri:'gs://'+C.bucket+'/'+archive.name,generation:String(archive.generation),sha256:sha(files[pkg.F.archive]),bytes:files[pkg.F.archive].length},p.packageArtifact,'SAME_RETAINED_PACKAGE');
   const lm=await io.metadata(pkg.lockName(pp),proof.lock.generation);equal([lm.bucket,lm.name,String(lm.generation)],[C.bucket,pkg.lockName(pp),proof.lock.generation],'PACKAGE_CLAIM_METADATA');pkg.validateObjectTime(b,lm);
   const claimBytes=await io.bytes(lm.name,proof.lock.generation),claim=JSON.parse(claimBytes);write(path.join(dir,'claim.json'),claimBytes);
@@ -170,7 +208,7 @@ async function readPackage(p,io,dir){
   // metadata, bind the package hash to the actual completed worker execution.
   const logName=b.logsBucket.slice(('gs://'+C.bucket+'/').length).replace(/\/$/,'')+'/log-'+id+'.txt',logMeta=await io.metadata(logName);
   equal([logMeta.bucket,logMeta.name],[C.bucket,logName],'PACKAGE_LOG_LOCATION');need(generation(String(logMeta.generation)),'PACKAGE_LOG_GENERATION');
-  const log=await io.bytes(logName,String(logMeta.generation));pkg.validateExecutionLog(pp,b,proof,log);write(path.join(dir,'execution.log'),log);
+  const log=await io.bytes(logName,String(logMeta.generation));if(isFocalPreview(p))require('./gravicentra-i6-6-focal-hosting-composition.cjs').verifyLog(proof,log);else pkg.validateExecutionLog(pp,b,proof,log);write(path.join(dir,'execution.log'),log);
   return {build:b,proof,files,objects,manifest:{name,generation:String(mm.generation),sha256:sha(manifest)},log:{name:logName,generation:String(logMeta.generation),sha256:sha(log)}};
 }
 function safeUnpack(tar,dir){
@@ -201,8 +239,11 @@ function inventoryFromZip(bytes,dir,a){
   for(const name of names.filter(n=>n.endsWith('.json'))){const data=execFileSync('unzip',['-p',zip,name],{maxBuffer:8*1024*1024});if(sha(data)===a.freshInventoryEvidence.rawInventorySha256)matches.push({name,data});}
   equal(matches.length,1,'EXACT_RAW_INVENTORY_MEMBER');const value=JSON.parse(matches[0].data);reuse.validateInventoryPreimage(value,a.freshInventoryEvidence);write(path.join(dir,'authorized-inventory.json'),matches[0].data);return {value,member:matches[0].name,sha256:sha(matches[0].data)};
 }
-async function readFiles(origin,bundle){
-  need([C.origin,...readback.LIVE.map(r=>r.origin)].includes(origin),'READBACK_ORIGIN');
+async function readFiles(origin,bundle,focalPlan){
+  if(focalPlan){
+    validateFocalPreviewPlan(focalPlan);
+    need(new RegExp('^https://ays-orbit-360-lab--'+focalPlan.channel+'-[a-z0-9]+\\.web\\.app$').test(origin),'FOCAL_READBACK_ORIGIN');
+  }else need([C.origin,...readback.LIVE.map(r=>r.origin)].includes(origin),'READBACK_ORIGIN');
   for(let i=0;i<bundle.manifest.length;i+=8)await Promise.all(bundle.manifest.slice(i,i+8).map(async file=>{
     const url=new URL(origin+'/'+file.relative);url.searchParams.set('__gi_i66_provider',crypto.randomBytes(12).toString('hex'));
     const r=await fetch(url,{redirect:'error',cache:'no-store',headers:{'cache-control':'no-cache'},signal:AbortSignal.timeout(30000)});need(r.ok,'READBACK_HTTP_'+r.status);equal(sha(Buffer.from(await r.arrayBuffer())),file.hash,'HOSTED_BYTES');}));
@@ -314,8 +355,9 @@ function finalPredeployGate({branchGuard,inventory,save,validate,deploy}){
   const branchHead=branchGuard(),raw=inventory();save(raw);const basis=validate(raw);
   return {branchHead,inventory:raw,basis,deployment:deploy()};
 }
-function deployExisting(cli,config,cwd,env,log){
-  const startedAt=new Date().toISOString(),args=[cli,'hosting:channel:deploy',C.channel,'--config',config,'--project',C.projectId,'--expires','7d','--non-interactive','--json'];
+function deployExisting(cli,config,cwd,env,log,focalPlan){
+  const channel=focalPlan?validateFocalPreviewPlan(focalPlan).channel:C.channel;
+  const startedAt=new Date().toISOString(),args=[cli,'hosting:channel:deploy',channel,'--config',config,'--project',C.projectId,'--expires','7d','--non-interactive','--json'];
   const r=spawnSync(process.execPath,args,{cwd,env,encoding:'utf8',maxBuffer:16*1024*1024,timeout:900000});
   write(log,(r.stdout||'')+(r.stderr||''));
   if(r.error||r.status!==0){console.error('I66_CLOUD_PREVIEW_DEPLOY_FAILED '+JSON.stringify({exitCode:r.status,signal:r.signal||null}));process.stderr.write(fs.readFileSync(log).subarray(-16384).toString('utf8').split(/\r?\n/).slice(-200).join('\n')+'\n');const e=Error('I66_CLOUD_PREVIEW_DEPLOY_FAILED');e.exitCode=Number.isInteger(r.status)&&r.status>0?r.status:1;throw e;}
@@ -336,10 +378,11 @@ function verify(p,id,out){
   const b=gcloud(['builds','describe',id,'--region='+C.region]);validateBuild(p,b);write(path.join(out,'cloud-build-metadata.json'),b);
   const manifestUri=b.results.artifactManifest,mm=metadata(manifestUri);equal([mm.bucket,mm.name],[C.bucket,prefix(p,id)+'artifacts-'+id+'.json'],'MANIFEST_PATH');need(generation(String(mm.generation)),'MANIFEST_GENERATION');pkg.validateObjectTime(b,mm);if(manifestUri.includes('#'))equal(String(mm.generation),manifestUri.split('#')[1],'MANIFEST_PROVIDER_GENERATION');
   const manifest=download('gs://'+C.bucket+'/'+mm.name+'#'+mm.generation,path.join(out,'artifact-manifest.json'));equal(manifest.length,Number(mm.size),'MANIFEST_SIZE');
-  const decoded=pkg.parseArtifactManifest(manifest),rows=Array.isArray(decoded)?decoded:decoded?.artifacts;need(Array.isArray(rows),'NATIVE_MANIFEST_ROWS');equal(rows.length,Object.keys(F).length,'NATIVE_MEMBER_COUNT');
+  const decoded=pkg.parseArtifactManifest(manifest),rows=Array.isArray(decoded)?decoded:decoded?.artifacts;need(Array.isArray(rows),'NATIVE_MANIFEST_ROWS');equal(rows.length,membersFor(p).length,'NATIVE_MEMBER_COUNT');
   const files={},objects={};
-  for(const row of rows){const stem='gs://'+C.bucket+'/'+prefix(p,id);need(typeof row.location==='string'&&row.location.startsWith(stem),'NATIVE_MEMBER_PREFIX');const m=/^([^/#]+)#([1-9][0-9]{0,24})$/.exec(row.location.slice(stem.length));need(m&&Object.values(F).includes(m[1])&&!files[m[1]],'NATIVE_MEMBER_EXACT');
-    const meta=metadata(row.location);equal(String(meta.generation),m[2],'NATIVE_MEMBER_GENERATION');const data=download(row.location,path.join(out,m[1])),hex=crypto.createHash('md5').update(data).digest('hex'),base64=Buffer.from(hex,'hex').toString('base64');need([hex,base64].includes(pkg.nativeArtifactMd5(row)),'NATIVE_MEMBER_MD5');if(meta.md5Hash)equal(meta.md5Hash,base64,'GCS_MEMBER_MD5');files[m[1]]=data;objects[m[1]]=meta;}
+  for(const row of rows){const stem='gs://'+C.bucket+'/'+prefix(p,id);need(typeof row.location==='string'&&row.location.startsWith(stem),'NATIVE_MEMBER_PREFIX');const m=/^([^/#]+)#([1-9][0-9]{0,24})$/.exec(row.location.slice(stem.length));need(m&&membersFor(p).includes(m[1])&&!files[m[1]],'NATIVE_MEMBER_EXACT');
+    const meta=metadata(row.location);if(isFocalPreview(p))pkg.validateObjectTime(b,meta);equal(String(meta.generation),m[2],'NATIVE_MEMBER_GENERATION');const data=download(row.location,path.join(out,m[1])),hex=crypto.createHash('md5').update(data).digest('hex'),base64=Buffer.from(hex,'hex').toString('base64');need([hex,base64].includes(pkg.nativeArtifactMd5(row)),'NATIVE_MEMBER_MD5');if(meta.md5Hash)equal(meta.md5Hash,base64,'GCS_MEMBER_MD5');files[m[1]]=data;objects[m[1]]=meta;}
+  if(isFocalPreview(p))return verifyFocalOutcome(p,b,files,metadata,download,out);
   const result=validateProof(p,b,files,objects);
   const logFile=path.join(out,'cloud-build-execution.log'),fd=fs.openSync(logFile,'wx',0o600);try{execFileSync('gcloud',['builds','log',id,'--region='+C.region,'--project='+C.projectId],{stdio:['ignore',fd,fd]});}finally{fs.closeSync(fd);}const log=fs.readFileSync(logFile);validateExecutionLog(p,b,result.proof,log);
   const claimUri='gs://'+C.bucket+'/'+result.proof.claim.name+'#'+result.proof.claim.generation,cm=metadata(claimUri);pkg.validateObjectTime(b,cm);equal([cm.bucket,cm.name,String(cm.generation)],[C.bucket,lockName(p),result.proof.claim.generation],'CLAIM_METADATA_READBACK');const claim=JSON.parse(download(claimUri,path.join(out,'preview-claim.json')));equal([claim.provider,claim.executionBuildId,claim.packageBuildId,claim.sourceSha,claim.planSha256],[C.provider,id,p.packageBuildId,p.sourceSha,digest(p)],'CLAIM_READBACK');equal(claim.artifact,p.packageArtifact,'CLAIM_PACKAGE');
@@ -371,8 +414,174 @@ function makePlan(repo,packagePlan,packageReceipt,imports){
     rollover:{path:C.rollover,sha256:C.rolloverSha256,channelId:C.channel,origin:C.origin},imports,pins:mechanismPins,
     constraints:{builds:0,newChannels:0,deletedChannels:0,liveWrites:0,backendWrites:0,businessWrites:0,authRulesIamWrites:0,signedFunctionalPass:false,productionAccepted:false}});
 }
+function focalInventory(p,raw){
+  validateFocalPreviewPlan(p);
+  need(!raw.nextPageToken&&Array.isArray(raw.channels),'FOCAL_COMPLETE_CHANNEL_INVENTORY');
+  const rows=raw.channels.map(entry=>{
+    const id=entry.name?.split('/').at(-1);
+    need(id&&entry.name==='sites/'+C.projectId+'/channels/'+id,'FOCAL_CHANNEL_RESOURCE');
+    return {id,url:entry.url,version:entry.release?.version?.name||null,fingerprint:digest(entry)};
+  }).sort((a,b)=>a.id.localeCompare(b.id));
+  equal(new Set(rows.map(r=>r.id)).size,rows.length,'FOCAL_DISTINCT_CHANNELS');
+  equal(rows.find(r=>r.id==='live')?.version,p.packagePlan.baseline.hostingVersion,'FOCAL_LIVE_PREIMAGE');
+  return {others:rows.filter(r=>r.id!==p.channel),target:rows.find(r=>r.id===p.channel)||null};
+}
+function checkFocalProof(p,b,proof,before,after,read){
+  const base=focalInventory(p,before),next=focalInventory(p,after);
+  equal(base.target,null,'FOCAL_CHANNEL_ORIGINAL_PREIMAGE');equal(next.others,base.others,'FOCAL_PROTECTED_CHANNELS');
+  need(next.target&&/^sites\/ays-orbit-360-lab\/versions\/[\w-]+$/.test(next.target.version),'FOCAL_PREVIEW_VERSION');
+  equal(proof.schema,'GI_I66_FOCAL_HOSTING_PREVIEW_PROOF_V1','FOCAL_PROOF_SCHEMA');
+  equal([proof.executionBuildId,proof.packageBuildId,proof.planDigest,proof.requestDigest,proof.compositionTree],
+    [b.id,p.packageBuildId,digest(p),p.packagePlan.requestDigest,p.packagePlan.compositionTree],'FOCAL_PROOF_BINDING');
+  equal(proof.packageArtifact,p.packageArtifact,'FOCAL_CERTIFIED_ARTIFACT');
+  equal([proof.origin,proof.hostingVersion,read.origin],[next.target.url,next.target.version,next.target.url],'FOCAL_PHYSICAL_PREVIEW');
+  need(new RegExp('^https://ays-orbit-360-lab--'+p.channel+'-[a-z0-9]+\\.web\\.app$').test(read.origin),'FOCAL_PROVIDER_ORIGIN');
+  equal(read.files,p.packagePlan.baseline.files,'FOCAL_ALL_SERVED_FILES');
+  equal([read.marker.sourceSha,read.marker.buildId,read.manifestSha256],[p.sourceSha,proof.buildId,proof.siteManifestSha256],'FOCAL_SERVED_MANIFEST');
+  need(sha64(proof.siteManifestSha256)&&uuid(proof.claimBuildId),'FOCAL_SERVER_EVIDENCE');
+  objectRef(proof.claim);equal(proof.claim.uri,'gs://'+C.bucket+'/'+lockName(p),'FOCAL_CLAIM_PATH');
+  if(proof.retry){objectRef(proof.retry);equal(proof.retry.uri,proof.claim.uri+'.retry1','FOCAL_RETRY_CLAIM_PATH');}
+  equal(proof.scope,'HOSTING_PREVIEW_ONLY','FOCAL_PROOF_SCOPE');
+  return proof;
+}
+function focalRecoveryAction(p,claim,current,original,priorLog){
+  equal([claim.schema,claim.planDigest,claim.packageBuildId,claim.channel,claim.requestDigest],
+    ['GI_I66_FOCAL_PREVIEW_CLAIM_V1',digest(p),p.packageBuildId,p.channel,p.packagePlan.requestDigest],'FOCAL_ORIGINAL_AUTHORITY');
+  equal(claim.packageArtifact,p.packageArtifact,'FOCAL_ORIGINAL_PACKAGE');
+  equal(original.id,claim.buildId,'FOCAL_ORIGINAL_BUILD');
+  const preimage=focalInventory(p,claim.before);
+  equal(preimage.target,null,'FOCAL_ORIGINAL_CHANNEL_WAS_PRESENT');
+  equal(current.others,preimage.others,'FOCAL_PROTECTED_PREIMAGE_CHANGED');
+  if(current.target){
+    need(current.target.version,'FOCAL_PARTIAL_CHANNEL_REQUIRES_PROVIDER_OWNERSHIP');
+    return 'READBACK_EXISTING';
+  }
+  need(['FAILURE','INTERNAL_ERROR','TIMEOUT','CANCELLED','EXPIRED'].includes(original.status)&&Number.isFinite(Date.parse(original.finishTime)),
+    'FOCAL_RETRY_REQUIRES_TERMINAL_ORIGINAL');
+  need(typeof priorLog==='string'&&priorLog.length>0,'FOCAL_ORIGINAL_LOG_REQUIRED');
+  need(!/resource_exhausted|http error:\s*429|channel quota/i.test(priorLog),'FOCAL_PREVIEW_QUOTA_REQUIRES_PROVIDER_CHANGE');
+  return 'RESERVE_IDENTICAL_RETRY';
+}
+async function focalPreviewWorker(p){
+  const focal=require('./gravicentra-i6-6-focal-hosting-composition.cjs'),os=require('node:os');
+  const identity=await pkg.workerIdentity(),io=await cloudIo(identity.headers),root=process.cwd();
+  const buildUrl='https://cloudbuild.googleapis.com/v1/projects/'+C.projectId+'/locations/'+C.region+'/builds/';
+  const b=await io.api(buildUrl+identity.buildId);validateBuild(p,b,{finished:false});
+  const work=fs.mkdtempSync(path.join(os.tmpdir(),'gi-focal-preview-')),repo=path.join(work,'source');
+  try{
+    execFileSync('git',['clone','--quiet','--single-branch','--branch',C.branch,'--no-checkout',C.repositoryUrl,repo]);
+    let allowedHead=p.mechanismSha;
+    function guard(){equal(git(repo,'ls-remote','--exit-code','origin','refs/heads/'+C.branch).split(/\s+/)[0],allowedHead,'FOCAL_PREVIEW_CONCURRENT_HEAD');}
+    const signed=await pkg.requestJson('https://api.github.com/repos/'+C.repository+'/commits/'+p.mechanismSha);
+    equal(signed.commit.verification.verified,true,'FOCAL_SIGNED_MECHANISM');equal(signed.commit.tree.sha,git(repo,'rev-parse',p.mechanismSha+'^{tree}'),'FOCAL_SIGNED_TREE');
+    equal(focal.plan(repo,p.mechanismSha),{...p.packagePlan,mechanismSha:p.mechanismSha},'FOCAL_CURRENT_COMPOSITION');
+    const fresh=git(repo,'rev-parse','refs/remotes/origin/'+C.branch);
+    if(fresh!==p.mechanismSha){
+      git(repo,'merge-base','--is-ancestor',p.mechanismSha,fresh);
+      const successors=await pkg.requestJson('https://api.github.com/repos/'+C.repository+'/commits/'+fresh);
+      equal(successors.commit.verification.verified,true,'FOCAL_SIGNED_SUCCESSOR');
+      equal(successors.commit.tree.sha,git(repo,'rev-parse',fresh+'^{tree}'),'FOCAL_EXACT_SUCCESSOR_TREE');
+      equal(git(repo,'diff','--name-only',p.mechanismSha,fresh,'--','tools','functions','.github/workflows','firebase.json','firestore.rules','storage.rules'),
+        '','FOCAL_MECHANISM_SUCCESSOR_DRIFT');
+      equal(focal.plan(repo,fresh),{...p.packagePlan,mechanismSha:fresh},'FOCAL_SUCCESSOR_PRODUCT_DRIFT');
+      allowedHead=fresh;
+    }
+    guard();
+    const dir=path.join(work,'package'),pkgEvidence=await readPackage(p,io,dir,repo);
+    const bundle=loadBundle(path.join(dir,'contents'),pkgEvidence.proof.output);
+    const inv=()=>io.api('https://firebasehosting.googleapis.com/v1beta1/sites/'+C.projectId+'/channels?pageSize=100');
+    const observed=await inv(),basis=focalInventory(p,observed),lock=lockName(p);
+    const content={schema:'GI_I66_FOCAL_PREVIEW_CLAIM_V1',planDigest:digest(p),buildId:b.id,packageBuildId:p.packageBuildId,
+      requestDigest:p.packagePlan.requestDigest,packageArtifact:p.packageArtifact,channel:p.channel,before:observed};
+    let claim,claimed,ownsNewClaim=false,retry=null;
+    if(!basis.target){
+      try{
+        claim=await io.retain(lock,Buffer.from(JSON.stringify(content)+'\n'),'application/json');
+        claimed=content;ownsNewClaim=true;
+      }catch(error){if(!/412|PRECONDITION|HTTP_4(?:09|12)/i.test(error.message))throw error;}
+    }
+    if(!ownsNewClaim){
+      const meta=await io.metadata(lock),data=await io.bytes(lock,String(meta.generation));
+      claim=objectRef({uri:'gs://'+C.bucket+'/'+lock,generation:String(meta.generation),bytes:data.length,sha256:sha(data)});
+      claimed=JSON.parse(data);equal(claimed.schema,content.schema,'FOCAL_CLAIM_SCHEMA');
+      equal([claimed.planDigest,claimed.requestDigest,claimed.channel,claimed.packageBuildId],[content.planDigest,content.requestDigest,p.channel,p.packageBuildId],'FOCAL_EXISTING_CLAIM');
+
+      need(uuid(claimed.buildId),'FOCAL_ORIGINAL_CLAIM_UUID');
+      const original=await io.api(buildUrl+claimed.buildId);
+      equal(original.id,claimed.buildId,'FOCAL_ORIGINAL_CLAIM_BUILD');
+      validateBuild(p,original,{claimRecovery:true});
+      let priorLog;
+      if(!basis.target){
+        const logName=b.logsBucket.slice(('gs://'+C.bucket+'/').length).replace(/\/$/,'')+'/log-'+original.id+'.txt';
+        const lm=await io.metadata(logName);
+        priorLog=(await io.bytes(logName,String(lm.generation))).toString();
+      }
+      if(focalRecoveryAction(p,claimed,basis,original,priorLog)==='RESERVE_IDENTICAL_RETRY'){
+        guard();equal(focalInventory(p,await inv()),basis,'FOCAL_RETRY_FRESH_PREIMAGE');
+        // A terminal first build and an absent channel permit one identical retry.
+        // A second retry cannot reserve the same generation-zero GCS object.
+        retry=await io.retain(lock+'.retry1',Buffer.from(JSON.stringify({original:claimed.buildId,
+          recovery:b.id,claimGeneration:claim.generation,requestDigest:p.packagePlan.requestDigest,planDigest:digest(p)})+'\n'),'application/json');
+      }
+    }
+    if(ownsNewClaim||retry){
+      const cliDir=path.join(work,'cli'),cfg=path.join(bundle.dir,'bundle','firebase.json');
+      execFileSync('npm',['install','--prefix',cliDir,'--no-save','--ignore-scripts','--no-audit','--no-fund','firebase-tools@14.10.1'],{stdio:'pipe'});
+      execFileSync(process.execPath,[path.join(root,'tools/gravicentra-firebase-tools-empty-extensions-workaround-v1.mjs'),cliDir]);
+      const cfgContents=json(cfg);
+      equal(cfgContents.hosting?.public,'site','FOCAL_HOSTING_PUBLIC');
+      need(!cfgContents.hosting.site||cfgContents.hosting.site===C.projectId,'FOCAL_HOSTING_SITE');
+      need(!cfgContents.hosting.predeploy&&!cfgContents.hosting.postdeploy&&!cfgContents.hosting.target,'FOCAL_NO_DEPLOY_HOOKS');
+      guard();equal(focalInventory(p,await inv()),basis,'FOCAL_FINAL_INVENTORY_CAS');
+      deployExisting(path.join(cliDir,'node_modules/firebase-tools/lib/bin/firebase.js'),cfg,path.dirname(cfg),process.env,path.join(work,'deploy.log'),p);
+    }
+    const after=await inv(),target=focalInventory(p,after).target;need(target?.version,'FOCAL_PROVIDER_VERSION');
+    const read=await readFiles(target.url,bundle,p);
+    guard();equal(focalInventory(p,await inv()),focalInventory(p,after),'FOCAL_POST_READBACK_CHANNEL_DRIFT');
+    const proof={schema:'GI_I66_FOCAL_HOSTING_PREVIEW_PROOF_V1',scope:p.scope,executionBuildId:b.id,packageBuildId:p.packageBuildId,
+      planDigest:digest(p),requestDigest:p.packagePlan.requestDigest,compositionTree:p.packagePlan.compositionTree,packageArtifact:p.packageArtifact,
+      claim,claimBuildId:claimed.buildId,...(retry?{retry}:{}),hostingVersion:target.version,origin:target.url,buildId:bundle.marker.buildId,siteManifestSha256:bundle.manifestSha256};
+    checkFocalProof(p,b,proof,claimed.before,after,read);
+    for(const [name,v] of [[F.proof,proof],[F.before,claimed.before],[F.after,after],[F.readback,read]])write(path.join(root,name),v);
+    console.log('I66_FOCAL_PREVIEW_READBACK '+digest(proof));
+  }finally{fs.rmSync(work,{recursive:true,force:true});}
+}
+async function verifyFocalOutcome(p,b,files,metadata,download,out){
+  const obj=f=>JSON.parse(files[f]),proof=checkFocalProof(p,b,obj(F.proof),obj(F.before),obj(F.after),obj(F.readback));
+  const ref=proof.claim,body=download(ref.uri+'#'+ref.generation,path.join(out,'preview-claim.json'));
+  equal([body.length,sha(body)],[ref.bytes,ref.sha256],'FOCAL_CLAIM_READBACK');
+  const claim=JSON.parse(body);equal([claim.planDigest,claim.buildId,claim.packageBuildId,claim.channel],[digest(p),proof.claimBuildId,p.packageBuildId,p.channel],'FOCAL_DURABLE_OWNER');
+  equal(claim.before,obj(F.before),'FOCAL_DURABLE_PREIMAGE');equal(claim.packageArtifact,p.packageArtifact,'FOCAL_DURABLE_ARTIFACT');
+  if(proof.retry){
+    const ref=proof.retry,raw=download(ref.uri+'#'+ref.generation,path.join(out,'preview-identical-retry.json'));
+    equal([raw.length,sha(raw)],[ref.bytes,ref.sha256],'FOCAL_RETRY_OBJECT');
+    equal(JSON.parse(raw),{original:proof.claimBuildId,recovery:b.id,claimGeneration:proof.claim.generation,
+      requestDigest:p.packagePlan.requestDigest,planDigest:digest(p)},'FOCAL_RETRY_IDENTITY');
+  }
+  const logMeta=metadata(b.logsBucket.replace(/\/$/,'')+'/log-'+b.id+'.txt');
+  const log=download('gs://'+logMeta.bucket+'/'+logMeta.name+'#'+logMeta.generation,path.join(out,'cloud-build-execution.log'));
+  equal(log.toString().split('\n').filter(s=>s.trimEnd().endsWith('I66_FOCAL_PREVIEW_READBACK '+digest(proof))).length,1,'FOCAL_PREVIEW_EXECUTION_LOG');
+  const archive=p.packageArtifact,archivePath=path.join(out,pkg.F.archive);
+  const bytes=download(archive.uri+'#'+archive.generation,archivePath);
+  equal([bytes.length,sha(bytes)],[archive.bytes,archive.sha256],'FOCAL_INDEPENDENT_ARTIFACT');
+  const dir=path.join(out,'readback-bundle');fs.mkdirSync(dir);safeUnpack(archivePath,dir);
+  const bundle=loadBundle(dir,{sourceSha:p.sourceSha,buildId:proof.buildId});
+  const token=execFileSync('gcloud',['auth','print-access-token','--project='+C.projectId],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const getChannels=()=>pkg.requestJson('https://firebasehosting.googleapis.com/v1beta1/sites/'+C.projectId+'/channels?pageSize=100',
+    {headers:{Authorization:'Bearer '+token}});
+  const current=focalInventory(p,await getChannels());
+  equal(current.target?.version,proof.hostingVersion,'FOCAL_INDEPENDENT_VERSION');
+  equal(current.target.url,proof.origin,'FOCAL_INDEPENDENT_ORIGIN');
+  const observed=await readFiles(current.target.url,bundle,p);
+  equal(observed,obj(F.readback),'FOCAL_INDEPENDENT_SERVED_BYTES');
+  equal(focalInventory(p,await getChannels()).target,current.target,'FOCAL_VERSION_AFTER_INDEPENDENT_READBACK');
+  const receipt={schema:'GI_I66_FOCAL_HOSTING_PREVIEW_RECEIPT_V1',status:'PREVIEW_DEPLOYED',proof,providerBuild:b.id,
+    packageBuildId:p.packageBuildId,packageArtifact:p.packageArtifact,authenticatedFunctionalQa:'PENDING',live:'PENDING'};
+  write(path.join(out,'receipt.json'),receipt);return receipt;
+}
+
 async function worker(p){
-  validatePlan(p);equal(process.versions.node.split('.')[0],'22','NODE_22');const root=process.cwd(),identity=await pkg.workerIdentity(),io=await cloudIo(identity.headers);
+  validatePlan(p);if(isFocalPreview(p))return focalPreviewWorker(p);equal(process.versions.node.split('.')[0],'22','NODE_22');const root=process.cwd(),identity=await pkg.workerIdentity(),io=await cloudIo(identity.headers);
   const b=await io.api('https://cloudbuild.googleapis.com/v1/projects/'+C.projectId+'/locations/'+C.region+'/builds/'+identity.buildId);validateBuild(p,b,{finished:false});
   equal([process.env.I66_PRODUCT_SOURCE_SHA,process.env.I66_MECHANISM_SOURCE_SHA,process.env.I66_REQUEST_VERSION],[p.sourceSha,p.mechanismSha,String(p.requestVersion)],'RUNTIME_SUBSTITUTIONS');
   for(const [file,pin] of Object.entries(p.pins)){const bytes=fs.readFileSync(path.join(root,file));equal({blob:blob(bytes),sha256:sha(bytes)},pin,'MECHANISM_PIN');}
@@ -444,10 +653,15 @@ async function worker(p){
   }
 }
 function main(args=process.argv.slice(2)){
+  if(args[0]==='prepare-focal'&&args.length===4){
+    const p=makeFocalPreviewPlan(process.cwd(),json(args[1]),json(args[2]));
+    fs.mkdirSync(args[3],{recursive:false});write(path.join(args[3],'plan.json'),p);
+    write(path.join(args[3],'cloudbuild.json'),configFor(p));return p;
+  }
   if(args[0]==='prepare'&&args.length===5){const p=makePlan(process.cwd(),json(args[1]),json(args[2]),json(args[3]));fs.mkdirSync(args[4],{recursive:false});write(path.join(args[4],'plan.json'),p);write(path.join(args[4],'cloudbuild.json'),configFor(p));console.log('I66_CLOUD_PREVIEW_PREPARED_NO_EXECUTION '+digest(p));return p;}
   if(args[0]==='worker'&&args.length===2)return worker(JSON.parse(args[1]));
   if(args[0]==='verify'&&args.length===4)return verify(json(args[1]),args[2],args[3]);
   throw new Error('I66_CLOUD_PREVIEW_USE_PREPARE_WORKER_OR_VERIFY');
 }
-module.exports={C,F,IMPORTS,objectRef,artifactIdentity,focalArtifactIdentity,validatePlan,prefix,lockName,configFor,validateBuild,cloudIo,readPackage,safeUnpack,loadBundle,unpackHistorical,inventoryFromZip,readFiles,validateHistoricalMetadata,validateProof,assertOverwriteReady,reuseBasisRecord,providerReuseBasis,finalPredeployGate,deployExisting,validateExecutionLog,makePlan,worker,verify,main};
+module.exports={C,F,IMPORTS,makeFocalPreviewPlan,focalInventory,focalRecoveryAction,checkFocalProof,focalPreviewSchema,objectRef,artifactIdentity,focalArtifactIdentity,validatePlan,prefix,lockName,configFor,validateBuild,cloudIo,readPackage,safeUnpack,loadBundle,unpackHistorical,inventoryFromZip,readFiles,validateHistoricalMetadata,validateProof,assertOverwriteReady,reuseBasisRecord,providerReuseBasis,finalPredeployGate,deployExisting,validateExecutionLog,makePlan,worker,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(e=>{console.error(String(e?.message||'I66_CLOUD_PREVIEW_HOLD'));process.exitCode=1;});

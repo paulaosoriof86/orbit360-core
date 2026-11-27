@@ -211,7 +211,7 @@ function verifyLog(proof,bytes) {
   assert.equal(bytes.toString().split('\n').filter(row=>row.trimEnd().endsWith(line)).length,1);
 }
 
-function verifyContent(p,build,proof,files,out,previousBytes) {
+function verifyContent(p,build,proof,files,out,previousBytes,sourceRepo=process.cwd()) {
   assert.deepEqual([proof.schema,proof.buildId,proof.requestDigest,proof.compositionTree,proof.sourceSha],
     [schema,build.id,p.requestDigest,p.compositionTree,p.sourceSha]);
   assert.deepEqual(proof.sourceQa,p.request.qa);
@@ -226,7 +226,7 @@ function verifyContent(p,build,proof,files,out,previousBytes) {
   assert.equal(pkg.sha(previousBytes),p.request.baselineArchive.sha256);
   const prior = path.join(out,'previous');
   const baseline = unpackBaseline(previousBytes,p,prior);
-  const expected = compose(process.cwd(),p,baseline,path.join(out,'expected-content'));
+  const expected = compose(sourceRepo,p,baseline,path.join(out,'expected-content'));
   assert.deepEqual(proof.output,expected,'FOCAL_INDEPENDENT_COMPOSITION');
   const dir=path.join(out,'contents'); fs.mkdirSync(dir);
   preview.safeUnpack(path.join(out,pkg.F.archive),dir);
