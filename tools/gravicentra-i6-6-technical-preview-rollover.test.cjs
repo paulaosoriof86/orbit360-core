@@ -1356,6 +1356,17 @@ const retry30Source = '96bc5388c5c22c1df9256bd11cdb4209681779dc';
 const retry29Source = '6efd4d494cd56b6be87d2fee3cbfc0ba55e9f6a8';
 const retryRepo = path.resolve(__dirname, '..');
 const retryGitRead = (...args) => execFileSync('git', args, { cwd: retryRepo, encoding: 'utf8', stdio: 'pipe' }).trim();
+// These fixtures replay an already issued request. Keep the selected product
+// comparison at the sealed request commit even when the canonical branch moves.
+const sealedRolloverHeads = Object.freeze({
+  30: retry30Source, 33: '63bf7d9e9ba7710cab73bffee010987c784d92aa',
+  34: 'a06e5b692595a863a6c6f6b223d895d874abb90e', 35: '16e3a70baf4e31ef8453173990f32a398c65e59b'
+});
+function sealedRequestGit(version, ...args) {
+  const at = sealedRolloverHeads[version];
+  assert.equal(JSON.parse(retryGitRead('show',at+':'+retryTransportPath)).frontendPreviewRequest.version,version);
+  return retryGitRead(...args.map(arg => arg === 'HEAD' ? at : arg));
+}
 const retry30Control = JSON.parse(retryGitRead('show', retry30Source + ':' + retryTransportPath));
 const retry29Control = JSON.parse(retryGitRead('show', retry29Source + ':' + retryTransportPath));
 const retryBlob = text => crypto.createHash('sha1').update('blob ' + Buffer.byteLength(text) + '\0').update(text).digest('hex');
@@ -1412,7 +1423,7 @@ function retry31Fixture() {
 }
 function checkRetry(f) { return api.validateAuthorization(f.control, successfulPhysicalText, f.io); }
 test('V4 accepts the sealed real request30 causal history instead of fixed request29 equality', () => {
-  const result = api.validateAuthorization(clone(retry30Control), successfulPhysicalText);
+  const result = api.validateAuthorization(clone(retry30Control), successfulPhysicalText, {git:(...args)=>sealedRequestGit(30,...args)});
   assert.equal(result.profile, successfulPhysicalReceipt.profile);
   assert.deepEqual(result, successfulPhysicalReceipt);
 });
@@ -1678,7 +1689,7 @@ function v5Fixture() {
   control.currentTechnicalPreviewRollover = clone(v5Selector);
   control.frontendPreviewRequest = { ...clone(v5Original.frontendPreviewRequest), version: 33,
     sourceQaHead: '5e4a348fa0cf22012b2bfd8950bd5ba410381bc9', reason: 'Synthetic source-owner correction; no new product.' };
-  const io = { git(...args) { calls.push(args); return retryGitRead(...args); },
+  const io = { git(...args) { calls.push(args); return sealedRequestGit(33,...args); },
     readText: p => fs.readFileSync(path.join(retryRepo, p), 'utf8') };
   return { control, calls, io };
 }
@@ -1863,7 +1874,7 @@ function v6Fixture() {
   control.frontendPreviewRequest = { ...clone(v6Original.frontendPreviewRequest), version: 34,
     sourceQaHead: v6ClosedSource, reason: 'Synthetic causal transport fixture; signed source QA is separately required.' };
   return { control, calls, io: {
-    git(...args) { calls.push(args); return retryGitRead(...args); },
+    git(...args) { calls.push(args); return sealedRequestGit(34,...args); },
     readText: p => fs.readFileSync(path.join(retryRepo, p), 'utf8')
   } };
 }
@@ -2013,7 +2024,7 @@ function v7Fixture() {
   control.frontendPreviewRequest = { ...clone(v7Original.frontendPreviewRequest), version: 35,
     sourceQaHead: v7ClosedSource, reason: 'Synthetic causal transport fixture; signed source QA is separately required.' };
   return { control, calls, io: {
-    git(...args) { calls.push(args); return retryGitRead(...args); },
+    git(...args) { calls.push(args); return sealedRequestGit(35,...args); },
     readText: p => fs.readFileSync(path.join(retryRepo, p), 'utf8')
   } };
 }
@@ -2146,4 +2157,13 @@ for (const [label, change] of [
   ['other channel', f => { f.final.result[2].release.version.name += '-other'; }]
 ]) test('V7 after-readback rejects ' + label + ' drift', () => {
   const f = v7AfterFixture(); change(f); assert.throws(() => validateAfter(f));
+});
+
+test('sealed replay does not admit a later product under the request30 authorization', () => {
+  const productSuccessor = '8f36425fb0e91ebe276132d6b936bde9ffb77d50';
+  const observed = [];
+  assert.throws(()=>api.validateAuthorization(clone(retry30Control),successfulPhysicalText,{
+    git(...args){observed.push(args);return retryGitRead(...args.map(value=>value==='HEAD'?productSuccessor:value));}
+  }));
+  assert.ok(observed.some(args=>args[0]==='diff' && args.includes('--quiet') && args.includes('HEAD')));
 });
