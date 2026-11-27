@@ -562,6 +562,47 @@ function validateFunctionalUnitSuccessor(binding,current,readBlob) {
   return binding;
 }
 
+// A focal Hosting request has its own identity. It cannot consume the claim or
+// replace the manifest of the composite backend request in the same transport.
+function admitFocalHostingRequest({request, control, transport, receipt, manifestChanges, pins}) {
+  assert.equal(request.schema, 'GI_I66_FOCAL_HOSTING_REQUEST_V1');
+  assert.equal(request.scope, 'HOSTING_ONLY');
+  assert.equal(control.gateState.gates.I6.activeSubgate, 'I6.6');
+  const physical = transport.currentPhysicalHostingRelease;
+  const current = control[control.currentExecutionDecisionPointer];
+  assert.equal(request.generation, transport.frontendReleaseSequence + 1);
+  assert.equal(current.generation, transport.frontendReleaseSequence);
+  assert.equal(current.receiptGitBlobSha, request.previousReceiptBlob);
+  assert.equal(request.previousReceiptPath, current.receiptPath);
+  assert.equal(receipt.generation, current.generation);
+  for (const field of ['artifactId', 'artifactDigest', 'sourceSha', 'buildId']) {
+    assert.deepEqual([physical[field], receipt.target[field]], [current[field], current[field]]);
+  }
+  assert.deepEqual([physical.liveHostingVersion, receipt.target.hostingVersion], [current.hostingVersion, current.hostingVersion]);
+  assert.equal(request.protectedPreviewRequestVersion, transport.frontendPreviewRequest.version);
+  assert.equal(transport.forbidBackendFunctionDeploy, true);
+  assert.equal(transport.forbidFirestoreRulesDataAuthWrites, true);
+  assert.ok(Array.isArray(request.changes) && request.changes.length > 0);
+  assert.equal(new Set(request.changes).size, request.changes.length);
+  assert.deepEqual(manifestChanges.map(row => row.id), request.changes);
+  const approved = new Map();
+  for (const change of manifestChanges) {
+    assert.equal(change.approvedByDirection, true);
+    for (const item of change.paths) {
+      if (!item.path.startsWith('orbit360-platform/')) {
+        assert.match(item.path, /^tools\//, 'FOCAL_BACKEND_DEPENDENCY');
+        continue;
+      }
+      assert.match(item.path, /^orbit360-platform\/(core|modules)\/[A-Za-z0-9_-]+\.js$/);
+      if (approved.has(item.path)) assert.equal(item.replaces?.priorGitBlobSha, approved.get(item.path));
+      approved.set(item.path, item.gitBlobSha);
+    }
+  }
+  assert.deepEqual(pins.map(row => [row.path, row.after]), [...approved].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0));
+  assert.ok(pins.length > 0 && pins.every(row => row.before !== row.after));
+  return true;
+}
+
 async function admitPreview(transport,api,readMarker,providerOptions={}) {
   const request = transport.frontendPreviewRequest;
   const previous = JSON.parse(git('show','HEAD^:'+transportPath));
@@ -680,7 +721,7 @@ async function admitPreview(transport,api,readMarker,providerOptions={}) {
   if(providerOptions.onEvidence)providerOptions.onEvidence(providerEvidence);
   return true;
 }
-module.exports={historicalPaymentUnit,validateFunctionalUnitSuccessor,COMPOSED_PUBLISHED_SOURCE,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB,DIRECT_FORMS_ASSIGNED_ROLES_PROFILE,DIRECT_FORMS_ASSIGNED_ROLES_CHANGED_QA,DIRECT_FORMS_ASSIGNED_ROLES_PREDECESSOR,
+module.exports={admitFocalHostingRequest,historicalPaymentUnit,validateFunctionalUnitSuccessor,COMPOSED_PUBLISHED_SOURCE,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB,DIRECT_FORMS_ASSIGNED_ROLES_PROFILE,DIRECT_FORMS_ASSIGNED_ROLES_CHANGED_QA,DIRECT_FORMS_ASSIGNED_ROLES_PREDECESSOR,
   DIRECT_FORMS_INSURER_EDITOR_PATH,DIRECT_FORMS_INSURER_EDITOR_TEST_PATH,DIRECT_FORMS_INSURER_EDITOR_RECEIPT_PATH,DIRECT_FORMS_INSURER_FINDINGS,validateAssignedRolesInsurerRevision,validateInsurerEditorSource,
   FINANCIAL_SUCCESSOR_RECEIPT_PATH,FINANCIAL_SUCCESSOR_PREDECESSOR,validateFinancialQaBinding,CANCELLATION_SUCCESSOR_RECEIPT_PATH,CANCELLATION_SUCCESSOR_PREDECESSOR,validateCancellationQaBinding,
   admitPreview,previewRequestTransition,validateStartupRecovery,STARTUP_PATHS,STARTUP_RECEIPT_PATH,STARTUP_TEST_PATH,

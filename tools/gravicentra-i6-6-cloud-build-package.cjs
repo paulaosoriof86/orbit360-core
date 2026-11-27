@@ -91,7 +91,10 @@ const NATIVE_ADMISSION_PATHS=Object.freeze([
 function nativePlan(p){return p.schema===C.nativePlanSchema;}
 function mechanismPaths(p){return [C.tool,C.test,C.branding,C.brandingTest,...(nativePlan(p)?NATIVE_ADMISSION_PATHS:[])];}
 function mechanismTests(p){return [C.test,C.brandingTest,...(nativePlan(p)?NATIVE_ADMISSION_PATHS.filter(file=>file.endsWith('.test.cjs')):[])];}
+const focal = () => require('./gravicentra-i6-6-focal-hosting-composition.cjs');
+const isFocal = p => p.schema === 'GI_I66_FOCAL_HOSTING_PACKAGE_V1';
 function validatePlan(p){
+  if(isFocal(p))return focal().checkPlan(p);
   need(p.schema===C.planSchema||nativePlan(p),'PLAN_SCHEMA');equal(p.provider,C.provider,'PROVIDER');equal(p.scope,C.scope,'PACKAGE_ONLY');
   equal(p.repository,C.repository,'REPOSITORY');equal(p.branch,C.branch,'BRANCH');
   equal(p.projectId,C.projectId,'PROJECT');equal(p.projectNumber,C.projectNumber,'PROJECT_NUMBER');
@@ -187,8 +190,8 @@ function makePlan(repo,{sourceSha,mechanismSha=git(repo,'rev-parse','HEAD'),gith
     blocks:Object.fromEntries(Object.entries(blocks).map(([k,v])=>[k,sha(v)])),
     ...(schema===C.planSchema?{unexecutedGithubBuild:{runId:githubRunId,attempt:githubAttempt}}:{}),noDeploy:true,realBusinessWrites:0,fullI66ProductionAccepted:false});
 }
-function artifactPrefix(p,id){need(uuid(id)||id==='$BUILD_ID','BUILD_UUID');return 'i66/packages/request-'+p.requestVersion+'/'+p.sourceSha+'/'+id+'/';}
-function lockName(p){return 'i66/package-locks/request-'+p.requestVersion+'-'+p.sourceSha+'.json';}
+function artifactPrefix(p,id){if(isFocal(p))return focal().prefix(p,id);need(uuid(id)||id==='$BUILD_ID','BUILD_UUID');return 'i66/packages/request-'+p.requestVersion+'/'+p.sourceSha+'/'+id+'/';}
+function lockName(p){if(isFocal(p))return 'i66/package-locks/focal-hosting/'+p.requestDigest+'.json';return 'i66/package-locks/request-'+p.requestVersion+'-'+p.sourceSha+'.json';}
 function configFor(p){
   validatePlan(p);
   return {steps:[{id:C.stepId,name:C.image,entrypoint:'node',args:[C.tool,'worker',JSON.stringify(p)],
@@ -199,8 +202,8 @@ function configFor(p){
     timeout:'1800s',logsBucket:'gs://'+C.bucket+'/i66/cloud-build-logs',
     options:{logging:'GCS_ONLY',sourceProvenanceHash:['SHA256'],machineType:'E2_STANDARD_2'},
     substitutions:{_I66_PROVIDER:C.provider,_I66_SOURCE_SHA:p.sourceSha,_I66_MECHANISM_SHA:p.mechanismSha,_I66_REQUEST_VERSION:String(p.requestVersion)},
-    tags:['i66-package-only','i66-request-'+p.requestVersion],
-    artifacts:{objects:{location:'gs://'+C.bucket+'/'+artifactPrefix(p,'$BUILD_ID'),paths:Object.values(F)}}};
+    tags:['i66-package-only',isFocal(p)?'i66-focal-hosting-'+p.requestVersion:'i66-request-'+p.requestVersion],
+    artifacts:{objects:{location:'gs://'+C.bucket+'/'+artifactPrefix(p,'$BUILD_ID'),paths:isFocal(p)?focal().members:Object.values(F)}}};
 }
 function validateBuild(p,b,{finished=true}={}){
   validatePlan(p);need(uuid(b.id),'REAL_BUILD_UUID');
@@ -230,14 +233,14 @@ function validateBuild(p,b,{finished=true}={}){
   const expectedLocation=cfg.artifacts.objects.location.replace('$BUILD_ID',b.id);
   equal(Object.keys(b.artifacts||{}),['objects'],'NO_EXTRA_ARTIFACT_PUBLISHER');
   need([cfg.artifacts.objects.location,expectedLocation].includes(b.artifacts?.objects?.location),'ARTIFACT_LOCATION');
-  equal(b.artifacts.objects.paths,Object.values(F),'EXACT_ARTIFACT_MEMBERS');
+  equal(b.artifacts.objects.paths,cfg.artifacts.objects.paths,'EXACT_ARTIFACT_MEMBERS');
   need(Number.isFinite(Date.parse(b.createTime))&&Number.isFinite(Date.parse(b.startTime)),'BUILD_TIMES');
   if(finished){
     equal(s.status,'SUCCESS','STEP_EXECUTED_SUCCESS');equal(b.results?.buildStepImages?.length,1,'REAL_STEP_IMAGE_COUNT');
     need(/^sha256:[a-f0-9]{64}$/.test(b.results.buildStepImages[0]),'REAL_STEP_IMAGE_DIGEST');
     need(Number.isFinite(Date.parse(s.timing?.startTime))&&Date.parse(s.timing.endTime)>Date.parse(s.timing.startTime),'STEP_EXECUTED_TIMING');
     need(Date.parse(b.finishTime)>=Date.parse(s.timing.endTime),'BUILD_FINISH_TIMING');
-    equal(String(b.results.numArtifacts),String(Object.keys(F).length),'ARTIFACT_COUNT');
+    equal(String(b.results.numArtifacts),String(cfg.artifacts.objects.paths.length),'ARTIFACT_COUNT');
     const manifestUri=expectedLocation+'artifacts-'+b.id+'.json';
     need(b.results.artifactManifest===manifestUri||new RegExp('^'+manifestUri.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'#[1-9][0-9]{0,24}$').test(b.results.artifactManifest||''),'REAL_ARTIFACT_MANIFEST');
     need(typeof b.logUrl==='string'&&b.logUrl.startsWith('https://console.cloud.google.com/')&&b.logUrl.includes(b.id)&&[C.projectId,C.projectNumber].some(p=>b.logUrl.includes(p)),'REAL_BUILD_LOG_URL');
@@ -300,18 +303,19 @@ function nativeArtifactMd5(row){
   throw Error('I66_CLOUD_BUILD_NATIVE_HASH_DEPTH');
 }
 function artifactRows(p,id,manifest){
+  const members=isFocal(p)?focal().members:Object.values(F);
   const rows=Array.isArray(manifest)?manifest:manifest?.artifacts;
-  need(Array.isArray(rows),'GCS_ARTIFACT_MANIFEST_REQUIRED');equal(rows.length,Object.keys(F).length,'ARTIFACT_MANIFEST_COUNT');
+  need(Array.isArray(rows),'GCS_ARTIFACT_MANIFEST_REQUIRED');equal(rows.length,members.length,'ARTIFACT_MANIFEST_COUNT');
   const out=new Map();
   for(const row of rows){
     need(typeof row.location==='string','ARTIFACT_GENERATION_URI');
     const prefix='gs://'+C.bucket+'/'+artifactPrefix(p,id);
     need(row.location.startsWith(prefix),'ARTIFACT_MANIFEST_PREFIX');
     const match=row.location.slice(prefix.length).match(/^([^/#]+)#([1-9][0-9]{0,24})$/);
-    need(match&&Object.values(F).includes(match[1])&&!out.has(match[1]),'ARTIFACT_MEMBER_DUPLICATE_OR_UNKNOWN');
+    need(match&&members.includes(match[1])&&!out.has(match[1]),'ARTIFACT_MEMBER_DUPLICATE_OR_UNKNOWN');
     out.set(match[1],{generation:match[2],uri:row.location,md5:nativeArtifactMd5(row)});
   }
-  equal([...out.keys()].sort(),Object.values(F).sort(),'ARTIFACT_MEMBERS_EXACT');return out;
+  equal([...out.keys()].sort(),[...members].sort(),'ARTIFACT_MEMBERS_EXACT');return out;
 }
 function validateWorkerProof(p,b,proof,files,objects){
   equal(proof.schema,C.proofSchema,'WORKER_PROOF_SCHEMA');equal(proof.provider,C.provider,'WORKER_PROVIDER');equal(proof.scope,C.scope,'WORKER_SCOPE');
@@ -449,6 +453,7 @@ function execLogged(command,args,{cwd,env,log,append=false,timeoutMs=1700000}){
   return {status:'PASS',exitCode:0,startedAt,endedAt:new Date().toISOString()};
 }
 async function worker(p){
+  if(isFocal(p))return focal().worker(p);
   validatePlan(p);need(process.versions.node.split('.')[0]==='22','NODE_22_REQUIRED');
   equal([process.env.I66_PRODUCT_SOURCE_SHA,process.env.I66_MECHANISM_SOURCE_SHA,process.env.I66_REQUEST_VERSION],[p.sourceSha,p.mechanismSha,String(p.requestVersion)],'RUNTIME_SOURCE_SUBSTITUTIONS');
   const root=process.cwd(),identity=await workerIdentity();
@@ -557,7 +562,13 @@ function verify(p,buildId,out){
     need([hex,base64].includes(row.md5),'NATIVE_MANIFEST_CONTENT_HASH');
     if(metadata.md5Hash)equal(metadata.md5Hash,base64,'GCS_OBJECT_CONTENT_HASH');
   }
-  const proof=JSON.parse(files[F.proof]);validateWorkerProof(p,b,proof,files,objects);
+  const proof=JSON.parse(files[F.proof]);
+  if(isFocal(p)){
+    const ref=p.request.baselineArchive;
+    const baseline=download(ref.uri+'#'+ref.generation,path.join(out,'previous-physical-artifact.zip'));
+    focal().verifyContent(p,b,proof,files,out,baseline);
+  }
+  else validateWorkerProof(p,b,proof,files,objects);
   const lockMeta=objectMetadata(C.bucket,lockName(p),proof.lock.generation);
   equal(lockMeta.bucket,C.bucket,'CLAIM_BUCKET_READBACK');equal(lockMeta.name,lockName(p),'CLAIM_NAME_READBACK');
   equal(String(lockMeta.generation),proof.lock.generation,'CLAIM_GENERATION_READBACK');validateObjectTime(b,lockMeta);
@@ -565,13 +576,14 @@ function verify(p,buildId,out){
   equal([lock.provider,lock.buildId,lock.sourceSha,lock.mechanismSha,lock.planSha256],[C.provider,buildId,p.sourceSha,p.mechanismSha,digest(p)],'CLAIM_READBACK_BINDING');
   const logPath=path.join(out,'cloud-build-execution.log');
   const fd=fs.openSync(logPath,'wx',0o600);try{execFileSync('gcloud',['builds','log',buildId,'--region='+C.region,'--project='+C.projectId],{stdio:['ignore',fd,fd]});}finally{fs.closeSync(fd);}
-  const executionLog=fs.readFileSync(logPath);validateExecutionLog(p,b,proof,executionLog);
+  const executionLog=fs.readFileSync(logPath);
+  if(isFocal(p))focal().verifyLog(proof,executionLog);else validateExecutionLog(p,b,proof,executionLog);
   const archive=objects[F.archive],receipt={schema:C.receiptSchema,provider:C.provider,scope:C.scope,status:'IMMUTABLE_PACKAGE_RETAINED_READBACK_PASS_NO_DEPLOY',
     sourceSha:p.sourceSha,sourceTreeSha:p.sourceTreeSha,mechanismSha:p.mechanismSha,requestVersion:p.requestVersion,planSha256:digest(p),
     cloudBuild:{name:b.name,id:b.id,status:b.status,serviceAccount:b.serviceAccount,resolvedSource:b.sourceProvenance.resolvedGitSource,stepImages:b.results.buildStepImages,logUrl:b.logUrl,logSha256:sha(executionLog),metadataSha256:digest(b)},
     artifact:{uri:'gs://'+C.bucket+'/'+archive.name,generation:String(archive.generation),sha256:sha(files[F.archive]),bytes:files[F.archive].length,
       manifestUri:'gs://'+C.bucket+'/'+manifestMeta.name,manifestGeneration:String(manifestMeta.generation),manifestSha256:sha(manifestBytes)},
-    checks:proof.checks,workerProofSha256:sha(files[F.proof]),claim:proof.lock,
+    ...(isFocal(p)?{compositionTree:p.compositionTree,output:proof.output,requestDigest:p.requestDigest}:{checks:proof.checks}),workerProofSha256:sha(files[F.proof]),claim:proof.lock,
     preview:'PENDING_SAME_ARTIFACT_PROVIDER_ADMISSION_AND_SIGNED_QA',live:'PENDING_EXACT_PREVIEW_ACCEPTANCE',
     deployments:{preview:0,live:0,functions:0},businessWrites:0,fullI66ProductionAccepted:false};
   write(path.join(out,'receipt.json'),receipt);write(path.join(out,'gcs-object-metadata.json'),objects);
@@ -579,7 +591,14 @@ function verify(p,buildId,out){
 }
 function main(args=process.argv.slice(2)){
   const [command,...rest]=args;
-  if(command==='prepare'){
+  if(command==='prepare-focal'){
+    need(rest.length===1,'FOCAL_OUTPUT_REQUIRED');
+    const repo=process.cwd(), h=git(repo,'rev-parse','HEAD');
+    equal(git(repo,'status','--porcelain','--untracked-files=no'),'','CLEAN_MECHANISM_CHECKOUT_REQUIRED');
+    const p=focal().plan(repo,h), out=rest[0];
+    fs.mkdirSync(out,{recursive:false});write(path.join(out,'plan.json'),p);write(path.join(out,'cloudbuild.json'),configFor(p));
+    console.log(JSON.stringify({scope:C.scope,mechanismSha:h,sourceSha:p.sourceSha,compositionTree:p.compositionTree,requestDigest:p.requestDigest}));
+  }else if(command==='prepare'){
     const [sourceSha,githubRun,githubAttempt,out]=rest;need(out&&rest.length===4,'USAGE_PREPARE_SOURCE_RUN_ATTEMPT_OUT');
     const p=makePlan(process.cwd(),{sourceSha,githubRunId:Number(githubRun),githubAttempt:Number(githubAttempt)});
     fs.mkdirSync(out,{recursive:false});write(path.join(out,'plan.json'),p);write(path.join(out,'cloudbuild.json'),configFor(p));

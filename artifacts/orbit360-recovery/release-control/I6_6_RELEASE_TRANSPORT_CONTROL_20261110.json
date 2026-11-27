@@ -11597,4 +11597,30 @@
       }
     }
   }
+,
+  "focalHostingRequest": {
+    "schema": "GI_I66_FOCAL_HOSTING_REQUEST_V1",
+    "scope": "HOSTING_ONLY",
+    "generation": 4,
+    "sourceSha": "70f5ea6ad1bfae7eec113e6bf9ad38c6a025b271",
+    "manifestBlob": "9f77b707660dbd382ba2e70fec52a185f020ba16",
+    "previousReceiptPath": "artifacts/orbit360-recovery/release-control/I6_6_FRONTEND_E00003_RECEIPT.json",
+    "previousReceiptBlob": "11fdb3bee494541513482666d6215f45cbad0567",
+    "protectedPreviewRequestVersion": 35,
+    "changes": [
+      "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127",
+      "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127_CONTENCION"
+    ],
+    "qa": {
+      "buildId": "8bace2f5-9ebe-4dd1-9a5b-36c11fa151d8",
+      "generation": "1795765038816495",
+      "sha256": "100327b7cf4aeff9f9cb9822b35862d6751d07a5daa78e5872030d0d1194d9c3"
+    },
+    "baselineArchive": {
+      "uri": "gs://ays-orbit360-firestore-private-backup-646761409743/i66/github-artifact-staging/14873426438/7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc/archive.zip",
+      "generation": "1795598973795028",
+      "sha256": "7cb782848a45083047c4899bc30c13bf5be46429607e42597d09342becfc9acc",
+      "bytes": 1824240
+    }
+  }
 }
