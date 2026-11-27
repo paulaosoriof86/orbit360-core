@@ -60,6 +60,20 @@ function artifactIdentity(sourceSha,buildId,artifactId,artifactDigest){
   need(/^sha256:[a-f0-9]{64}$/.test(artifactDigest||''),'CLOUD_ARTIFACT_DIGEST');
   return {provider:C.provider,sourceSha,buildId,uri:artifactId.split('#')[0],generation:match[4],sha256:artifactDigest.slice(7),requestVersion:Number(match[1])};
 }
+// Focal Hosting has its own namespace. The request-35 parser stays exclusive to
+// its original contract, including when the two releases share a source commit.
+function focalArtifactIdentity(binding){
+  const focal=binding.focalHosting;
+  equal(Object.keys(focal||{}).sort(),['compositionTree','generation','requestDigest','schema'],'FOCAL_BINDING_KEYS');
+  equal(focal.schema,'GI_I66_FOCAL_HOSTING_REQUEST_V1','FOCAL_REQUEST_SCHEMA');
+  need(sha40(focal.compositionTree)&&sha64(focal.requestDigest)&&Number.isSafeInteger(focal.generation)&&focal.generation>0,'FOCAL_BINDING');
+  need(sha40(binding.sourceSha)&&uuid(binding.buildRunId)&&/^sha256:[a-f0-9]{64}$/.test(binding.artifactDigest),'FOCAL_PACKAGE_ID');
+  equal(binding.compositionTree,focal.compositionTree,'FOCAL_COMPOSITION_TREE');
+  const uri='gs://'+C.bucket+'/i66/packages/focal-hosting/'+focal.requestDigest+'/'+binding.sourceSha+'/'+binding.buildRunId+'/'+pkg.F.archive;
+  const [object,version,...extra]=String(binding.artifactId).split('#');
+  need(object===uri&&generation(version)&&extra.length===0,'FOCAL_PACKAGE_GENERATION');
+  return {uri,generation:version,sha256:binding.artifactDigest.slice(7)};
+}
 function validatePlan(p){
   equal(p.schema,C.planSchema,'PLAN_SCHEMA');equal(p.provider,C.provider,'PROVIDER');equal(p.scope,C.scope,'SCOPE');equal(p.mode,C.mode,'EXISTING_CHANNEL_MODE');
   equal([p.repository,p.branch,p.projectId,p.projectNumber,p.region,p.serviceAccount,p.bucket],[C.repository,C.branch,C.projectId,C.projectNumber,C.region,C.serviceAccount,C.bucket],'EXECUTION_BOUNDARY');
@@ -435,5 +449,5 @@ function main(args=process.argv.slice(2)){
   if(args[0]==='verify'&&args.length===4)return verify(json(args[1]),args[2],args[3]);
   throw new Error('I66_CLOUD_PREVIEW_USE_PREPARE_WORKER_OR_VERIFY');
 }
-module.exports={C,F,IMPORTS,objectRef,artifactIdentity,validatePlan,prefix,lockName,configFor,validateBuild,cloudIo,readPackage,safeUnpack,loadBundle,unpackHistorical,inventoryFromZip,readFiles,validateHistoricalMetadata,validateProof,assertOverwriteReady,reuseBasisRecord,providerReuseBasis,finalPredeployGate,deployExisting,validateExecutionLog,makePlan,worker,verify,main};
+module.exports={C,F,IMPORTS,objectRef,artifactIdentity,focalArtifactIdentity,validatePlan,prefix,lockName,configFor,validateBuild,cloudIo,readPackage,safeUnpack,loadBundle,unpackHistorical,inventoryFromZip,readFiles,validateHistoricalMetadata,validateProof,assertOverwriteReady,reuseBasisRecord,providerReuseBasis,finalPredeployGate,deployExisting,validateExecutionLog,makePlan,worker,verify,main};
 if(require.main===module)Promise.resolve().then(()=>main()).catch(e=>{console.error(String(e?.message||'I66_CLOUD_PREVIEW_HOLD'));process.exitCode=1;});

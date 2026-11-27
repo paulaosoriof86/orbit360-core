@@ -918,10 +918,21 @@ function assertActiveReleaseProgress(control,progress,transport){
     assert.equal(execution?.[k],head[k],'I66_ACTIVE_RELEASE_EXECUTION_DRIFT_'+k);
   assert.equal(execution.receiptPath,head.receiptPath);assert.equal(execution.liveRunId,head.liveCloneRunId||head.liveRunId);
   assert.equal(execution.fullI66ProductionAccepted,false);
-  const consumed=transport.lastConsumedFrontendRelease;assert.ok(consumed,'I66_ACTIVE_RELEASE_CONSUMPTION_MISSING');
+  const focal=head.focalHosting;
+  const consumed=focal?transport.lastConsumedFocalHostingRelease:transport.lastConsumedFrontendRelease;
+  assert.ok(consumed,'I66_ACTIVE_RELEASE_CONSUMPTION_MISSING');
   assert.equal(consumed.generation,head.generation);assert.equal(consumed.sourceSha,head.sourceSha);
   assert.equal(consumed.artifactDigest,head.artifactDigest);assert.equal(consumed.receiptPath,head.receiptPath);
-  assert.deepEqual(progress.consumedPreviewRequest,transport.lastConsumedFrontendPreviewRequest,'I66_ACTIVE_CONSUMED_PREVIEW_DRIFT');
+  if(focal){
+    assert.equal(head.scope,'FRONTEND_ONLY');
+    assert.equal(require('./gravicentra-i6-6-cloud-build-package.cjs').digest(consumed.request),focal.requestDigest,'FOCAL_CONSUMED_REQUEST_DRIFT');
+    assert.deepEqual(consumed.focalHosting,focal);
+    assert.deepEqual(progress.consumedFocalHostingRequest,consumed.request);
+    assert.deepEqual(execution.focalHosting,focal);
+    assert.deepEqual(execution.sourceQa,consumed.request.qa);
+  }else{
+    assert.deepEqual(progress.consumedPreviewRequest,transport.lastConsumedFrontendPreviewRequest,'I66_ACTIVE_CONSUMED_PREVIEW_DRIFT');
+  }
   if(progress.releaseScope==='FRONTEND_ONLY'){
     assert.equal(control.i66OperationalContinuation20261115.latestProvenLiveSourceScope,'FRONTEND_ONLY_EXACT_ARTIFACT_SIGNED_UI_PROOF',
       'I66_ACTIVE_FRONTEND_SOURCE_SCOPE_DRIFT');
@@ -1011,6 +1022,14 @@ function physicalGuard(control,state,transport,io){
   assert.equal(receipt.preview.artifactDigest,receipt.target.artifactDigest);assert.equal(receipt.ui.result,'PASS');
   require('./gravicentra-i66-frontend-promotion-transaction.cjs').verifyBytes(receipt.target,receipt.physical);
   const target=receipt.target,physical=transport.currentPhysicalHostingRelease;
+  for(const sealed of [head,physical]) assert.deepEqual(sealed.focalHosting,target.focalHosting,'FOCAL_HOSTING_PHYSICAL_BINDING');
+  if(target.focalHosting){
+    require('./gravicentra-i6-6-cloud-build-preview.cjs').focalArtifactIdentity(target);
+    assert.equal(head.compositionTree,target.focalHosting.compositionTree,'FOCAL_HOSTING_HEAD_TREE');
+    assert.equal(head.generation,target.focalHosting.generation,'FOCAL_HOSTING_HEAD_GENERATION');
+    assert.notEqual(receipt.scope,'COMPOSITE','FOCAL_HOSTING_SCOPE');
+    assert.equal(journal.request.scope,'FRONTEND_ONLY','FOCAL_HOSTING_SCOPE');
+  }
   assert.equal(receipt.generation,head.generation,'I66_RECEIPT_GENERATION');
   assert.ok(Number.isSafeInteger(target.files)&&target.files>0,'I66_SIGNED_FILE_COUNT_REQUIRED');
   assert.equal(head.hostedFilesEachOrigin,target.files,'I66_HEAD_FILE_COUNT_DRIFT');
@@ -1092,6 +1111,22 @@ function closeFiles(read,j,body){
     hostingVersion:t.hostingVersion,buildId:t.buildId,hostedFilesEachOrigin:t.files,previewUrl:t.previewUrl,buildRunId:t.buildRunId,
     rollback:j.request.previous.hostingVersion,receiptPath,receiptGitBlobSha:body.receipt.blob,receiptCommit:body.receipt.commit,
     fullI66ProductionAccepted:false,liveCloneRunId:body.receipt.runId};
+  const focal=t.focalHosting;
+  if(focal){
+    const authorized=transport.focalHostingRequest;
+    require('./gravicentra-i6-6-cloud-build-preview.cjs').focalArtifactIdentity(t);
+    assert.equal(j.request.scope,'FRONTEND_ONLY');
+    assert.equal(authorized?.scope,'HOSTING_ONLY');
+    assert.equal(focal.schema,authorized.schema);
+    assert.equal(require('./gravicentra-i6-6-cloud-build-package.cjs').digest(authorized),focal.requestDigest,'FOCAL_STALE_REQUEST');
+    assert.equal(n,transport.frontendReleaseSequence+1);
+    assert.equal(authorized.generation,n);assert.equal(focal.generation,n);
+    assert.equal(authorized.sourceSha,t.sourceSha);assert.equal(authorized.manifestBlob,t.manifestBlob);
+    assert.equal(authorized.previousReceiptBlob,cp.i66FrontendReleaseHead.receiptGitBlobSha);
+    assert.equal(authorized.protectedPreviewRequestVersion,transport.frontendPreviewRequest.version);
+    assert.equal(transport.forbidBackendFunctionDeploy,true);assert.equal(transport.forbidFirestoreRulesDataAuthWrites,true);
+    head.focalHosting=structuredClone(focal);head.compositionTree=focal.compositionTree;
+  }
   cp.i66FrontendReleaseHead=head;cp.currentExecutionDecisionPointer='i66FrontendReleaseHead';
   cp.i66OperationalContinuation20261115={...cp.i66OperationalContinuation20261115,latestProvenLiveSource:t.sourceSha,
     latestProvenLiveSourceScope:'FRONTEND_ONLY_EXACT_ARTIFACT_SIGNED_UI_PROOF',latestPhysicalFrontendLiveReceipt:receiptPath};
@@ -1101,6 +1136,7 @@ function closeFiles(read,j,body){
   transport.currentPhysicalHostingRelease={...(t.executionProvider===undefined?{}:{executionProvider:t.executionProvider}),sourceSha:t.sourceSha,buildId:t.buildId,artifactId:t.artifactId,artifactDigest:t.artifactDigest,
     previewRunId:t.buildRunId,signedPreviewRunId:t.previewUiRunId||null,liveCloneRunId:body.receipt.runId,liveHostingVersion:t.hostingVersion,
     readbackEachOrigin:t.files,receipt:receiptPath,backendFunctionsChanged:0,fullI66ProductionAccepted:false,status:head.status};
+  if(focal)transport.currentPhysicalHostingRelease.focalHosting=structuredClone(focal);
   cp.i66OperationalContinuation20261115.currentPhysicalHostingRelease=transport.currentPhysicalHostingRelease;
   cp.i66OperationalContinuation20261115.latestPhysicalFrontendLiveRunId=body.receipt.runId;
   transport.latestSignedPhysicalFrontendLivePointer20261122=head;
@@ -1114,20 +1150,28 @@ function closeFiles(read,j,body){
   progress.releasedFrontend={sourceSha:t.sourceSha,buildId:t.buildId,artifactId:t.artifactId,digest:t.artifactDigest,fileCount:t.files,
     hostingVersion:t.hostingVersion,liveReceipt:receiptPath};
   progress.notTouched.hostingProduction=false;progress.frontendReleaseGeneration=n;progress.frontendPromotionBusinessWrites=0;
-  transport.lastConsumedFrontendPreviewRequest=structuredClone(transport.frontendPreviewRequest);
-  transport.lastConsumedFrontendRelease={generation:n,previewRequestVersion:transport.frontendPreviewRequest?.version||null,
-    sourceSha:t.sourceSha,artifactDigest:t.artifactDigest,receiptPath};
+  if(focal){
+    transport.lastConsumedFocalHostingRelease={generation:n,focalHosting:structuredClone(focal),
+      request:structuredClone(transport.focalHostingRequest),sourceSha:t.sourceSha,artifactDigest:t.artifactDigest,receiptPath};
+  }else{
+    transport.lastConsumedFrontendPreviewRequest=structuredClone(transport.frontendPreviewRequest);
+    transport.lastConsumedFrontendRelease={generation:n,previewRequestVersion:transport.frontendPreviewRequest?.version||null,
+      sourceSha:t.sourceSha,artifactDigest:t.artifactDigest,receiptPath};
+  }
   if(j.request.scope!=='COMPOSITE'){
     progress.priorReleaseExecutionViews=[...(progress.priorReleaseExecutionViews||[]),{
       priorEvidencePath:oldEvidence,priorEvidenceGitBlobSha:c.currentEvidenceBlobSha,priorLiveSourceScope,view:priorReleaseView}];
-    progress.releaseScope='FRONTEND_ONLY';progress.consumedPreviewRequest=structuredClone(transport.frontendPreviewRequest);
+    progress.releaseScope='FRONTEND_ONLY';
+    if(focal)progress.consumedFocalHostingRequest=structuredClone(transport.focalHostingRequest);
+    else progress.consumedPreviewRequest=structuredClone(transport.frontendPreviewRequest);
     progress.releaseExecution={status:'FRONTEND_FOCAL_SIGNED_LIVE_ACCEPTED',scope:'FRONTEND_ONLY',scopeId:j.request.scopeId||null,
       sourceSha:t.sourceSha,buildId:t.buildId,buildRunId:t.buildRunId,artifactId:t.artifactId,artifactDigest:t.artifactDigest,
       artifactBuilt:true,previewSignedPass:true,livePromoted:true,signedPreviewRunId:t.previewUiRunId||null,
       liveRunId:body.receipt.runId,receiptPath,uiReceiptPath:genName(n,'LIVE_UI'),uiReceiptGitBlobSha:body.liveUi?.receiptBlob||null,
-      backendFunctionsChanged:0,businessWrites:0,sourceQaHead:transport.frontendPreviewRequest?.sourceQaHead||null,
+      backendFunctionsChanged:0,businessWrites:0,...(focal?{focalHosting:structuredClone(focal),
+        sourceQa:structuredClone(transport.focalHostingRequest.qa)}:{sourceQaHead:transport.frontendPreviewRequest?.sourceQaHead||null,
       sourceQaRunId:transport.frontendPreviewRequest?.sourceQaRunId||null,guardRunId:transport.frontendPreviewRequest?.guardRunId||null,
-      frontendPreviewRequestVersion:transport.frontendPreviewRequest?.version||null,fullI66ProductionAccepted:false};
+      frontendPreviewRequestVersion:transport.frontendPreviewRequest?.version||null}),fullI66ProductionAccepted:false};
     progress.currentExecutionMutations={scope:'THIS_FRONTEND_PROMOTION_ONLY',sourceQaAndProtectedWriterCodePublished:true,
       productSourceChanged:true,hostingDeploy:true,backendDeploy:false,businessWrites:false,
       priorFinancialWritesRetainedAt:oldEvidence};

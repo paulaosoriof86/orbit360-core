@@ -8,7 +8,10 @@ const version=x=>/^sites\/ays-orbit-360-lab\/versions\/[a-zA-Z0-9_-]+$/.test(x);
 function releaseBinding(release) {
   assert.ok(gitSha(release.sourceSha)&&gitSha(release.sourceTree)&&gitSha(release.manifestBlob)&&gitSha(release.compositionBlob),'RELEASE_SOURCE_BINDING');
   assert.ok(artDigest(release.artifactDigest),'RELEASE_ARTIFACT_BINDING');
-  if(release.executionProvider===undefined){
+  if(Object.hasOwn(release,'focalHosting')){
+    assert.equal(release.executionProvider,'CLOUD_BUILD','FOCAL_HOSTING_PROVIDER');
+    require('./gravicentra-i6-6-cloud-build-preview.cjs').focalArtifactIdentity(release);
+  }else if(release.executionProvider===undefined){
     assert.ok(Number.isSafeInteger(release.artifactId)&&release.artifactId>0,'RELEASE_ARTIFACT_BINDING');
   }else{
     assert.equal(release.executionProvider,'CLOUD_BUILD','RELEASE_EXECUTION_PROVIDER_UNKNOWN');
@@ -28,6 +31,12 @@ function validateRequest(request,control) {
   assert.ok(!control.consumed?.includes(request.approvalBlob),'RELEASE_AUTHORIZATION_CONSUMED');
   assert.deepEqual(request.previous,control.physical,'RELEASE_CONTROL_DRIFT');
   releaseBinding(request.target);
+  if(request.target.focalHosting){
+    assert.equal(request.scope,'FRONTEND_ONLY','FOCAL_HOSTING_SCOPE');
+    assert.equal(request.generation,request.target.focalHosting.generation,'FOCAL_HOSTING_GENERATION');
+    assert.equal(request.target.focalHosting.requestDigest,control.focalRequestDigest,'FOCAL_HOSTING_AUTHORITY');
+    assert.equal(request.target.compositionTree,control.focalCompositionTree,'FOCAL_HOSTING_COMPOSITION');
+  }
   assert.notEqual(request.target.sourceSha,request.previous.sourceSha,'RELEASE_NO_PRODUCT_CHANGE');
   assert.notEqual(request.target.artifactDigest,request.previous.artifactDigest,'RELEASE_SAME_ARTIFACT');
 }

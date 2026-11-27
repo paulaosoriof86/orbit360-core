@@ -809,3 +809,42 @@ test('an arbitrary retry marker or edited retry admission cannot hide the termin
   const tr=JSON.parse(g.files.get(P.transport));tr.scopedBackendPreviewI66.candidate.providerBinding.compensatedRetry.priorBuildId='aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
   g.files.set(P.transport,serial(tr));assert.throws(g.verify,/I66_TERMINAL_RETRY_PREDECESSOR_DRIFT/);
 });
+
+test('a focal Hosting close consumes its own signed request and preserves the composite request and provider claim',()=>{
+  const pkg=require('./gravicentra-i6-6-cloud-build-package.cjs');
+  const {validateRequest}=require('./gravicentra-i66-frontend-promotion-transaction.cjs');
+  const {execFileSync}=require('node:child_process');
+  const initial='fe50904f073dfcdb3fb4b6eb8e42acaf3e6b2944';
+  const readInitial=file=>JSON.parse(execFileSync('git',['show',initial+':'+file],{maxBuffer:16*1024*1024}));
+  const tr=readInitial(P.transport),req=tr.focalHostingRequest;
+  const original=readInitial(req.previousReceiptPath).target;
+  const id='10000000-0000-4000-8000-000000000001';
+  const focal={schema:req.schema,requestDigest:pkg.digest(req),generation:req.generation,compositionTree:'a'.repeat(40)};
+  const target={...original,executionProvider:'CLOUD_BUILD',focalHosting:focal,compositionTree:focal.compositionTree,manifestBlob:req.manifestBlob,sourceSha:req.sourceSha,
+    sourceTree:'b'.repeat(40),compositionBlob:'c'.repeat(40),artifactDigest:'sha256:'+'1'.repeat(64),buildId:'synthetic-focal',
+    buildRunId:id,hostingVersion:'sites/ays-orbit-360-lab/versions/fixture',artifactId:'gs://'+pkg.C.bucket+'/i66/packages/focal-hosting/'+
+      focal.requestDigest+'/'+req.sourceSha+'/'+id+'/'+pkg.F.archive+'#1'};
+  const request={schema:'GI_I66_FRONTEND_PROMOTION_V1',gate:'I6.6',scope:'FRONTEND_ONLY',generation:req.generation,
+    previousReceiptBlob:req.previousReceiptBlob,previous:original,target,guardBlob:'d'.repeat(40),approvalBlob:'e'.repeat(40)};
+  const control={generation:req.generation-1,guardBlob:request.guardBlob,receiptBlob:req.previousReceiptBlob,
+    physical:original,focalRequestDigest:focal.requestDigest,focalCompositionTree:focal.compositionTree};
+  validateRequest(request,control);
+  assert.throws(()=>validateRequest({...request,scope:'COMPOSITE'},control),/FOCAL_HOSTING_SCOPE/);
+  assert.throws(()=>validateRequest(request,{...control,focalRequestDigest:'2'.repeat(64)}),/FOCAL_HOSTING_AUTHORITY/);
+  assert.throws(()=>validateRequest({...request,target:{...target,artifactId:target.artifactId.replace('focal-hosting/'+focal.requestDigest,'request-35')}},control),
+    /FOCAL_PACKAGE_GENERATION/);
+  const journal={generation:req.generation,request};
+  const body={...journal,phase:'COMMITTED',receipt:{blob:'3'.repeat(40),commit:'4'.repeat(40),runId:id},liveUi:{receiptBlob:'5'.repeat(40)}};
+  const files=owner.closeFiles(readInitial,journal,body),next=files[P.transport],head=files[P.cp].i66FrontendReleaseHead;
+  for(const k of ['frontendPreviewRequest','lastConsumedFrontendPreviewRequest','lastConsumedFrontendRelease','operationalReleaseCandidate','scopedBackendPreviewI66','status']){
+    assert.equal(Object.hasOwn(next,k),Object.hasOwn(tr,k),k);
+    assert.deepEqual(next[k],tr[k],k);
+  }
+  assert.deepEqual(next.lastConsumedFocalHostingRelease.request,req);
+  assert.equal(head.compositionTree,focal.compositionTree);
+  const progress=files[genName(req.generation,'FOCAL_PROGRESS')];
+  assert.deepEqual(progress.releaseExecution.sourceQa,req.qa);
+  assert.equal(Object.hasOwn(progress.releaseExecution,'frontendPreviewRequestVersion'),false);
+  assert.throws(()=>owner.assertActiveReleaseProgress(files[P.cp],progress,{...next,lastConsumedFocalHostingRelease:undefined}),/CONSUMPTION_MISSING/);
+  assert.throws(()=>owner.closeFiles(file=>file===P.transport?{...tr,focalHostingRequest:{...req,generation:9}}:readInitial(file),journal,body),/FOCAL_STALE_REQUEST/);
+});
