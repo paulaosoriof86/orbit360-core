@@ -146,8 +146,14 @@ Orbit.modules.comparativo = (function () {
   }
 
   /* ---- score consultivo por criterio elegido ---- */
+  function draftMoney(value, currency) {
+    const amount = Number(value);
+    if (value == null || value === '' || !Number.isFinite(amount)) return '—';
+    const label = /^[A-Z]{3}$/.test(currency || '') ? currency : 'Moneda pendiente';
+    return label + ' ' + amount.toLocaleString('es-GT',{minimumFractionDigits:2,maximumFractionDigits:20});
+  }
   function ranking() {
-    if (!props.length) return [];
+    if (!props.length || !props[0].cur || props.some(p => p.cur !== props[0].cur)) return [];
     const totals = props.map(p => p.total || 0).filter(Boolean);
     const minT = Math.min(...totals), maxT = Math.max(...totals);
     const sumas = props.map(p => +p.sumaAsegurada || 0);
@@ -167,7 +173,7 @@ Orbit.modules.comparativo = (function () {
 
   function render(h) {
     host = h; init();
-    const cur = (props[0] || {}).cur || 'GTQ';
+    const cur = (props[0] || {}).cur || '';
     const rk = ranking();
     const winI = rk.length ? rk[0].i : -1;
     host.innerHTML = `<div class="page">
@@ -178,9 +184,9 @@ Orbit.modules.comparativo = (function () {
         <b style="font-family:var(--f-display);font-size:16px">${props.length ? '⚖️ ' + props.length + ' aseguradoras · ' + meta.ramo : '⚖️ Nuevo comparativo'}</b>
         <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost sm" id="cp-add">➕ Propuesta manual</button>${props.length ? `<button class="btn ghost sm" id="cp-save">💾 Guardar</button><button class="btn ghost sm" id="cp-send">Borrador consultivo</button><button class="btn primary sm" id="cp-print">🖨 Imprimir</button>` : ''}</div>
       </div>
-      <div id="cp-out" class="cz-cards">${props.map((p, i) => card(p, i === winI, i, cur)).join('') || '<div class="muted" style="padding:30px 0;text-align:center;grid-column:1/-1">Sin propuestas todavía.</div>'}</div>
-      ${props.length > 1 ? tabla(cur, rk) : ''}
-      ${props.length > 1 ? recomendacion(rk, cur) : ''}
+      <div id="cp-out" class="cz-cards">${props.map((p, i) => card(p, i === winI, i, p.cur)).join('') || '<div class="muted" style="padding:30px 0;text-align:center;grid-column:1/-1">Sin propuestas todavía.</div>'}</div>
+      ${props.length > 1 && rk.length ? tabla(cur, rk) : ''}
+      ${props.length > 1 && rk.length ? recomendacion(rk, cur) : ''}
     </div>`;
     host.querySelector('#cp-pdf').addEventListener('click', cargarPDF);
     host.querySelector('#cp-hist-b').addEventListener('click', verHist);
@@ -197,9 +203,9 @@ Orbit.modules.comparativo = (function () {
     return `<div class="cz-card ${win ? 'win' : ''}">
       ${win ? '<span class="cz-badge">🏆 Recomendada</span>' : ''}
       <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">${logoDe(p)}<b style="font-family:var(--f-display);flex:1;line-height:1.15">${U.esc(p.nombre)}</b>${p.origen === 'pdf' ? '<span class="badge info" style="font-size:9px">📄 PDF</span>' : ''}<button class="asg-del" data-edit="${i}" title="Editar valores">✏</button><button class="asg-del" data-del="${i}">✕</button></div>
-      <div class="cz-total">${U.money(p.total || 0, cur)}</div>
-      <div class="muted" style="font-size:11.5px">💵 prima total${p.fracc > 1 ? ' · ' + U.money((p.total || 0) / p.fracc, cur) + '/pago' : ''}</div>
-      ${p.sumaAsegurada ? `<div class="muted" style="font-size:11.5px;margin-top:3px">💰 suma ${U.money(p.sumaAsegurada, cur)}</div>` : ''}
+      <div class="cz-total">${draftMoney(p.total || 0, cur)}</div>
+      <div class="muted" style="font-size:11.5px">💵 prima total${p.fracc > 1 ? ' · ' + draftMoney((p.total || 0) / p.fracc, cur) + '/pago' : ''}</div>
+      ${p.sumaAsegurada ? `<div class="muted" style="font-size:11.5px;margin-top:3px">💰 suma ${draftMoney(p.sumaAsegurada, cur)}</div>` : ''}
       ${p.origen === 'pdf' ? '<div style="font-size:11px;color:var(--warn);margin-top:4px">⚠ revisar extracción</div>' : ''}
     </div>`;
   }
@@ -221,11 +227,12 @@ Orbit.modules.comparativo = (function () {
       + '<div style="padding:16px 18px;display:grid;gap:10px">'
       + (p.origen === 'pdf' ? '<div class="cfg-note">📄 Valores extraídos del PDF — verifica y corrige antes de comparar.</div>' : '')
       + '<label class="ce-l">Aseguradora / propuesta<input id="pe-nom" class="o-sel" value="' + U.esc(p.nombre) + '"></label>'
-      + '<div class="cgrid"><label class="ce-l">Prima neta<input id="pe-neta" type="number" class="o-sel" value="' + Math.round(p.neta || 0) + '"></label>'
-      + '<label class="ce-l">IVA<input id="pe-iva" type="number" class="o-sel" value="' + Math.round(p.iva || 0) + '"></label>'
-      + '<label class="ce-l">Prima total<input id="pe-total" type="number" class="o-sel" value="' + Math.round(p.total || 0) + '"></label>'
-      + '<label class="ce-l">Pagos<input id="pe-fracc" type="number" class="o-sel" value="' + (p.fracc || 1) + '"></label>'
-      + '<label class="ce-l">💰 Suma asegurada<input id="pe-suma" type="number" class="o-sel" value="' + (p.sumaAsegurada || 0) + '"></label>'
+      + '<label class="ce-l">Moneda del documento<input id="pe-currency" class="o-sel" maxlength="3" placeholder="GTQ, COP, USD…" value="' + U.esc(p.cur || '') + '"></label>'
+      + '<div class="cgrid"><label class="ce-l">Prima neta<input id="pe-neta" type="number" step="any" class="o-sel" value="' + Number(p.neta || 0) + '"></label>'
+      + '<label class="ce-l">IVA<input id="pe-iva" type="number" step="any" class="o-sel" value="' + Number(p.iva || 0) + '"></label>'
+      + '<label class="ce-l">Prima total<input id="pe-total" type="number" step="any" class="o-sel" value="' + Number(p.total || 0) + '"></label>'
+      + '<label class="ce-l">Pagos<input id="pe-fracc" type="number" step="any" class="o-sel" value="' + (p.fracc || 1) + '"></label>'
+      + '<label class="ce-l">💰 Suma asegurada<input id="pe-suma" type="number" step="any" class="o-sel" value="' + (p.sumaAsegurada || 0) + '"></label>'
       + '<label class="ce-l">📉 Deducible<input id="pe-ded" class="o-sel" value="' + U.esc(p.deducible || '') + '" placeholder="1% · Q1,000…"></label></div>'
       + '<div class="asg-sec-t" style="margin-top:6px">Coberturas comparables (' + meta.ramo + ')</div>'
       + '<div class="cgrid">' + cobFields + '</div>'
@@ -237,6 +244,9 @@ Orbit.modules.comparativo = (function () {
     back.querySelector('#pe-x').onclick = close; back.querySelector('#pe-cancel').onclick = close;
     back.querySelector('#pe-ok').onclick = () => {
       p.nombre = back.querySelector('#pe-nom').value || p.nombre;
+      const currency = back.querySelector('#pe-currency').value.trim().toUpperCase();
+      if (currency && !/^[A-Z]{3}$/.test(currency)) return Orbit.ui.toast('Indica el código de moneda de tres letras.');
+      p.cur = currency;
       p.neta = +back.querySelector('#pe-neta').value || 0;
       p.iva = +back.querySelector('#pe-iva').value || 0;
       p.total = +back.querySelector('#pe-total').value || (p.neta + p.iva);
@@ -248,11 +258,11 @@ Orbit.modules.comparativo = (function () {
     };
   }
   function celdaCob(p, c, cur, best) {
-    if (c.k === 'sumaAsegurada') return p.sumaAsegurada ? U.money(p.sumaAsegurada, cur) : '—';
+    if (c.k === 'sumaAsegurada') return p.sumaAsegurada ? draftMoney(p.sumaAsegurada, cur) : '—';
     if (c.k === 'deducible') return U.esc(p.deducible || '—');
     const v = p.cob && p.cob[c.k];
     if (c.tipo === 'bool') return v ? '<span style="color:var(--ok);font-weight:700">✔ Sí</span>' : '<span class="muted">— No</span>';
-    if (c.tipo === 'money') return v ? U.money(v, cur) : '—';
+    if (c.tipo === 'money') return v ? draftMoney(v, cur) : '—';
     return v ? U.esc(v) : '—';
   }
   function tabla(cur, rk) {
@@ -263,10 +273,10 @@ Orbit.modules.comparativo = (function () {
     // mejor por criterio money (max)
     const bestBy = {};
     crits.forEach(c => { if (c.tipo === 'money' || c.k === 'sumaAsegurada') { let bv = -1, bi = -1; ordered.forEach((p, j) => { const v = c.k === 'sumaAsegurada' ? (+p.sumaAsegurada || 0) : (p.cob && +p.cob[c.k] || 0); if (v > bv) { bv = v; bi = j; } }); bestBy[c.k] = bv > 0 ? bi : -1; } });
-    const filaPrima = `<tr style="background:var(--surface)"><td style="font-weight:700">💵 Prima total</td>${ordered.map(p => `<td class="num" style="font-weight:800;color:${p.total === minT ? 'var(--ok)' : 'var(--ink)'}">${U.money(p.total || 0, cur)}${p.total === minT ? ' 🏆' : ''}</td>`).join('')}</tr>`;
-    const filaPago = `<tr><td>📆 Forma de pago</td>${ordered.map(p => `<td class="num">${p.fracc > 1 ? p.fracc + ' cuotas · ' + U.money((p.total || 0) / p.fracc, cur) : 'Contado'}</td>`).join('')}</tr>`;
-    const filaNeta = `<tr><td>Prima neta</td>${ordered.map(p => `<td class="num">${U.money(p.neta || 0, cur)}</td>`).join('')}</tr>`;
-    const filaIva = `<tr><td>IVA / recargos</td>${ordered.map(p => `<td class="num">${U.money(p.iva || 0, cur)}</td>`).join('')}</tr>`;
+    const filaPrima = `<tr style="background:var(--surface)"><td style="font-weight:700">💵 Prima total</td>${ordered.map(p => `<td class="num" style="font-weight:800;color:${p.total === minT ? 'var(--ok)' : 'var(--ink)'}">${draftMoney(p.total || 0, cur)}${p.total === minT ? ' 🏆' : ''}</td>`).join('')}</tr>`;
+    const filaPago = `<tr><td>📆 Forma de pago</td>${ordered.map(p => `<td class="num">${p.fracc > 1 ? p.fracc + ' cuotas · ' + draftMoney((p.total || 0) / p.fracc, cur) : 'Contado'}</td>`).join('')}</tr>`;
+    const filaNeta = `<tr><td>Prima neta</td>${ordered.map(p => `<td class="num">${draftMoney(p.neta, cur)}</td>`).join('')}</tr>`;
+    const filaIva = `<tr><td>IVA / recargos</td>${ordered.map(p => `<td class="num">${draftMoney(p.iva, cur)}</td>`).join('')}</tr>`;
     const filasCob = crits.map(c => `<tr><td>${c.t}</td>${ordered.map((p, j) => `<td class="num" style="${bestBy[c.k] === j ? 'color:var(--ok);font-weight:700' : ''}">${celdaCob(p, c, cur, bestBy[c.k] === j)}</td>`).join('')}</tr>`).join('');
     return `<div class="card" style="overflow:hidden;margin-top:16px">
       <div style="padding:12px 16px;border-bottom:1px solid var(--line)"><b style="font-family:var(--f-display);font-size:14px">⚖️ Comparativo de aseguradoras · ${meta.ramo}</b></div>
@@ -281,9 +291,9 @@ Orbit.modules.comparativo = (function () {
     const esMasBarata = p.total === minT;
     const critLabel = { precio: '💵 mejor precio', cobertura: '🛡️ mejor cobertura', equilibrio: '⚖️ mejor equilibrio precio/cobertura' }[meta.criterio];
     let texto;
-    if (meta.criterio === 'precio') texto = `Por <b>precio</b>, <b>${U.esc(p.nombre)}</b> es la más económica (${U.money(p.total, cur)})${second ? `, ${Math.round((1 - top.p.total / second.p.total) * 100)}% bajo la siguiente` : ''}. Verificá que las coberturas cubran las necesidades del cliente antes de cerrar.`;
-    else if (meta.criterio === 'cobertura') texto = `Por <b>cobertura</b>, <b>${U.esc(p.nombre)}</b> ofrece la protección más amplia${p.sumaAsegurada ? ` (suma ${U.money(p.sumaAsegurada, cur)})` : ''}. ${esMasBarata ? 'Y además es la más económica — opción clara.' : 'Tiene una prima mayor, justificable por el alcance.'}`;
-    else texto = `Equilibrando precio y cobertura, <b>${U.esc(p.nombre)}</b> es la opción más sólida: ${esMasBarata ? 'precio competitivo' : 'prima razonable'} con buena protección${p.sumaAsegurada ? ` (suma ${U.money(p.sumaAsegurada, cur)})` : ''}. ${second ? `Alternativa: ${U.esc(second.p.nombre)}.` : ''}`;
+    if (meta.criterio === 'precio') texto = `Por <b>precio</b>, <b>${U.esc(p.nombre)}</b> es la más económica (${draftMoney(p.total, cur)})${second ? `, ${Math.round((1 - top.p.total / second.p.total) * 100)}% bajo la siguiente` : ''}. Verificá que las coberturas cubran las necesidades del cliente antes de cerrar.`;
+    else if (meta.criterio === 'cobertura') texto = `Por <b>cobertura</b>, <b>${U.esc(p.nombre)}</b> ofrece la protección más amplia${p.sumaAsegurada ? ` (suma ${draftMoney(p.sumaAsegurada, cur)})` : ''}. ${esMasBarata ? 'Y además es la más económica — opción clara.' : 'Tiene una prima mayor, justificable por el alcance.'}`;
+    else texto = `Equilibrando precio y cobertura, <b>${U.esc(p.nombre)}</b> es la opción más sólida: ${esMasBarata ? 'precio competitivo' : 'prima razonable'} con buena protección${p.sumaAsegurada ? ` (suma ${draftMoney(p.sumaAsegurada, cur)})` : ''}. ${second ? `Alternativa: ${U.esc(second.p.nombre)}.` : ''}`;
     return `<div class="card pad" style="margin-top:14px;border-left:3px solid var(--red)">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
         <b style="font-family:var(--f-display);font-size:14px">🧠 Recomendación consultiva</b>
@@ -298,7 +308,7 @@ Orbit.modules.comparativo = (function () {
   async function manual() {
     const nombre = await Orbit.ui.prompt('Nombre de la aseguradora / propuesta:', { title: 'Propuesta manual' }); if (!nombre) return;
     const total = +(await Orbit.ui.prompt('Prima total:', { title: 'Prima total', value: '0' })) || 0;
-    props.push({ nombre, color: '#6b7280', total, neta: total / 1.12, iva: total - total / 1.12, cur: (props[0] || {}).cur || 'GTQ', fracc: (props[0] || {}).fracc || 1, ramo: meta.ramo, sumaAsegurada: 0, deducible: '', cob: {}, origen: 'manual' }); render(host);
+    props.push({ nombre, color: '#6b7280', total, neta: null, iva: null, cur: '', fracc: (props[0] || {}).fracc || 1, ramo: meta.ramo, sumaAsegurada: 0, deducible: '', cob: {}, origen: 'manual' }); render(host);
   }
   function cargarPDF() {
     const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/pdf,image/*'; inp.multiple = true;
@@ -313,7 +323,7 @@ Orbit.modules.comparativo = (function () {
             // 1) intentar multi-aseguradora (PDF comparativo con varias)
             const multi = (Orbit.ia.parseMulti ? Orbit.ia.parseMulti(txt) : []);
             if (multi.length >= 2) {
-              multi.forEach(d => props.push({ nombre: d.nombre, color: '#1f3a5f', total: d.total, neta: d.neta, iva: d.iva, cur: (props[0] || {}).cur || 'GTQ', fracc: 1, ramo: meta.ramo, sumaAsegurada: d.sumaAsegurada || 0, deducible: d.deducible || '', cob: d.cob || {}, origen: 'pdf', archivo: f.name, via: 'pdf-multi', plan: d.plan }));
+              multi.forEach(d => props.push({ nombre: d.nombre, color: '#1f3a5f', total: d.total, neta: d.neta, iva: d.iva, cur: String(d.moneda || d.cur || '').trim().toUpperCase(), fracc: 1, ramo: meta.ramo, sumaAsegurada: d.sumaAsegurada || 0, deducible: d.deducible || '', cob: d.cob || {}, origen: 'pdf', archivo: f.name, via: 'pdf-multi', plan: d.plan }));
               usados = true;
             }
           }
@@ -323,9 +333,9 @@ Orbit.modules.comparativo = (function () {
         try { if (Orbit.ia && Orbit.ia.extraerPDF) d = await Orbit.ia.extraerPDF(f); } catch (x) { d = null; }
         if (d && (d.total || d.neta)) {
           const total = d.total || (d.neta + (d.iva || 0));
-          props.push({ nombre: d.nombre || f.name.replace(/\.(pdf|png|jpe?g)$/i, ''), color: '#1f3a5f', total: Math.round(total), neta: Math.round(d.neta || total / 1.12), iva: Math.round(d.iva || total - total / 1.12), cur: (props[0] || {}).cur || 'GTQ', fracc: d.fracc || 1, ramo: meta.ramo, sumaAsegurada: Math.round(d.sumaAsegurada || 0), deducible: d.deducible || '', cob: d.cob || {}, origen: 'pdf', archivo: f.name, via: d._via || 'local' });
+          props.push({ nombre: d.nombre || f.name.replace(/\.(pdf|png|jpe?g)$/i, ''), color: '#1f3a5f', total, neta: d.neta ?? null, iva: d.iva ?? null, cur: String(d.moneda || d.cur || '').trim().toUpperCase(), fracc: d.fracc || 1, ramo: meta.ramo, sumaAsegurada: Math.round(d.sumaAsegurada || 0), deducible: d.deducible || '', cob: d.cob || {}, origen: 'pdf', archivo: f.name, via: d._via || 'local' });
         } else {
-          props.push({ nombre: f.name.replace(/\.(pdf|png|jpe?g)$/i, '').replace(/[_-]+/g, ' '), color: '#6b7280', total: 0, neta: 0, iva: 0, cur: (props[0] || {}).cur || 'GTQ', fracc: 1, ramo: meta.ramo, sumaAsegurada: 0, deducible: '', cob: {}, origen: 'pdf', archivo: f.name, via: 'manual' });
+          props.push({ nombre: f.name.replace(/\.(pdf|png|jpe?g)$/i, '').replace(/[_-]+/g, ' '), color: '#6b7280', total: 0, neta: 0, iva: 0, cur: '', fracc: 1, ramo: meta.ramo, sumaAsegurada: 0, deducible: '', cob: {}, origen: 'pdf', archivo: f.name, via: 'manual' });
         }
       }
       t.remove(); render(host);
@@ -337,7 +347,7 @@ Orbit.modules.comparativo = (function () {
   function guardarHist() {
     if (!props.length) return;
     const h = Orbit._compHist = Orbit._compHist || [];
-    h.unshift({ id: 'cmp' + Date.now(), fecha: Orbit.ui.today(), ramo: meta.ramo, cliente: meta.cliente || 'Prospecto', n: props.length, mejor: (ranking()[0] || {}).p ? ranking()[0].p.nombre : props[0].nombre, criterio: meta.criterio, props: JSON.parse(JSON.stringify(props)), meta: JSON.parse(JSON.stringify(meta)) });
+    h.unshift({ id: 'cmp' + Date.now(), fecha: Orbit.ui.today(), ramo: meta.ramo, cliente: meta.cliente || 'Prospecto', n: props.length, mejor: (ranking()[0] || {}).p ? ranking()[0].p.nombre : '', criterio: meta.criterio, props: JSON.parse(JSON.stringify(props)), meta: JSON.parse(JSON.stringify(meta)) });
     const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = '✓ Comparativo guardado en el historial'; document.body.appendChild(t); setTimeout(() => t.remove(), 2600);
     render(host);
   }
@@ -357,8 +367,8 @@ Orbit.modules.comparativo = (function () {
     back.querySelectorAll('[data-load]').forEach(b => b.addEventListener('click', () => { const c = (Orbit._compHist || []).find(x => x.id === b.dataset.load); if (c) { props = JSON.parse(JSON.stringify(c.props)); if (c.meta) meta = JSON.parse(JSON.stringify(c.meta)); close(); render(host); } }));
   }
   function imprimir() {
-    const cur = (props[0] || {}).cur || 'GTQ', rk = ranking(), minT = Math.min(...props.map(p => p.total || 1e15));
-    const ordered = rk.map(r => props[r.i]);
+    const cur = (props[0] || {}).cur || '', rk = ranking(), minT = Math.min(...props.map(p => p.total || 1e15));
+    const ordered = rk.length ? rk.map(r => props[r.i]) : props;
     const crits = criteriosDe();
     const landscape = props.length >= 3;
     const top = rk[0] ? rk[0].p : null;
@@ -369,7 +379,7 @@ Orbit.modules.comparativo = (function () {
     const tenant = (Orbit.tenant && Orbit.tenant.nombre) || 'Orbit 360';
     const tlogo = (Orbit.tenant && Orbit.tenant.logo) || '';
     const logoImg = (p) => { const a = S().all('aseguradoras').find(x => x.nombre && p.nombre && (x.nombre.toLowerCase() === p.nombre.toLowerCase() || p.nombre.toLowerCase().indexOf(x.nombre.toLowerCase()) >= 0)); if (a && a.logo) return `<img src="${a.logo}" style="height:26px;object-fit:contain">`; const c = (a && a.color) || p.color || brand; const ini = (p.nombre || '?').split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase(); return `<span style="display:inline-grid;place-items:center;width:26px;height:26px;border-radius:6px;background:${c};color:#fff;font-weight:800;font-size:11px">${ini}</span>`; };
-    const cobRows = crits.map(c => `<tr><td>${c.t.replace(/^[^ ]+ /, '')}</td>${ordered.map(p => `<td class="n">${(function () { if (c.k === 'sumaAsegurada') return p.sumaAsegurada ? U.money(p.sumaAsegurada, cur) : '—'; if (c.k === 'deducible') return p.deducible || '—'; const v = p.cob && p.cob[c.k]; if (c.tipo === 'bool') return v ? 'Sí' : 'No'; if (c.tipo === 'money') return v ? U.money(v, cur) : '—'; return v || '—'; })()}</td>`).join('')}</tr>`).join('');
+    const cobRows = crits.map(c => `<tr><td>${c.t.replace(/^[^ ]+ /, '')}</td>${ordered.map(p => `<td class="n">${(function () { if (c.k === 'sumaAsegurada') return p.sumaAsegurada ? draftMoney(p.sumaAsegurada, p.cur) : '—'; if (c.k === 'deducible') return p.deducible || '—'; const v = p.cob && p.cob[c.k]; if (c.tipo === 'bool') return v ? 'Sí' : 'No'; if (c.tipo === 'money') return v ? draftMoney(v, p.cur) : '—'; return v || '—'; })()}</td>`).join('')}</tr>`).join('');
     const w = window.open('', '_blank'); if (!w) return;
     w.document.write(`<html><head><title>Comparativo de seguros · ${tenant}</title><style>@page{size:A4 ${landscape ? 'landscape' : 'portrait'};margin:11mm}body{font-family:system-ui,sans-serif;color:${ink}}
       .hd{display:flex;align-items:center;gap:12px;border-bottom:3px solid ${brand};padding-bottom:10px;margin-bottom:6px}
@@ -384,10 +394,10 @@ Orbit.modules.comparativo = (function () {
       <div class="sub">${U.esc(meta.cliente || 'Prospecto')}${meta.marca ? ' · ' + meta.marca + ' ' + meta.linea + (meta.modelo ? ' ' + meta.modelo : '') + ' ' + meta.anio : ''}</div>
       <table><thead><tr><th>Concepto</th>${ordered.map(p => `<th class="n">${logoImg(p)}<br>${U.esc(p.nombre)}</th>`).join('')}</tr></thead>
       <tbody>
-        <tr class="win"><td><b>Prima total</b></td>${ordered.map(p => `<td class="n"><b>${U.money(p.total || 0, cur)}</b>${p.total === minT ? ' 🏆' : ''}</td>`).join('')}</tr>
-        <tr><td>Forma de pago</td>${ordered.map(p => `<td class="n">${p.fracc > 1 ? p.fracc + ' cuotas · ' + U.money((p.total || 0) / p.fracc, cur) : 'Contado'}</td>`).join('')}</tr>
-        <tr><td>Prima neta</td>${ordered.map(p => `<td class="n">${U.money(p.neta || 0, cur)}</td>`).join('')}</tr>
-        <tr><td>IVA / recargos</td>${ordered.map(p => `<td class="n">${U.money(p.iva || 0, cur)}</td>`).join('')}</tr>
+        <tr class="win"><td><b>Prima total</b></td>${ordered.map(p => `<td class="n"><b>${draftMoney(p.total || 0, p.cur)}</b>${rk.length && p.total === minT ? ' 🏆' : ''}</td>`).join('')}</tr>
+        <tr><td>Forma de pago</td>${ordered.map(p => `<td class="n">${p.fracc > 1 ? p.fracc + ' cuotas · ' + draftMoney((p.total || 0) / p.fracc, p.cur) : 'Contado'}</td>`).join('')}</tr>
+        <tr><td>Prima neta</td>${ordered.map(p => `<td class="n">${draftMoney(p.neta, p.cur)}</td>`).join('')}</tr>
+        <tr><td>IVA / recargos</td>${ordered.map(p => `<td class="n">${draftMoney(p.iva, p.cur)}</td>`).join('')}</tr>
         <tr class="sec"><td colspan="${ordered.length + 1}">🛡️ Coberturas</td></tr>
         ${cobRows}
       </tbody></table>
@@ -410,7 +420,7 @@ Orbit.modules.comparativo = (function () {
       ofertas: props.map((p,i)=>({
         indice:i,nombre:String(p.nombre||p.aseguradora||'').trim(),
         ramo:String(p.ramo||meta.ramo||'').trim(),producto:String(p.producto||meta.sub||'').trim(),
-        cur:String(p.cur|| (meta.pais==='CO'?'COP':'GTQ')).trim(),
+        cur:String(p.cur || '').trim(),
         neta:Number(p.neta)||0,total:Number(p.total)||0,iva:Number(p.iva)||0,
         gastosEm:Number(p.gastosEm)||0,recargo:Number(p.recargo)||0,
         fracc:Number(p.fracc)||1,sourceRef:String(p.sourceRef||'').trim(),

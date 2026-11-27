@@ -21,7 +21,7 @@ Orbit.modules = Orbit.modules || {};
   function esc(v) { return U && U.esc ? U.esc(String(v == null ? '' : v)) : String(v || ''); }
   function clean(v) { return String(v == null ? '' : v).trim(); }
   function num(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
-  function money(v, cur) { return Q.communicationMoney(num(v),cur); }
+  function money(v, cur) { return Q.communicationMoney ? Q.communicationMoney(num(v),cur) : '—'; }
   function query() { const hash = String(location.hash || ''); return new URLSearchParams(hash.includes('?') ? hash.slice(hash.indexOf('?') + 1) : ''); }
   function quote(id) { return id ? S().get('cotizaciones', id) : null; }
   function comparison(id) { return id ? S().get('comparativos', id) : null; }
@@ -114,8 +114,10 @@ Orbit.modules = Orbit.modules || {};
   }
   async function prepare() {
     const cmp = current(); if (!cmp || !cmp.clienteId) return toast('Asocia el comparativo a un cliente existente.');
+    if (!Orbit.notify || Orbit.notify.revalidaPropuesta !== true || typeof Q.reviewCommunication !== 'function')
+      return toast('Recarga la aplicación para revisar el destinatario y el contenido.');
     const prepared = await Q.prepareCommunication(cmp.id,'auto',cmp.clienteId);
-    if (!prepared.ok) return toast('Revisa el destinatario y las propuestas: ' + prepared.errors.join(', '));
+    if (!prepared.ok || typeof prepared.autorizar !== 'function') return toast('Revisa el destinatario y las propuestas: ' + (prepared.errors || []).join(', '));
     Orbit.notify.pedir(cmp.clienteId,{tipo:'Comparativo preparado',icon:'⚖️',asunto:prepared.subject,mensaje:prepared.message,autorizar:prepared.autorizar});
   }
   async function accept(quoteId) {

@@ -119,3 +119,31 @@ test('el selector y el compositor de correo validan nuevamente antes de registra
   const reopened=openDraft();reopened.querySelector('#rd-para').value='qa@example.invalid';reopened.querySelector('#rd-asunto').value=opts.asunto;
   f.state.role='Consulta';reopened.querySelector('#dr-ok').listeners.click();assert.equal(requests.length,1);
 });
+test('una vista antigua no puede entregar propuestas con el transporte nuevo sin revisión',()=>{
+  const doc=syntheticDom();const orbit={store:{get(){throw Error('destinatario sin revisión');}},ui:{toast(){}},modules:{}};
+  vm.runInNewContext(source('core/notify.js'),{Orbit:orbit,window:{Orbit:orbit},document:doc});
+  for(const tipo of ['Comparativo enviado','Comparativo preparado','Cotización enviada','Cotización preparada']){
+    assert.equal(orbit.notify.pedir('c',{tipo}),null);assert.equal(orbit.notify.cliente('c',{tipo}),null);
+  }
+});
+test('compositor antiguo no recibe una propuesta aunque el selector tenga su revisión',async()=>{
+  const f=await fixture(),r=await f.prepare(),mails=[];
+  const orbit={store:f.store,ui:{toast(){}},modules:{correo:{redactar:m=>mails.push(m)}}};
+  vm.runInNewContext(source('core/notify.js'),{Orbit:orbit,window:{Orbit:orbit},document:syntheticDom()});
+  assert.equal(orbit.notify.cliente('c',{tipo:'Comparativo preparado',canal:'correo',autorizar:r.autorizar,
+    mensaje:r.message,asunto:r.subject}),null);assert.equal(mails.length,0);
+});
+test('el borrador guarda centavos, mantiene monedas distintas y omite la recomendación de precio',async()=>{
+  const doc=syntheticDom(),host=doc.createElement('main'),notices=[],answer=['Propuesta ficticia','101.07'];
+  const orbit={modules:{},kit:{banner:o=>o.actions},ui:{esc:String,today:()=> '2026-11-27',prompt:async()=>answer.shift(),toast(){}},
+    _cots:[{nombre:'Propuesta A',total:100.02,cur:'GTQ'},{nombre:'Propuesta B',total:101.01,cur:'USD'}],
+    store:{all:c=>{assert.notEqual(c,'clientes');return [];}},notify:{pedir:()=>notices.push(true)}};
+  vm.runInNewContext(source('modules/comparativo.js'),{Orbit:orbit,window:{Orbit:orbit},document:doc,setTimeout(){}});
+  const mod=orbit.modules.comparativo;mod.render(host);
+  assert.match(host.innerHTML,/GTQ 100\.02/);assert.match(host.innerHTML,/USD 101\.01/);
+  assert.doesNotMatch(host.innerHTML,/class="cz-badge"/);
+  await host.querySelector('#cp-add').listeners.click();host.querySelector('#cp-save').listeners.click();
+  const history=orbit._compHist[0];assert.equal(history.mejor,'');assert.equal(history.props[2].total,101.07);
+  assert.equal(history.props[2].cur,'');assert.equal(mod.acceptanceSnapshot().ofertas[2].cur,'');
+  assert.match(host.innerHTML,/Moneda pendiente 101\.07/);host.querySelector('#cp-send').listeners.click();assert.equal(notices.length,0);
+});

@@ -21,7 +21,7 @@ Orbit.modules = Orbit.modules || {};
   function num(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
   function clone(v) { try { return JSON.parse(JSON.stringify(v)); } catch (e) { return Object.assign({}, v || {}); } }
   function toast(v) { try { U.toast(v); } catch (e) {} }
-  function money(v, cur) { return U && U.money ? U.money(v, cur) : cur + ' ' + num(v).toLocaleString('es-GT'); }
+  function money(v, cur) { return Q.communicationMoney ? Q.communicationMoney(num(v),cur) : '—'; }
   function currency(country) { return country === 'CO' ? 'COP' : 'GTQ'; }
   function read(host, selector) { const el = host && host.querySelector(selector); return el ? clean(el.value) : ''; }
   function insurer(id) { return id ? S().get('aseguradoras', id) : null; }
@@ -214,8 +214,10 @@ Orbit.modules = Orbit.modules || {};
   async function prepare(id) {
     const q = quote(id); if (!valid(q)) return toast('Valida la propuesta antes de prepararla para el cliente.');
     if (!q.clienteId) return toast('Asocia la propuesta a un cliente existente.');
+    if (!Orbit.notify || Orbit.notify.revalidaPropuesta !== true || typeof Q.reviewCommunication !== 'function')
+      return toast('Recarga la aplicación para revisar el destinatario y el contenido.');
     const prepared = await Q.prepareCommunication(q.id,'auto',q.clienteId,'cotizaciones');
-    if (!prepared.ok) return toast('Revisa el destinatario y la propuesta: ' + prepared.errors.join(', '));
+    if (!prepared.ok || typeof prepared.autorizar !== 'function') return toast('Revisa el destinatario y la propuesta: ' + (prepared.errors || []).join(', '));
     Orbit.notify.pedir(q.clienteId,{tipo:'Cotización preparada',icon:'🧮',asunto:prepared.subject,mensaje:prepared.message,autorizar:prepared.autorizar});
   }
   function transfer() {

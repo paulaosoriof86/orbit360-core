@@ -1,0 +1,27 @@
+{
+  "gate": "I6.6",
+  "changeId": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127_CONTENCION",
+  "unit": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127",
+  "stage": "SOURCE",
+  "predecessor": "6a76d8b2f48acc795933966a9989d0cdb56f3ee2",
+  "priorReceipt": "artifacts/orbit360-recovery/release-control/I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_SOURCE_20261127.json",
+  "sourceQa": {
+    "focused": 27,
+    "failures": 0,
+    "regressionContracts": 2,
+    "externalCommunications": 0
+  },
+  "predecessorProvider": {
+    "id": "a6ff6ee0-d867-4a5e-9bba-0bc52236f646",
+    "scope": "SOURCE_QA_AND_GUARD_VERIFIED_PREVIEW_LIVE_PENDING",
+    "manifestGeneration": "1795764053228793",
+    "manifestSha256": "bb888699915027f3d16781c2aca14859888824191d383a953015e3144e70576a"
+  },
+  "observedServingCut": {
+    "hosting": "332999a55b189108",
+    "role": "Direccion",
+    "independentRouteVisibleAfterReload": true,
+    "officialRecipientPickerExecuted": false
+  },
+  "newRuntimeAcceptance": false
+}

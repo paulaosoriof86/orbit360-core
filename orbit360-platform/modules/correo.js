@@ -188,5 +188,5 @@ Orbit.modules.correo = (function () {
 
   function toast(msg) { const t = document.createElement('div'); t.className = 'ciclo-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 
-  return { render, redactar: (pre) => redactar(pre || {}) };
+  return { render, revalidaPropuesta:true, redactar: (pre) => redactar(pre || {}) };
 })();

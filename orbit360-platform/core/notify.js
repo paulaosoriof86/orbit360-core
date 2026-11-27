@@ -11,6 +11,14 @@ window.Orbit = window.Orbit || {};
 Orbit.notify = (function () {
   const S = () => Orbit.store;
 
+  function reviewRequired(opts) {
+    return /^(?:Comparativo|Cotización) (?:preparad[oa]|enviad[oa])$/i.test(String(opts.tipo || ''));
+  }
+  function missingReview(opts) {
+    if (!reviewRequired(opts) || typeof opts.autorizar === 'function') return false;
+    Orbit.ui.toast('Recarga Cotizador o Comparativo y vuelve a revisar la propuesta.');
+    return true;
+  }
   function _tel(cli) { return String(cli.telefono || cli.whatsapp || '').replace(/[^0-9]/g, ''); }
 
   /* Entrega actual sin proveedor confirmado. Devuelve el estado preparado/abierto. */
@@ -32,6 +40,7 @@ Orbit.notify = (function () {
      opts: { canal:'whatsapp'|'correo'|'auto', asunto, mensaje, tipo, icon, adjunto, silent } */
   function cliente(clienteId, opts) {
     opts = opts || {};
+    if (missingReview(opts)) return null;
     const cli = S().get('clientes', clienteId);
     if (!cli) { Orbit.ui && Orbit.ui.toast && Orbit.ui.toast('Cliente no encontrado'); return null; }
     let canal = opts.canal || 'auto';
@@ -39,6 +48,11 @@ Orbit.notify = (function () {
     if (opts.autorizar && !opts.autorizar({clienteId,canal,asunto:opts.asunto,mensaje:opts.mensaje,
         destino:canal === 'whatsapp' ? _tel(cli) : String(cli.email || '').trim(),adjuntos:opts.adjunto ? [opts.adjunto] : []})) {
       Orbit.ui.toast('El destinatario o la propuesta cambió. Revisa la comunicación de nuevo.');
+      return null;
+    }
+    if (opts.autorizar && canal === 'correo' && Orbit.modules && Orbit.modules.correo &&
+        Orbit.modules.correo.redactar && Orbit.modules.correo.revalidaPropuesta !== true) {
+      Orbit.ui.toast('Recarga el compositor antes de abrir el correo de la propuesta.');
       return null;
     }
     const usado = _deliver(cli, canal, opts.asunto, opts.mensaje || '', opts.adjunto, opts.autorizar);
@@ -61,6 +75,7 @@ Orbit.notify = (function () {
      opts igual que cliente() + { onSent } */
   function pedir(clienteId, opts) {
     opts = opts || {};
+    if (missingReview(opts)) return null;
     const U = Orbit.ui, cli = S().get('clientes', clienteId);
     if (!cli) { U.toast('Cliente no encontrado'); return; }
     const tieneTel = !!_tel(cli), tieneMail = !!cli.email;
@@ -96,5 +111,5 @@ Orbit.notify = (function () {
     });
   }
 
-  return { cliente, pedir };
+  return { cliente, pedir, revalidaPropuesta:true };
 })();

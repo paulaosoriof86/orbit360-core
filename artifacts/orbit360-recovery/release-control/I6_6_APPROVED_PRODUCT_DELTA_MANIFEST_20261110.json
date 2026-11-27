@@ -4492,6 +4492,71 @@
           "gitBlobSha": "5e96ceb2611b3d96e9e0d1dc2cd7d541bf9ba934"
         }
       ]
+    },
+    {
+      "id": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127_CONTENCION",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_CONTENCION_SOURCE_20261127.json",
+      "sourceStatus": "SOURCE_VERIFIED_PENDING_PACKAGE_AND_SERVED_ROLE_TESTS",
+      "scope": "Same quote communication unit. Preserve draft currencies and cents and reject mixed-version calls before opening a provider.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/notify.js",
+          "gitBlobSha": "baed31a4740b9532230d38d3a283360dd52547e9",
+          "replaces": {
+            "path": "orbit360-platform/core/notify.js",
+            "priorGitBlobSha": "6b1f88031bac02c603f7b9e5c7fcc7771e13902a",
+            "priorChangeId": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/comparativo-v1203-operational-bridge.js",
+          "gitBlobSha": "f8b92bd2c34e9459a1ebe803d6a22b5598f5124c",
+          "replaces": {
+            "path": "orbit360-platform/modules/comparativo-v1203-operational-bridge.js",
+            "priorGitBlobSha": "6239f8bbf5b1a4aad922d4a3d78d1407b20e13f6",
+            "priorChangeId": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/comparativo.js",
+          "gitBlobSha": "a1ee870118c9b7a8bd9853839f8c25409813a6c7",
+          "replaces": {
+            "path": "orbit360-platform/modules/comparativo.js",
+            "priorGitBlobSha": "434e23ebfe2921e067b213e9220a2338e180393e",
+            "priorChangeId": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/correo.js",
+          "gitBlobSha": "69f87b50ad23ea3cdff9836dd6849e24163e6ec9",
+          "replaces": {
+            "path": "orbit360-platform/modules/correo.js",
+            "priorGitBlobSha": "a9a27f678fd80e3ad190af5afdb6cfe24038e556",
+            "priorChangeId": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/cotizador-v1203-source-gate.js",
+          "gitBlobSha": "ae011c308914932b54d8fc9b839a3c0d7690d0de",
+          "replaces": {
+            "path": "orbit360-platform/modules/cotizador-v1203-source-gate.js",
+            "priorGitBlobSha": "97ed72d26cae3ddf5a189271f8d99e99ddaa0fa5",
+            "priorChangeId": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-quote-communication.test.cjs",
+          "gitBlobSha": "0289c7396f0b155d0b6e03c91f5b3d53cd78494b",
+          "replaces": {
+            "path": "tools/gravicentra-i6-6-quote-communication.test.cjs",
+            "priorGitBlobSha": "5e96ceb2611b3d96e9e0d1dc2cd7d541bf9ba934",
+            "priorChangeId": "I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127"
+          }
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {
