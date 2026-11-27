@@ -343,3 +343,17 @@ test('CLI refuses oversized GCS metadata before downloading and redacts provider
   const failed=h.operatorCliIo({exec:()=>{throw Object.assign(Error('Bearer DO_NOT_LOG'),{stderr:Buffer.from(SECRET)});}});
   await assert.rejects(failed.readBuild(operatorInput.execution.buildId),error=>error.message==='I66_SIGNED_CAS_HOLD_OPERATOR_BUILD_READ');
 });
+
+test('final UTF-8 transport budget includes base64, escaped path names, headline and envelope',()=>{
+  const content='a'.repeat(1650000);
+  const packet={expectedHead:HEAD,headline:'Prueba á',entries:[{path:'prueba-ñ.json',content}]};
+  const large=h.operatorMutation({packet:{...packet,entries:[]}});
+  large.variables.input.fileChanges.additions=[{path:packet.entries[0].path,contents:Buffer.from(content).toString('base64')}];
+  const raw=Buffer.from(JSON.stringify(large));
+  assert.ok(raw.length>h.GRAPHQL_BODY_BUDGET);
+  const fingerprint=require('node:crypto').createHash('sha256').update(raw).digest('hex');
+  assert.throws(()=>h.operatorMutation({packet}),new RegExp('FINAL_BODY_BUDGET_'+raw.length));
+  assert.throws(()=>h.signedMutationBody(large),new RegExp('FINAL_BODY_BUDGET_'+raw.length+'_OF_2200000_SHA256_'+fingerprint));
+  const small=h.operatorMutation({packet:{...packet,entries:[{path:'ñ.json',content:'á'}]}});
+  assert.deepEqual(h.signedMutationBody(small),Buffer.from(JSON.stringify(small)));
+});

@@ -472,8 +472,11 @@ function prepareProviderOutcome(event,{io=require('node:fs'),head,now=new Date()
 // transport, and independently addressable old Git blobs stay available.
 function providerOutcomeBytes(change,checkpoint,io=require('node:fs')){
   const original=Object.fromEntries(Object.entries(change.changes).map(([p,value])=>[p,serial(value)]));
-  const additionBytes=Object.values(original).reduce((n,value)=>n+4*Math.ceil(Buffer.byteLength(value)/3),0);
-  if(additionBytes<=2_600_000)return original;
+  const {mutationForFiles,GRAPHQL_BODY_BUDGET}=require('./gravicentra-i6-6-cloud-build-signed-cas.cjs');
+  const title='release(i66): reconcile verified provider outcome at R'+change.changes[checkpoint].version;
+  const additions=Object.keys(original).sort().map(path=>({path,contents:Buffer.from(original[path]).toString('base64')}));
+  const envelope=mutationForFiles(change.expectedHeadOid,title,additions);
+  if(Buffer.byteLength(JSON.stringify(envelope))<=GRAPHQL_BODY_BUDGET)return original;
   const compact=value=>JSON.stringify(value)+'\n';
   const read=p=>{
     const bytes=io.readFileSync(p,'utf8');
@@ -585,8 +588,8 @@ function commitProviderOutcome(change) {
       catch(error){if(ref()!==sha)throw Error('I66_SIGNED_CAS_UNCONFIRMED_RECOMPOSE_FROM_FRESH_HEAD');}
       return verified(sha);
     }
-    const query='mutation($input:CreateCommitOnBranchInput!){createCommitOnBranch(input:$input){commit{oid}}}';
-    const payload=JSON.stringify({query,variables:{input:{branch:{repositoryNameWithOwner:repo,branchName:branch},expectedHeadOid:head,message:{headline:message},fileChanges:{additions}}}});
+    const {mutationForFiles,signedMutationBody}=require('./gravicentra-i6-6-cloud-build-signed-cas.cjs');
+    const payload=signedMutationBody(mutationForFiles(head,message,additions));
     const journal=path.resolve(git(['rev-parse','--git-common-dir']).toString().trim(),'gi-i66-provider-outcomes',head,tree);
     fs.mkdirSync(journal,{recursive:true,mode:0o700});
     const fingerprint=JSON.stringify({parent:head,tree,bytes:Buffer.byteLength(payload),sha256:hash(payload)});

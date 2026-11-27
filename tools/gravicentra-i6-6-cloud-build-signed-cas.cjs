@@ -232,10 +232,26 @@ function validateOperatorBuild(execution,build){
     [execution.buildId,'live',execution.sourceSha,execution.authorityHead],'OPERATOR_EXACT_EXECUTION');
   return plan;
 }
-function operatorMutation(prepared){
+// Operational budget measured on the existing Cloud Shell route. It applies
+// to the complete UTF-8 POST, including JSON/base64 and the GraphQL envelope.
+const GRAPHQL_BODY_BUDGET = 2200000;
+function signedMutationBody(mutation) {
+  const body = Buffer.from(JSON.stringify(mutation), 'utf8');
+  need(body.length <= GRAPHQL_BODY_BUDGET,
+    'FINAL_BODY_BUDGET_'+body.length+'_OF_'+GRAPHQL_BODY_BUDGET+'_SHA256_'+sha256(body));
+  return body;
+}
+function mutationForFiles(head,headline,additions){
   return {query:'mutation($input:CreateCommitOnBranchInput!){createCommitOnBranch(input:$input){commit{oid}}}',
-    variables:{input:{branch:{repositoryNameWithOwner:C.repository,branchName:C.branch},expectedHeadOid:prepared.packet.expectedHead,
-      message:{headline:prepared.packet.headline},fileChanges:{additions:prepared.packet.entries.map(entry=>({path:entry.path,contents:Buffer.from(entry.content).toString('base64')}))}}}};
+    variables:{input:{branch:{repositoryNameWithOwner:C.repository,branchName:C.branch},expectedHeadOid:head,
+      message:{headline},fileChanges:{additions}}}};
+}
+function operatorMutation(prepared){
+  const {expectedHead,headline,entries}=prepared.packet;
+  const additions=entries.map(({path,content})=>({path,contents:Buffer.from(content).toString('base64')}));
+  const mutation=mutationForFiles(expectedHead,headline,additions);
+  signedMutationBody(mutation);
+  return mutation;
 }
 function operatorCliIo({exec=require('node:child_process').execFileSync}={}){
   const native=require('./gravicentra-i6-6-cloud-build-operational.cjs');
@@ -258,7 +274,7 @@ function operatorCliIo({exec=require('node:child_process').execFileSync}={}){
       // Only gh receives its existing authentication. No token, shell command,
       // request body or provider error output is printed or passed in argv.
       return parseOperatorJson(run('gh',['api','graphql','--hostname','github.com','--method','POST','--input','-'],
-        'OPERATOR_GRAPHQL_RESPONSE_UNCONFIRMED',Buffer.from(JSON.stringify(payload))),'OPERATOR_GRAPHQL_RESPONSE_JSON');
+        'OPERATOR_GRAPHQL_RESPONSE_UNCONFIRMED',signedMutationBody(payload)),'OPERATOR_GRAPHQL_RESPONSE_JSON');
     }
   };
 }
@@ -287,8 +303,9 @@ async function operateSignedCas(reference,{mode='inspect',io,env=process.env}={}
   const currentHead=await readHead();
   if(currentHead!==input.head)return summary('EXACT_SIGNED_COMMIT_ALREADY_PRESENT',await observe(currentHead),0);
   need(currentBuild.status==='WORKING','OPERATOR_NEW_COMMIT_REQUIRES_WORKING_BUILD');
+  const mutation=operatorMutation(prepared);
   let acknowledged;
-  try{const response=await io.createCommit(operatorMutation(prepared)),oid=response?.data?.createCommitOnBranch?.commit?.oid;
+  try{const response=await io.createCommit(mutation),oid=response?.data?.createCommitOnBranch?.commit?.oid;
     if(!response?.errors?.length&&hash40(oid))acknowledged=oid;
   }catch{/* The independent readback decides; this function never repeats POST. */}
   const after=await readHead();need(after!==input.head,'OPERATOR_WRITE_UNCONFIRMED_NO_RETRY');
@@ -303,5 +320,5 @@ if(require.main===module)operatorMain().catch(error=>{
   console.error(code?code[0]:'I66_SIGNED_CAS_HOLD_OPERATOR_FAILED');
   if(code?.[0]==='I66_SIGNED_CAS_HOLD_OPERATOR_USAGE')console.error(operatorUsage);process.exitCode=1;
 });
-module.exports={C,metadataPath,validateInput,hashTree,treeMap,preparePacket,verifyCommit,retainedReference,requestSignedCas,
+module.exports={C,GRAPHQL_BODY_BUDGET,mutationForFiles,signedMutationBody,metadataPath,validateInput,hashTree,treeMap,preparePacket,verifyCommit,retainedReference,requestSignedCas,
   operatorReference,parseOperatorArgs,operatorPacket,validateOperatorBuild,operatorMutation,operatorCliIo,operateSignedCas,operatorMain};
