@@ -1,3 +1,4 @@
+import findingCas from './gravicentra-i6-6-cloud-build-signed-cas.cjs';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -816,8 +817,9 @@ export function verifyB4004FormalGate(){
   need(row?.status==='CLOSED_PASS'&&row.blocking===false&&same(row,mirrorRow)&&row.closureReceiptBlobSha===ref.receiptBlobSha&&row.closureReceiptSha256===ref.receiptSha256&&row.nextAction===ACTION&&row.siniestros==='OWNER_DEFERRED_NON_BLOCKING_PHASE_A_NOT_FULL_CRUD_PASS','LEDGER_DISPOSITION');
   for(const old of oldLedger.findings)if(old.id!=='B4-004'&&!(b4006Closed&&['B4-005','B4-006'].includes(old.id)))need(same(old,byId(ledger.findings).get(old.id)),'UNRELATED_FINDING_CHANGED:'+old.id);
   for(const old of oldRegister.inventory)if(old.id!=='B4-004'&&!(b4006Closed&&['B4-005','B4-006'].includes(old.id)))need(same(old,byId(reg.inventory).get(old.id)),'UNRELATED_REGISTER_CHANGED:'+old.id);
-  need(reg.expectedLedgerNextBlobSha===blob(fs.readFileSync(LEDGER))&&cp.findingLedgerBlobSha===reg.expectedLedgerNextBlobSha,'LEDGER_HASH');
-  need(cp.continuityRegisterBlobSha===blob(fs.readFileSync(REGISTER))&&cp.findingContinuityControl.registerBlobSha===cp.continuityRegisterBlobSha&&cp.findingContinuityControl.lastLedgerBlobSha===cp.findingLedgerBlobSha,'REGISTER_HASH');
+  const pointerControl=findingCas.resolveFindingHandoff(cp,fs.readFileSync(LEDGER),fs.readFileSync(REGISTER));
+  need(reg.expectedLedgerNextBlobSha===blob(fs.readFileSync(LEDGER))&&pointerControl.findingLedgerBlobSha===reg.expectedLedgerNextBlobSha,'LEDGER_HASH');
+  need(pointerControl.continuityRegisterBlobSha===blob(fs.readFileSync(REGISTER))&&pointerControl.findingContinuityControl.registerBlobSha===pointerControl.continuityRegisterBlobSha&&pointerControl.findingContinuityControl.lastLedgerBlobSha===pointerControl.findingLedgerBlobSha,'REGISTER_HASH');
   need(cp.findingContinuityControl.guardBlobSha===git('rev-parse','HEAD:tools/gravicentra-open-findings-continuity-guard-v1.mjs'),'CONTINUITY_GUARD_VERSION');
   need(read(ROOT+'CAPABILITY_STATUS_LEDGER.json').capabilities.length===15,'CAPABILITY_COUNT');
   const currentLiveI66=cp.b4007OwnerOperationalGateClosure20261110?.operationalReleaseClosedByDirection===true&&

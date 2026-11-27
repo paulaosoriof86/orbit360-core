@@ -1,3 +1,4 @@
+import findingCas from './gravicentra-i6-6-cloud-build-signed-cas.cjs';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
@@ -108,8 +109,9 @@ function verifyLedgerMetadata(r,seal,cp,parent){
  for(const id of MIRROR_IDS)restoreKeys(rp.inventory.find(x=>x.id===id),priorRegister.inventory.find(x=>x.id===id),['status','blocking',...(QA_IDS.includes(id)?['ownerDecision20261106']:['closureProof'])]);
  need(same(lp,priorLedger)&&same(rp,priorRegister),'UNENUMERATED_LEDGER_MUTATION');
  const ledgerBlob=blob(fs.readFileSync(LEDGER)),registerBlob=blob(fs.readFileSync(REGISTER));
- need(reg.expectedLedgerNextBlobSha===ledgerBlob&&cp.findingLedgerBlobSha===ledgerBlob&&cp.continuityRegisterBlobSha===registerBlob,'CURRENT_LEDGER_POINTERS');
- need(cp.findingContinuityControl?.lastLedgerBlobSha===ledgerBlob&&cp.findingContinuityControl?.registerBlobSha===registerBlob,'CONTINUITY_POINTERS');
+ const pointerControl=findingCas.resolveFindingHandoff(cp,fs.readFileSync(LEDGER),fs.readFileSync(REGISTER));
+ need(reg.expectedLedgerNextBlobSha===ledgerBlob&&pointerControl.findingLedgerBlobSha===ledgerBlob&&pointerControl.continuityRegisterBlobSha===registerBlob,'CURRENT_LEDGER_POINTERS');
+ need(pointerControl.findingContinuityControl?.lastLedgerBlobSha===ledgerBlob&&pointerControl.findingContinuityControl?.registerBlobSha===registerBlob,'CONTINUITY_POINTERS');
  const cap=read(CAPABILITY),priorCap=old(parent,CAPABILITY),master=read(MASTER),priorMaster=old(parent,MASTER);
  need(cap.capabilities.length===15&&same(cap.capabilities,priorCap.capabilities)&&same(cap.releaseBinding,priorCap.releaseBinding),'HISTORICAL_15_PRESERVED');
  const capClone=clone(cap),masterClone=clone(master);

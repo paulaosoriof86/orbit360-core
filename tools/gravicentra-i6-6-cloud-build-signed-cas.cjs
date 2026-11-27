@@ -253,6 +253,66 @@ function operatorMutation(prepared){
   signedMutationBody(mutation);
   return mutation;
 }
+// A technical handoff changes the ledger and its carry register together. A
+// signed preparation pins both complete states before either file changes.
+// The legacy aliases describe the last settled state until finalization.
+function findingPair(ledger,register) {
+  return {ledger:gitBlob(ledger),register:gitBlob(register),
+    ledgerSha256:sha256(ledger),registerSha256:sha256(register)};
+}
+function withFindingPair(control,pair) {
+  return {...control,findingLedgerBlobSha:pair.ledger,continuityRegisterBlobSha:pair.register,
+    findingContinuityControl:{...control.findingContinuityControl,lastLedgerBlobSha:pair.ledger,registerBlobSha:pair.register}};
+}
+function assertFindingAliases(control,pair) {
+  same([control.findingLedgerBlobSha,control.continuityRegisterBlobSha,
+    control.findingContinuityControl.lastLedgerBlobSha,control.findingContinuityControl.registerBlobSha],
+    [pair.ledger,pair.register,pair.ledger,pair.register],'FINDING_SETTLED_PREIMAGES');
+}
+function prepareFindingHandoff({head,control,ledger,register,nextLedger,nextRegister,id}) {
+  need(hash40(head)&&/^GI-HO-[0-9]+$/.test(id),'FINDING_HANDOFF_ID');
+  need(!control.findingContinuityControl.preparedTechnicalHandoff,'FINDING_PREPARATION_ACTIVE');
+  const previous=findingPair(ledger,register),next=findingPair(nextLedger,nextRegister);
+  assertFindingAliases(control,previous);
+  const original=JSON.parse(ledger),updated=JSON.parse(nextLedger),oldRegister=JSON.parse(register);
+  const handoff=updated.i66TechnicalHandoffs?.[id];
+  need(!Object.hasOwn(original.i66TechnicalHandoffs,id)&&handoff?.id===id&&handoff.gate==='I6.6'&&
+    handoff.status==='RECEIVED_OPEN'&&handoff.functionalReleaseAccepted===false,'FINDING_RECEIPT_ONLY');
+  delete updated.i66TechnicalHandoffs[id];
+  same(updated,original,'FINDING_UNRELATED_MUTATION');
+  same(oldRegister.expectedLedgerNextBlobSha,previous.ledger,'FINDING_ORIGINAL_REGISTER');
+  same(JSON.parse(nextRegister),{...oldRegister,expectedLedgerNextBlobSha:next.ledger},'FINDING_UNRELATED_REGISTER_MUTATION');
+  const preparedTechnicalHandoff={schema:'I66_SIGNED_TECHNICAL_HANDOFF_PAIR_V1',id,baseCommit:head,
+    handoffSha256:sha256(Buffer.from(serial(handoff))),previous,next};
+  return {...control,findingContinuityControl:{...control.findingContinuityControl,preparedTechnicalHandoff}};
+}
+function resolveFindingHandoff(control,ledger,register) {
+  const binding=control.findingContinuityControl?.preparedTechnicalHandoff;
+  if(!binding)return control;
+  need(binding.schema==='I66_SIGNED_TECHNICAL_HANDOFF_PAIR_V1'&&hash40(binding.baseCommit)&&
+    /^GI-HO-[0-9]+$/.test(binding.id),'FINDING_PREPARATION_SCHEMA');
+  assertFindingAliases(control,binding.previous);
+  const actual=findingPair(ledger,register),record=JSON.parse(ledger).i66TechnicalHandoffs?.[binding.id];
+  same(JSON.parse(register).expectedLedgerNextBlobSha,actual.ledger,'FINDING_PHYSICAL_REGISTER');
+  if(actual.ledger===binding.previous.ledger) {
+    same(actual,binding.previous,'FINDING_PREVIOUS_PAIR');
+    need(!record,'FINDING_PREVIOUS_RECEIPT_PRESENT');
+    return control;
+  }
+  same(actual,binding.next,'FINDING_NEXT_PAIR');
+  same(sha256(Buffer.from(serial(record))),binding.handoffSha256,'FINDING_RECEIPT_DIGEST');
+  return withFindingPair(control,actual);
+}
+function settleFindingHandoff(control,ledger,register) {
+  const binding=control.findingContinuityControl?.preparedTechnicalHandoff;
+  need(binding,'FINDING_PREPARATION_MISSING');
+  const resolved=resolveFindingHandoff(control,ledger,register);
+  same(findingPair(ledger,register),binding.next,'FINDING_SUCCESSOR_REQUIRED');
+  const settled={...resolved,findingContinuityControl:{...resolved.findingContinuityControl}};
+  delete settled.findingContinuityControl.preparedTechnicalHandoff;
+  return settled;
+}
+
 function operatorCliIo({exec=require('node:child_process').execFileSync}={}){
   const native=require('./gravicentra-i6-6-cloud-build-operational.cjs');
   const run=(command,args,code,input)=>{try{return Buffer.from(exec(command,args,{input,stdio:['pipe','pipe','pipe'],timeout:60000,maxBuffer:64*1024*1024}));}catch{fail(code);}};
@@ -320,5 +380,5 @@ if(require.main===module)operatorMain().catch(error=>{
   console.error(code?code[0]:'I66_SIGNED_CAS_HOLD_OPERATOR_FAILED');
   if(code?.[0]==='I66_SIGNED_CAS_HOLD_OPERATOR_USAGE')console.error(operatorUsage);process.exitCode=1;
 });
-module.exports={C,GRAPHQL_BODY_BUDGET,mutationForFiles,signedMutationBody,metadataPath,validateInput,hashTree,treeMap,preparePacket,verifyCommit,retainedReference,requestSignedCas,
+module.exports={prepareFindingHandoff,resolveFindingHandoff,settleFindingHandoff,C,GRAPHQL_BODY_BUDGET,mutationForFiles,signedMutationBody,metadataPath,validateInput,hashTree,treeMap,preparePacket,verifyCommit,retainedReference,requestSignedCas,
   operatorReference,parseOperatorArgs,operatorPacket,validateOperatorBuild,operatorMutation,operatorCliIo,operateSignedCas,operatorMain};
