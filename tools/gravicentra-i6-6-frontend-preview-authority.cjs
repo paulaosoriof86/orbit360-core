@@ -562,7 +562,7 @@ function validateFunctionalUnitSuccessor(binding,current,readBlob) {
   return binding;
 }
 
-async function admitPreview(transport,api,readMarker) {
+async function admitPreview(transport,api,readMarker,providerOptions={}) {
   const request = transport.frontendPreviewRequest;
   const previous = JSON.parse(git('show','HEAD^:'+transportPath));
   if (!previewRequestTransition(request,previous.frontendPreviewRequest)) return false;
@@ -637,23 +637,47 @@ async function admitPreview(transport,api,readMarker) {
     assert.ok(paths.length && paths.every(frontendPath),'PREVIEW_SCOPE_DRIFT');
   }
   assert.deepEqual(request.productPaths,paths);
-  const runs = [[request.sourceQaRunId,'gravicentra-i66-privileged-role-parity-source-qa.yml'],
-    [request.guardRunId,'gravicentra-release-lock-sync.yml']];
-  for (const [runId,workflow] of runs) {
-    assert.ok(Number.isSafeInteger(runId) && runId>0);
-    const run=await api('runs/'+runId);
-    assert.deepEqual([run.head_sha,run.head_branch,run.path,run.status,run.conclusion],
-      [request.sourceQaHead,branch,'.github/workflows/'+workflow,'completed','success']);
-    const jobs=await api('runs/'+runId+'/jobs?per_page=100');
-    assert.ok(jobs.jobs.some(j=>j.conclusion==='success' && j.steps?.some(s=>s.conclusion==='success' && s.number>2)));
-  }
-  const artifact=await api('artifacts/'+current.artifactId);
-  assert.equal(artifact.digest,current.artifactDigest);
-  assert.equal(artifact.workflow_run.head_sha,current.sourceSha);
+  const nativeSource=Object.hasOwn(request,'nativeSourceQa');
+  const currentProvider=current.executionProvider||'GITHUB_ACTIONS';
+  assert.ok(currentProvider==='GITHUB_ACTIONS'||currentProvider==='CLOUD_BUILD','I66_CURRENT_ARTIFACT_PROVIDER_UNSUPPORTED');
+  const providerEvidence={sourceQa:null,currentArtifact:null};
+  let native,tempRoot;
+  try{
+    if(nativeSource||currentProvider==='CLOUD_BUILD'){
+      native=require('./gravicentra-i6-6-cloud-build-source-admission.cjs');
+      tempRoot=fs.mkdtempSync(require('node:path').join(require('node:os').tmpdir(),'gi-i66-admission-readback-'));
+    }
+    if(nativeSource){
+      providerEvidence.sourceQa=await native.verifySourceQaReference(request,{
+        repo:process.cwd(),io:providerOptions.io,out:require('node:path').join(tempRoot,'source-qa')});
+    }else{
+      const runs = [[request.sourceQaRunId,'gravicentra-i66-privileged-role-parity-source-qa.yml'],
+        [request.guardRunId,'gravicentra-release-lock-sync.yml']];
+      for (const [runId,workflow] of runs) {
+        assert.ok(Number.isSafeInteger(runId) && runId>0);
+        const run=await api('runs/'+runId);
+        assert.deepEqual([run.head_sha,run.head_branch,run.path,run.status,run.conclusion],
+          [request.sourceQaHead,branch,'.github/workflows/'+workflow,'completed','success']);
+        const jobs=await api('runs/'+runId+'/jobs?per_page=100');
+        assert.ok(jobs.jobs.some(j=>j.conclusion==='success' && j.steps?.some(s=>s.conclusion==='success' && s.number>2)));
+      }
+      providerEvidence.sourceQa={executionProvider:'GITHUB_ACTIONS',headSha:request.sourceQaHead,runId:request.sourceQaRunId,guardRunId:request.guardRunId};
+    }
+    if(currentProvider==='CLOUD_BUILD'){
+      providerEvidence.currentArtifact=await native.verifyCurrentArtifact(current,{
+        io:providerOptions.io,out:require('node:path').join(tempRoot,'current-package')});
+    }else{
+      const artifact=await api('artifacts/'+current.artifactId);
+      assert.equal(artifact.digest,current.artifactDigest);
+      assert.equal(artifact.workflow_run.head_sha,current.sourceSha);
+      providerEvidence.currentArtifact={executionProvider:'GITHUB_ACTIONS',artifactId:current.artifactId,artifactDigest:current.artifactDigest,sourceSha:current.sourceSha,buildId:current.buildId};
+    }
+  }finally{if(tempRoot)fs.rmSync(tempRoot,{recursive:true,force:true});}
   for(const origin of ['https://app.aysseguros.com','https://ays-orbit-360-lab.web.app']) {
     const marker=await readMarker(origin);
     assert.deepEqual([marker.sourceSha,marker.buildId],[current.sourceSha,current.buildId]);
   }
+  if(providerOptions.onEvidence)providerOptions.onEvidence(providerEvidence);
   return true;
 }
 module.exports={historicalPaymentUnit,validateFunctionalUnitSuccessor,COMPOSED_PUBLISHED_SOURCE,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_PATH,DIRECT_FORMS_ASSIGNED_ROLES_RECEIPT_BLOB,DIRECT_FORMS_ASSIGNED_ROLES_PROFILE,DIRECT_FORMS_ASSIGNED_ROLES_CHANGED_QA,DIRECT_FORMS_ASSIGNED_ROLES_PREDECESSOR,
