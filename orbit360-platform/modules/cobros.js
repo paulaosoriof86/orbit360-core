@@ -680,11 +680,37 @@ Orbit.modules.cobros = (function () {
     return {status,message:messages[status]};
   }
 
+  function cobroReceiptBreakdown(c, policy) {
+    const clean=value=>String(value==null?'':value).trim();
+    const numeric=(row,keys)=>{
+      for(const key of keys){
+        const value=row&&row[key];
+        if(!['number','string'].includes(typeof value)||clean(value)==='')continue;
+        const n=Number(value);if(Number.isFinite(n))return n;
+      }
+      return null;
+    };
+    const refs=[...new Set([c.reciboId,c.receiptId].map(clean).filter(Boolean))];
+    let receipt=null;
+    if(refs.length===1&&clean(c.polizaId)&&clean(c.clienteId)&&policy&&clean(policy.id)===clean(c.polizaId)&&clean(policy.clienteId)===clean(c.clienteId)){
+      const linked=S().get('recibosEsperados',refs[0]),currency=clean(c.moneda).toUpperCase();
+      const sameCurrency=row=>!clean(row&&row.moneda)||clean(row.moneda).toUpperCase()===currency;
+      const paid=numeric(c,['monto']),total=numeric(linked,['primaTotal','montoTotal','monto']);
+      if(linked&&clean(linked.id)===refs[0]&&clean(linked.polizaId)===clean(c.polizaId)&&
+          clean(linked.clienteId||policy.clienteId)===clean(c.clienteId)&&currency&&sameCurrency(linked)&&sameCurrency(policy)&&
+          paid!=null&&total!=null&&Math.round(paid*100)===Math.round(total*100))receipt=linked;
+    }
+    const component=keys=>{const own=numeric(c,keys);return own==null?numeric(receipt,keys):own;};
+    return {neta:component(['neta','primaNeta']),gastosEmision:component(['gastosEmision','gastosExpedicion']),
+      gastosFinan:component(['gastosFinan','gastosFinanciamiento']),otros:component(['otros']),iva:component(['iva','impuestosIVA'])};
+  }
+
   /* ---- Detalle del recibo (drawer) — abre el detalle del cobro, no la póliza ---- */
   function detalle(cobroId) {
     const c = S().get('cobros', cobroId); if (!c) return;
     const cli = S().get('clientes', c.clienteId), p = S().get('polizas', c.polizaId), asg = p ? q.aseguradora(p.aseguradoraId) : null, ase = q.asesor(c.asesorId);
-    const cur = c.moneda; const m2 = n => U.money(n, cur);
+    const cur = c.moneda, breakdown = cobroReceiptBreakdown(c,p);
+    const m2 = n => n==null ? '<span class="muted">No informado</span>' : U.esc(exactRowMoney(n,cur));
     const TT = k => (Orbit.termino ? Orbit.termino(k, cli && cli.pais) : k);
     const aplicable = c.estado === 'Pendiente' || c.estado === 'Vencido';
     let back = document.getElementById('cob-det'); if (back) back.remove();
@@ -709,11 +735,11 @@ Orbit.modules.cobros = (function () {
         <div class="vp-desglose">
           <div class="vp-sec-t">🧾 Desglose del ${TT('recibo').toLowerCase()}</div>
           <table class="vp-dtbl">
-            <tr><td>${TT('prima_neta')}</td><td class="num">${m2(c.neta != null ? c.neta : c.monto)}</td></tr>
-            <tr><td>Gastos de expedición</td><td class="num">${m2(c.gastosEmision || 0)}</td></tr>
-            <tr><td>Gastos financieros</td><td class="num">${m2(c.gastosFinan || 0)}</td></tr>
-            <tr><td>Otros / asistencias</td><td class="num">${m2(c.otros || 0)}</td></tr>
-            <tr><td>IVA</td><td class="num">${m2(c.iva || 0)}</td></tr>
+            <tr><td>${TT('prima_neta')}</td><td class="num">${m2(breakdown.neta)}</td></tr>
+            <tr><td>Gastos de expedición</td><td class="num">${m2(breakdown.gastosEmision)}</td></tr>
+            <tr><td>Gastos financieros</td><td class="num">${m2(breakdown.gastosFinan)}</td></tr>
+            <tr><td>Otros / asistencias</td><td class="num">${m2(breakdown.otros)}</td></tr>
+            <tr><td>IVA</td><td class="num">${m2(breakdown.iva)}</td></tr>
             <tr class="vp-tot"><td>Total del ${TT('recibo').toLowerCase()}</td><td class="num">${m2(c.monto)}</td></tr>
           </table>
         </div>

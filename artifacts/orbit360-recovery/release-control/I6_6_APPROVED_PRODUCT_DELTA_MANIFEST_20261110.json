@@ -4408,6 +4408,43 @@
           "gitBlobSha": "242027512ada8c8010917bfb75daff731e2d50da"
         }
       ]
+    },
+    {
+      "id": "I6_6_ORDEN_Y_DESGLOSE_DE_RECIBOS_20261126",
+      "approvedByDirection": true,
+      "receipt": "artifacts/orbit360-recovery/release-control/I6_6_ORDEN_DESGLOSE_RECIBOS_SOURCE_20261126.json",
+      "sourceStatus": "SOURCE_VERIFIED_PENDING_PACKAGE_AND_SERVED_ROLE_TESTS",
+      "scope": "Receipt ordinal display and read-only payment breakdown. Existing financial facts, server functions and Hosting release are preserved.",
+      "paths": [
+        {
+          "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+          "gitBlobSha": "108e1787d725a7a0dc2bbde3293c5eb61d04fe52",
+          "replaces": {
+            "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+            "priorGitBlobSha": "1866fd392be49b8506c83d1392092a715b3983dd",
+            "priorChangeId": "I6_6_DOCUMENTED_NON_TAXED_CHARGE_AND_CONTRACTUAL_RECEIPT_CALENDAR_20261117"
+          }
+        },
+        {
+          "path": "orbit360-platform/modules/cobros.js",
+          "gitBlobSha": "65aae3301eb3f0727389c6874b1f12d9f699d320",
+          "replaces": {
+            "path": "orbit360-platform/modules/cobros.js",
+            "priorGitBlobSha": "e86ea782c6aacf97fe4ab4900ed40dec07537a22",
+            "priorChangeId": "I6_6_SELECTED_PAYMENT_ATTACHMENT_PRESERVATION_20261124"
+          }
+        }
+      ],
+      "tests": [
+        {
+          "path": "tools/gravicentra-i6-6-receipt-list-ordinal-display.test.cjs",
+          "gitBlobSha": "51066fefb00df1a60662ce03d0327e0d58e7e5d7"
+        },
+        {
+          "path": "tools/gravicentra-i6-6-cobro-receipt-breakdown-display.test.cjs",
+          "gitBlobSha": "1f2cb4ca5340858400a5755a4747519d9ffbcc45"
+        }
+      ]
     }
   ],
   "i66R11PreviewBuildRequest20261113": {

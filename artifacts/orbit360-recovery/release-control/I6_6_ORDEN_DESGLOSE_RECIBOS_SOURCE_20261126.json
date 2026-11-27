@@ -1,0 +1,47 @@
+{
+  "gate": "I6.6",
+  "changeId": "I6_6_ORDEN_Y_DESGLOSE_DE_RECIBOS_20261126",
+  "stage": "SOURCE",
+  "authority": "DIRECTION_STANDING_INCREMENTAL_RELEASE",
+  "base": "5d77b35a7048e2b24113b00cc0642a857f7de43f",
+  "preparedTree": "5d392387fe7393c8db75ebe2244566438634d702",
+  "originalCheckpointSha256": "a6da620c35c02395c0cd1383610132b5f1820302fa24665c36fac8ab4330d007",
+  "pins": [
+    {
+      "path": "orbit360-platform/core/backend-lab-receipts-portfolio-native-bridge-v20260801.js",
+      "beforeBlob": "1866fd392be49b8506c83d1392092a715b3983dd",
+      "afterBlob": "108e1787d725a7a0dc2bbde3293c5eb61d04fe52",
+      "afterSha256": "793d2b65a674b41fce4361c7b95858e0167e5837670cb918342e08c1256cc50d"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-receipt-list-ordinal-display.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "51066fefb00df1a60662ce03d0327e0d58e7e5d7",
+      "afterSha256": "ddaf4418a2567fa4460ec7c77c2697f370b62da46f788bc2ccd3c2c4d8544cfb"
+    },
+    {
+      "path": "orbit360-platform/modules/cobros.js",
+      "beforeBlob": "e86ea782c6aacf97fe4ab4900ed40dec07537a22",
+      "afterBlob": "65aae3301eb3f0727389c6874b1f12d9f699d320",
+      "afterSha256": "0b7ff9495120a3813b578a356fc498892f2c8bb6c32d6aa392bfe45e4a779132"
+    },
+    {
+      "path": "tools/gravicentra-i6-6-cobro-receipt-breakdown-display.test.cjs",
+      "beforeBlob": null,
+      "afterBlob": "1f2cb4ca5340858400a5755a4747519d9ffbcc45",
+      "afterSha256": "97592632c99c01ac6ddf8ff8c0ce425b8539847093f5b33fddcf66b5a0de4734"
+    }
+  ],
+  "tests": {
+    "currentSource": 16,
+    "servedSourceComposition": 16,
+    "environment": "synthetic source only"
+  },
+  "servedBase": {
+    "source": "65c825b2808a615ca4195bdde6689dbdbe3193b2",
+    "hostingVersion": "332999a55b189108",
+    "candidateCobrosModuleBlob": "c109ebb1bb5cd460f3534a51c1c59bbb8241d721"
+  },
+  "supersedesPhysicalPackage": false,
+  "newRuntimeAcceptance": false
+}
