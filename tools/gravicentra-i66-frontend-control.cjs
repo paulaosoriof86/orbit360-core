@@ -528,6 +528,52 @@ function providerOutcomeBytes(change,checkpoint,io=require('node:fs')){
   return bytes;
 }
 
+// Shared by the two bounded metadata owners. The signing key is never used for
+// repository authentication. The pre-push hook compares the server-advertised ref.
+function pushRegisteredTree({fs,git,gh,account,email,key,tree,head,message,temp,ref,branch,remote,verified,getSignedCommit=create=>create(),onPush=()=>{}}) {
+  const publicKey=fs.readFileSync(key+'.pub','utf8').trim().split(/\s+/).slice(0,2).join(' ');
+  assert.ok(gh(['users/'+account.login+'/ssh_signing_keys']).some(k=>k.key.trim().split(/\s+/).slice(0,2).join(' ')===publicKey),'I66_PROVIDER_REGISTERED_SIGNER_REQUIRED');
+  const sha=getSignedCommit(()=>git(['-c','user.name='+account.login,'-c','user.email='+email,'-c','gpg.format=ssh','-c','user.signingkey='+key,'commit-tree','-S',tree,'-p',head,'-m',message]).toString().trim());
+  fs.writeFileSync(path.join(temp,'allowed'),email+' '+publicKey+'\n',{mode:0o600});
+  git(['-c','gpg.ssh.allowedSignersFile='+path.join(temp,'allowed'),'verify-commit',sha]);
+  assert.equal(git(['rev-list','--parents','-1',sha]).toString().trim(),sha+' '+head);
+  assert.equal(git(['rev-parse',sha+'^{tree}']).toString().trim(),tree);
+  assert.equal(git(['log','-1','--format=%B',sha]).toString().trimEnd(),message);
+  fs.writeFileSync(path.join(temp,'pre-push'),'#!/bin/sh\nset -eu\nread -r local_ref local_sha remote_ref remote_sha\ntest "$local_sha" = "'+sha+'" && test "$remote_ref" = "refs/heads/'+branch+'" && test "$remote_sha" = "'+head+'" || exit 1\nif read -r extra; then exit 1; fi\n',{mode:0o700});
+  const fresh=ref();if(fresh!==head)return verified(fresh);
+  onPush();
+  try{git(['-c','core.hooksPath='+temp,'-c','credential.helper=','-c','credential.helper=!gh auth git-credential','push','--porcelain',remote,sha+':refs/heads/'+branch]);}
+  catch(error){if(ref()!==sha)throw Error('I66_SIGNED_CAS_UNCONFIRMED_RECOMPOSE_FROM_FRESH_HEAD');}
+  return verified(sha);
+}
+
+// This exceptional signer may only close the previously verified E4 journal.
+function pushFocalClosure(options){
+  const {git,head,tree,account,branch,remote,message}=options;
+  assert.equal(account.login,'paulaosoriof86');
+  assert.equal(branch,'recovery/fase-a-clean-20260831');
+  assert.equal(remote,'https://github.com/paulaosoriof86/orbit360-core.git');
+  assert.equal(message,'release(i66): COMMITTED exact focal Hosting generation 4');
+  const file=genName(4,'FOCAL_HOSTING_JOURNAL');
+  const previous=JSON.parse(git(['cat-file','blob',head+':'+file]));
+  const next=JSON.parse(git(['cat-file','blob',tree+':'+file]));
+  assert.equal(previous.phase,'VERIFIED');
+  assert.equal(previous.generation,4);
+  assert.deepEqual(previous.request.target.focalHosting,{
+    schema:'GI_I66_FOCAL_HOSTING_REQUEST_V1',generation:4,
+    requestDigest:'55e78a70916bbcd4dffa3dd57a4e60f43c3ee4d2fc214471148047559322b1c6',
+    compositionTree:'072013af1a8ae12569611a8828179db9b4a63ed3'});
+  assert.deepEqual(next,{...previous,phase:'COMMITTED',receipt:next.receipt,liveUi:next.liveUi});
+  const changes=closeFiles(f=>JSON.parse(git(['cat-file','blob',head+':'+f])),previous,next);
+  const files=Object.keys(changes).sort();
+  assert.deepEqual(files,[P.cp,P.state,P.transport,P.ledger,genName(4,'FOCAL_PROGRESS'),file].sort());
+  assert.deepEqual(git(['diff-tree','-r','--name-only',head,tree]).toString().trim().split('\n').sort(),files);
+  for(const f of files)assert.equal(git(['rev-parse',tree+':'+f]).toString().trim(),blob(serial(changes[f])));
+  const read={readFileSync:(f,enc)=>git(['cat-file','blob',tree+':'+f]).toString(enc||'utf8')};
+  physicalGuard(changes[P.cp],changes[P.state],changes[P.transport],read);
+  return pushRegisteredTree(options);
+}
+
 function commitProviderOutcome(change) {
   const fs=require('node:fs'),os=require('node:os');
   const {execFileSync}=require('node:child_process');
@@ -580,19 +626,7 @@ function commitProviderOutcome(change) {
     // the existing authenticated GitHub expected-head mutation signs the same
     // bounded metadata delta. No key is generated, registered or exported.
     if(key&&path.isAbsolute(key)&&fs.existsSync(key)&&fs.existsSync(key+'.pub')){
-      const publicKey=fs.readFileSync(key+'.pub','utf8').trim().split(/\s+/).slice(0,2).join(' ');
-      assert.ok(gh(['users/'+account.login+'/ssh_signing_keys']).some(k=>k.key.trim().split(/\s+/).slice(0,2).join(' ')===publicKey),'I66_PROVIDER_REGISTERED_SIGNER_REQUIRED');
-      const sha=git(['-c','user.name='+account.login,'-c','user.email='+email,'-c','gpg.format=ssh','-c','user.signingkey='+key,'commit-tree','-S',tree,'-p',head,'-m',message]).toString().trim();
-      fs.writeFileSync(path.join(temp,'allowed'),email+' '+publicKey+'\n',{mode:0o600});
-      git(['-c','gpg.ssh.allowedSignersFile='+path.join(temp,'allowed'),'verify-commit',sha]);
-      assert.equal(git(['rev-list','--parents','-1',sha]).toString().trim(),sha+' '+head);
-      assert.equal(git(['rev-parse',sha+'^{tree}']).toString().trim(),tree);
-      assert.equal(git(['log','-1','--format=%s',sha]).toString().trim(),message);
-      fs.writeFileSync(path.join(temp,'pre-push'),'#!/bin/sh\nset -eu\nread -r local_ref local_sha remote_ref remote_sha\ntest "$local_sha" = "'+sha+'" && test "$remote_ref" = "refs/heads/'+branch+'" && test "$remote_sha" = "'+head+'" || exit 1\nif read -r extra; then exit 1; fi\n',{mode:0o700});
-      const fresh=ref();if(fresh!==head)return verified(fresh);
-      try{git(['-c','core.hooksPath='+temp,'-c','credential.helper=','-c','credential.helper=!gh auth git-credential','push','--porcelain',remote,sha+':refs/heads/'+branch]);}
-      catch(error){if(ref()!==sha)throw Error('I66_SIGNED_CAS_UNCONFIRMED_RECOMPOSE_FROM_FRESH_HEAD');}
-      return verified(sha);
+      return pushRegisteredTree({fs,git,gh,account,email,key,tree,head,message,temp,ref,branch,remote,verified});
     }
     const {mutationForFiles,signedMutationBody}=require('./gravicentra-i6-6-cloud-build-signed-cas.cjs');
     const payload=signedMutationBody(mutationForFiles(head,message,additions));
@@ -1175,7 +1209,7 @@ function closeFiles(read,j,body){
     progress.releaseExecution={status:'FRONTEND_FOCAL_SIGNED_LIVE_ACCEPTED',scope:'FRONTEND_ONLY',scopeId:j.request.scopeId||null,
       sourceSha:t.sourceSha,buildId:t.buildId,buildRunId:t.buildRunId,artifactId:t.artifactId,artifactDigest:t.artifactDigest,
       artifactBuilt:true,previewSignedPass:true,livePromoted:true,signedPreviewRunId:t.previewUiRunId||null,
-      liveRunId:body.receipt.runId,receiptPath,uiReceiptPath:genName(n,'LIVE_UI'),uiReceiptGitBlobSha:body.liveUi?.receiptBlob||null,
+      liveRunId:body.receipt.runId,receiptPath,uiReceiptPath:genName(n,focal?'FOCAL_HOSTING_LIVE_UI':'LIVE_UI'),uiReceiptGitBlobSha:body.liveUi?.receiptBlob||null,
       backendFunctionsChanged:0,businessWrites:0,...(focal?{focalHosting:structuredClone(focal),
         sourceQa:structuredClone(transport.focalHostingRequest.qa)}:{sourceQaHead:transport.frontendPreviewRequest?.sourceQaHead||null,
       sourceQaRunId:transport.frontendPreviewRequest?.sourceQaRunId||null,guardRunId:transport.frontendPreviewRequest?.guardRunId||null,
@@ -1475,7 +1509,7 @@ async function verifyReadonlyObserver(resolution,{env=process.env,api,readMarker
     sourceQaVerified,remoteControlHead:remoteHead,target:resolution.target,readOnly:true,
     productWrites:0,syntheticWrites:0,releaseTransitions:0,hostedMarkersVerified:origins};
 }
-module.exports={releaseJournalPath,providerOutcomeBytes,DIRECT_LIVE_PUBLICATION,directLivePublication,prepareFunctionalStage,prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
+module.exports={pushFocalClosure,releaseJournalPath,providerOutcomeBytes,DIRECT_LIVE_PUBLICATION,directLivePublication,prepareFunctionalStage,prepareProviderOutcome,commitProviderOutcome,P,genName,serial,blob,physicalGuard,closeFiles,executionSnapshot,executionProgressProjection,synchronizeExecutionProgress,archiveExecutionObservers,assertExecutionProgress,assertRetiredReleaseContinuation,
   resolveNativeExecutionProgress,assertNativeExecutionProgress,terminalAttemptRecords,assertTerminalAttemptProgress,
   prepareTerminalAttemptReconciliation,assertTerminalAttemptChangeSetPreimages,prepareTerminalCli,
   ownerPlanContinuationProjection,synchronizeOwnerPlanContinuation,assertOwnerPlanContinuation,assertActiveFinancialAndPlanProjections,assertActiveReleaseProgress,

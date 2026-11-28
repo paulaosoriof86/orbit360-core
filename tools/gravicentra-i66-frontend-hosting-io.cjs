@@ -4,17 +4,26 @@ const {execFileSync}=require('node:child_process'),assert=require('node:assert/s
 const site='ays-orbit-360-lab',origins=['https://ays-orbit-360-lab.web.app','https://app.aysseguros.com'];
 const hash=v=>crypto.createHash('sha256').update(v).digest('hex');
 const pause=ms=>new Promise(r=>setTimeout(r,ms));
-function hosting(auth,github){
+function hosting(auth,github,{certifiedBundles}={}){
   const packages=new Map(),git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
-  async function current(channel){
+  async function currentRelease(channel){
     assert.match(channel,/^[a-z0-9][a-z0-9-]+$/);
     const url='https://firebasehosting.googleapis.com/v1beta1/sites/'+site+'/channels/'+channel+'/releases?pageSize=1';
     const headers=await auth.getRequestHeaders(url);
     const res=await fetch(url,{headers,signal:AbortSignal.timeout(20000)});assert.ok(res.ok,'HOSTING_RELEASE_READ');
-    const version=(await res.json()).releases?.[0]?.version?.name;
-    assert.match(version,/^sites\/ays-orbit-360-lab\/versions\/[a-zA-Z0-9_-]+$/);return version;
+    const release=(await res.json()).releases?.[0],version=release?.version?.name;
+    assert.match(version,/^sites\/ays-orbit-360-lab\/versions\/[a-zA-Z0-9_-]+$/);return release;
   }
+  async function current(channel){return (await currentRelease(channel)).version.name;}
   async function packageData(r){
+    if(certifiedBundles){
+      const entry=certifiedBundles.find(row=>row.binding.artifactDigest===r.artifactDigest);
+      assert.ok(entry,'FOCAL_UNCERTIFIED_PACKAGE');
+      assert.deepEqual(r,entry.binding,'FOCAL_PHYSICAL_BINDING_DRIFT');
+      const b=entry.bundle;
+      assert.deepEqual([b.marker.sourceSha,b.marker.buildId,b.manifest.length],[r.sourceSha,r.buildId,r.files]);
+      return {rows:b.manifest.map(row=>({digest:row.hash,path:row.relative})),manifestDigest:'sha256:'+b.manifestSha256};
+    }
     if(packages.has(r.artifactDigest))return packages.get(r.artifactDigest);
     const native=process.env.GRAVICENTRA_BUILD_PROVIDER==='CLOUD_BUILD';
     assert.ok(!process.env.GRAVICENTRA_BUILD_PROVIDER||native,'HOSTING_UNKNOWN_PROVIDER');
@@ -79,6 +88,6 @@ function hosting(auth,github){
     execFileSync(process.execPath,[process.env.FIREBASE_CLI_BIN,'hosting:clone',site+'@'+to.split('/').at(-1),site+':live',
       '--project',site,'--non-interactive','--json'],{stdio:['ignore','pipe','pipe'],timeout:180000});
   }
-  return {current,packageData,live,preview,clone,git};
+  return {current,currentRelease,packageData,live,preview,clone,git};
 }
 module.exports={hosting};

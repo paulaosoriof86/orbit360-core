@@ -914,8 +914,380 @@ async function recordCompositeRollback(){
     {[jp]:{...j,phase:'ROLLED_BACK',rollback:{physical,backend,verified:true,runId,...(makeIngress?{makeIngress}:{})}}});
   console.log('I66_COMPOSITE_COMPENSATION_RECORDED_GENERATION='+attempt.generation);
 }
-function dispatchReleaseAction(action,handlers={verifyCompositeFinancialPreview,runCompositeAcceptance,authorizeCompositeRollback,recordCompositeRollback,run}){
-  const operations={'--verify-composite-financial-preview':'verifyCompositeFinancialPreview','--accept-composite-live':'runCompositeAcceptance',
+// This adapter supplies the existing promotion transaction with the exact
+// Hosting-only request. The composite request and its journal remain independent.
+const focalPreview = require('./gravicentra-i6-6-cloud-build-preview.cjs');
+const focalPackage = require('./gravicentra-i6-6-cloud-build-package.cjs');
+const focalComposition = require('./gravicentra-i6-6-focal-hosting-composition.cjs');
+const focalSigning = require('./gravicentra-i6-6-cloud-build-signed-cas.cjs');
+const comparisonUnit = ['I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127','I6_6_COTIZADOR_COMPARATIVO_DESTINATARIO_20261127_CONTENCION'];
+
+function focalRoleProof(report, phase, binding, physicalKey) {
+  assert.ok(phase==='preview'||phase==='live');
+  if(phase==='live')assert.match(physicalKey,/^[a-f0-9]{64}$/);
+  else assert.equal(physicalKey,null);
+  assert.deepEqual([report.schema,report.phase,report.result],['GI_I66_FOCAL_COMPARISON_ROLE_READBACK_V1',phase,'PASS']);
+  const origin=phase==='preview'?binding.previewUrl:'https://app.aysseguros.com';
+  assert.deepEqual([report.requestDigest,report.compositionTree,report.artifactDigest,report.hostingVersion,
+    report.sourceSha,report.buildId,report.origin,report.physicalPhaseKey],
+    [binding.focalHosting.requestDigest,binding.compositionTree,binding.artifactDigest,binding.hostingVersion,
+      binding.sourceSha,binding.buildId,origin,physicalKey]);
+  assert.deepEqual([report.externalCommunications,report.businessWrites,report.backendChanges],[0,0,0]);
+  assert.deepEqual(report.roles.map(row=>row.role).sort(),['direccion','operativo'],'FOCAL_ASSIGNED_ROLE_COVERAGE');
+  assert.equal(new Set(report.roles.map(row=>row.actorSha256)).size,2,'FOCAL_DISTINCT_ASSIGNED_ACTORS');
+  for(const row of report.roles){
+    assert.match(row.actorSha256,/^[0-9a-f]{64}$/);
+    for(const stage of ['beforeReload','afterReload']){
+      const s=row[stage];
+      assert.deepEqual([s.role,s.actorSha256,s.buildId,s.origin,s.authenticated,s.tenant,s.country],
+        [row.role,row.actorSha256,binding.buildId,origin,true,'alianzas-soluciones','GT'],'FOCAL_AUTHENTICATED_ROLE_READBACK');
+      for(const check of ['implicitRecipientBlocked','invalidProposalBlocked','mixedCurrenciesBlocked',
+        'exactCentavos','changedApprovalBlocked','emailComposerRevalidated','canonicalComparisonValid','independentDraftAvailable'])
+        assert.equal(s[check],true,'FOCAL_BEHAVIOR_'+check);
+    }
+    assert.deepEqual([row.fixtureKind,row.externalCommunications,row.businessWrites],['synthetic',0,0]);
+  }
+  return report;
+}
+function focalTarget(plan,proof,previewBuildId,compositionBlob) {
+  focalPreview.validatePlan(plan);
+  assert.equal(plan.schema,focalPreview.focalPreviewSchema);
+  const p=plan.packagePlan,a=plan.packageArtifact;
+  assert.deepEqual(p.request.changes,comparisonUnit,'FOCAL_COMPARISON_UNIT');
+  assert.deepEqual([proof.schema,proof.executionBuildId,proof.packageBuildId,proof.planDigest,proof.requestDigest,
+    proof.compositionTree,proof.packageArtifact,proof.scope],
+    ['GI_I66_FOCAL_HOSTING_PREVIEW_PROOF_V1',previewBuildId,plan.packageBuildId,focalPackage.digest(plan),
+      p.requestDigest,p.compositionTree,a,'HOSTING_PREVIEW_ONLY']);
+  const buildId='gi-i66-'+p.sourceSha.slice(0,12)+'-'+p.compositionTree.slice(0,12);
+  assert.equal(proof.buildId,buildId);
+  assert.match(proof.origin,new RegExp('^https://ays-orbit-360-lab--'+plan.channel+'-[a-z0-9]+\\.web\\.app$'));
+  const target={executionProvider:'CLOUD_BUILD',sourceSha:p.sourceSha,sourceTree:p.sourceTreeSha,
+    manifestBlob:p.request.manifestBlob,compositionBlob,compositionTree:p.compositionTree,
+    focalHosting:{schema:p.request.schema,generation:p.requestVersion,requestDigest:p.requestDigest,compositionTree:p.compositionTree},
+    buildId,buildRunId:plan.packageBuildId,artifactId:a.uri+'#'+a.generation,artifactDigest:'sha256:'+a.sha256,
+    previewChannel:plan.channel,previewUrl:proof.origin,hostingVersion:proof.hostingVersion,files:p.baseline.files};
+  require('./gravicentra-i66-frontend-promotion-transaction.cjs').releaseBinding(target);
+  return target;
+}
+
+function focalControl(head,plan){
+  const p=plan.packagePlan,tr=jsonAt(head,P.transport),cp=jsonAt(head,P.cp);
+  const live=cp[cp.currentExecutionDecisionPointer];
+  const admitted=focalComposition.plan(process.cwd(),head);
+  assert.deepEqual(admitted,{...p,mechanismSha:head},'FOCAL_SIGNED_COMPOSITION_CHANGED');
+  assert.equal(live.receiptGitBlobSha,p.request.previousReceiptBlob);
+  assert.equal(blobAt(head,live.receiptPath),live.receiptGitBlobSha);
+  return {generation:tr.frontendReleaseSequence,physical:admitted.baseline,receiptBlob:live.receiptGitBlobSha,
+    guardBlob:blobAt(head,P.guard),consumed:tr.consumedFrontendAuthorities||[],
+    focalRequestDigest:admitted.requestDigest,focalCompositionTree:admitted.compositionTree};
+}
+
+function getFocalSigner(account,digest){
+  assert.equal(account.login,'paulaosoriof86');
+  const key=process.env.GRAVICENTRA_I66_E4_CLOSURE_KEY;
+  assert.ok(key&&path.isAbsolute(key),'FOCAL_REGISTERED_CLOSURE_KEY_REQUIRED');
+  const stat=fs.lstatSync(key),parent=fs.lstatSync(path.dirname(key));
+  assert.ok(fs.realpathSync(key)===key&&key.startsWith('/dev/shm/')&&stat.isFile()&&!stat.isSymbolicLink()&&
+    stat.uid===process.getuid()&&(stat.mode&0o077)===0&&parent.uid===stat.uid&&(parent.mode&0o077)===0,
+    'FOCAL_SIGNER_TEMPORARY_PROTECTION');
+  const pub=fs.readFileSync(key+'.pub','utf8').trim().split(/\s+/).slice(0,2).join(' ');
+  const keys=focalGh(['users/'+account.login+'/ssh_signing_keys']);
+  const label='Gravicentra I6.6 E4 '+digest.slice(0,12)+' - firma temporal';
+  assert.ok(keys.some(k=>(!k.title||k.title===label)&&k.key.trim().split(/\s+/).slice(0,2).join(' ')===pub),'FOCAL_REGISTERED_SIGNING_ONLY_KEY');
+  return key;
+}
+function focalGh(args){return JSON.parse(execFileSync('gh',['api',...args],{encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:40*1024*1024}));}
+const focalRef=()=>focalGh(['repos/'+repository+'/git/ref/heads/'+branch]).object.sha;
+function exactFocalCommit(hash){
+  const c=focalGh(['repos/'+repository+'/commits/'+hash]);
+  assert.equal(c.sha,hash);assert.equal(c.commit.verification.verified,true,'FOCAL_VERIFIED_SIGNATURE_REQUIRED');
+  return c;
+}
+async function retainFocal(storage,name,bytes){
+  try{return await storage.retain(name,bytes,'application/json');}
+  catch(error){
+    const m=await storage.metadata(name);
+    const ref={uri:'gs://'+focalPackage.C.bucket+'/'+name,generation:String(m.generation),
+      bytes:bytes.length,sha256:focalPackage.sha(bytes)};
+    await storage.object(ref);
+    return ref;
+  }
+}
+function assertFocalPhasePaths(generation,authority,paths,closing){
+  const jp=releaseJournalPath(generation,authority),rp=genName(generation,'RECEIPT');
+  if(closing){
+    assert.deepEqual([...paths].sort(),[jp,P.cp,P.state,P.transport,P.ledger,genName(generation,'FOCAL_PROGRESS')].sort(),'FOCAL_EXACT_CLOSURE_PATHS');
+  }else{
+    assert.equal(paths.length,1);assert.ok([jp,rp,genName(generation,'FOCAL_HOSTING_PREVIEW_UI'),genName(generation,'FOCAL_HOSTING_LIVE_UI')].includes(paths[0]),'FOCAL_METADATA_SCOPE');
+  }
+}
+// Retain the signed Git object itself before sending the ref update. When a
+// response is lost another operator session can recover the same commit OID.
+function retainedFocalCommit(uri,dir,gitBytes,create){
+  const common={stdio:['ignore','pipe','pipe'],timeout:60000};
+  const meta=()=>JSON.parse(execFileSync('gcloud',['storage','objects','describe',uri,'--raw','--format=json'],common));
+  let m;
+  try{m=meta();}catch(error){
+    if(!/404|not found|No URLs matched/i.test(String(error.stderr)))throw error;
+    const sha=create(),file=path.join(dir,'signed.git');
+    fs.writeFileSync(file,gitBytes(['cat-file','commit',sha]),{flag:'wx',mode:0o600});
+    try{execFileSync('gcloud',['storage','cp','--if-generation-match=0',file,uri],common);}catch{/* Exact immutable readback below decides. */}
+    m=meta();
+  }
+  assert.equal('gs://'+m.bucket+'/'+m.name,uri);assert.match(String(m.generation),/^[1-9]\d*$/);
+  assert.ok(Number(m.size)>0&&Number(m.size)<65536);
+  const bytes=execFileSync('gcloud',['storage','cat',uri+'#'+m.generation],{...common,maxBuffer:65536});
+  assert.equal(bytes.length,Number(m.size));
+  return gitBytes(['hash-object','-w','-t','commit','--stdin'],{input:bytes}).toString().trim();
+}
+async function writeFocalCas({head,message,entries,request,storage,temp,account,closing=false}){
+  const paths=Object.keys(entries).sort(),authority=request.target.focalHosting,n=request.generation;
+  assertFocalPhasePaths(n,authority,paths,closing);
+  const gitBytes=(args,options={})=>execFileSync('git',args,{stdio:['pipe','pipe','pipe'],maxBuffer:64*1024*1024,...options});
+  const dir=fs.mkdtempSync(path.join(temp,'transition-')),env={...process.env,GIT_INDEX_FILE:path.join(dir,'index')};
+  const entriesWithPins=[];
+  gitBytes(['read-tree',head],{env});
+  for(const file of paths){
+    const content=serial(entries[file]),oid=blob(content);
+    assert.equal(gitBytes(['hash-object','-w','--stdin'],{input:content}).toString().trim(),oid);
+    const prior=git('ls-tree',head,'--',file);
+    assert.ok(!prior||prior.startsWith('100644 blob '),'FOCAL_PREIMAGE_MODE');
+    entriesWithPins.push({path:file,baseBlobSha:prior?prior.split(/\s/)[2]:null,newBlobSha:oid,content});
+    gitBytes(['update-index','--add','--cacheinfo','100644',oid,file],{env});
+  }
+  const tree=gitBytes(['write-tree'],{env}).toString().trim();
+  const packet={expectedHead:head,expectedBaseTree:git('rev-parse',head+'^{tree}'),expectedTree:tree,headline:message,
+    requestDigest:authority.requestDigest,packageBuildId:request.target.buildRunId,entries:entriesWithPins};
+  assert.notEqual(tree,packet.expectedBaseTree,'FOCAL_NO_CHANGES');
+  const verify=sha=>{focalSigning.verifyCommit({packet},exactFocalCommit(sha));assert.equal(focalRef(),sha);return sha;};
+  const prefix='i66/source-checkpoints/focal-hosting-package/'+authority.requestDigest+'/promotion/'+head+'/'+tree+'/';
+  const data=Buffer.from(serial(packet)),ref=await retainFocal(storage,prefix+'transition.json',data);
+  const before=focalRef();if(before!==head)return verify(before);
+  if(closing){
+    assert.equal(n,4,'E4_TEMPORARY_SIGNER_SCOPE');
+    const key=getFocalSigner(account,authority.requestDigest),email=account.id+'+'+account.login+'@users.noreply.github.com';
+    let submitted=false;
+    try{
+      return require('./gravicentra-i66-frontend-control.cjs').pushFocalClosure({fs,git:gitBytes,gh:focalGh,account,email,key,tree,
+        head,message,temp:dir,ref:focalRef,branch,remote:'https://github.com/'+repository+'.git',verified:verify,
+        onPush:()=>{submitted=true;},getSignedCommit:create=>retainedFocalCommit('gs://'+focalPackage.C.bucket+'/'+prefix+'closure.git',dir,gitBytes,create)});
+    }catch(error){
+      if(submitted)error.code='FOCAL_CLOSURE_ACK_PENDING';
+      throw error;
+    }
+  }
+  const mutation=focalSigning.operatorMutation({packet});
+  // A reservation belongs to one POST only. On an uncertain ACK the original
+  // expected tree and all its preimages survive in private storage.
+  try{await storage.retain(prefix+'attempt1.json',Buffer.from(serial(ref)),'application/json');}
+  catch{const observed=focalRef();if(observed!==head)return verify(observed);throw Error('FOCAL_CAS_EXISTING_CLAIM_ACK_PENDING');}
+  if(focalRef()!==head)return verify(focalRef());
+  let response;
+  try{response=await focalSigning.operatorCliIo().createCommit(mutation);}catch{/* Inspect the ref before taking any further action. */}
+  const after=focalRef();assert.notEqual(after,head,'FOCAL_CAS_ACK_PENDING');
+  const ack=response?.data?.createCommitOnBranch?.commit?.oid;if(ack)assert.equal(after,ack);
+  return verify(after);
+}
+
+async function runFocal(args=process.argv.slice(3)){
+  const [planFile,previewId,mode='promote',reportFile]=args;
+  assert.ok(planFile&&/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(previewId),'FOCAL_PREVIEW_BUILD_REQUIRED');
+  assert.ok(['promote','attest-preview','attest-live','inspect'].includes(mode));
+  assert.equal(args.length,mode.startsWith('attest-')?4:mode==='promote'&&args.length===2?2:3);
+  const account=focalGh(['user']);assert.equal(account.login,'paulaosoriof86');
+  const cloud=(args)=>execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:40*1024*1024}).trim();
+  assert.equal(cloud(['config','get-value','project']),focalPackage.C.projectId,'FOCAL_GOOGLE_PROJECT');
+  assert.equal(cloud(['auth','list','--filter=status:ACTIVE','--format=value(account)']),'aysseguros2009@gmail.com','FOCAL_GOOGLE_ACTOR');
+  assert.equal(git('status','--porcelain'),'','FOCAL_CLEAN_OPERATOR_CHECKOUT');
+  assert.equal(git('rev-parse','--abbrev-ref','HEAD'),'HEAD','FOCAL_DETACHED_OPERATOR_CHECKOUT');
+  const plan=JSON.parse(fs.readFileSync(planFile,'utf8'));
+  focalPreview.validatePlan(plan);assert.equal(plan.schema,focalPreview.focalPreviewSchema);
+  const pp=plan.packagePlan,n=pp.requestVersion;
+  assert.deepEqual(pp.request.changes,comparisonUnit);
+  const journalPath=releaseJournalPath(n,pp.request),receiptPath=genName(n,'RECEIPT');
+  const previewUi=genName(n,'FOCAL_HOSTING_PREVIEW_UI'),liveUi=genName(n,'FOCAL_HOSTING_LIVE_UI');
+  const programHead=git('rev-parse','HEAD');
+  const codePins=[P.guard,'tools/gravicentra-i66-frontend-promotion-owner.cjs','tools/gravicentra-i66-frontend-promotion-transaction.cjs',
+    'tools/gravicentra-i66-frontend-control.cjs','tools/gravicentra-i66-frontend-hosting-io.cjs','tools/gravicentra-i6-6-cloud-build-signed-cas.cjs',
+    'tools/gravicentra-i6-6-cloud-build-package.cjs','tools/gravicentra-i6-6-cloud-build-preview.cjs','tools/gravicentra-i6-6-focal-hosting-composition.cjs',
+    'tools/gravicentra-i6-6-frontend-preview-authority.cjs'];
+  function fresh(){
+    const head=remote();
+    assert.equal(focalRef(),head,'FOCAL_BRANCH_READBACK');
+    git('diff','--quiet',programHead,head,'--',...codePins);
+    if(git('rev-parse','HEAD')!==head){
+      assert.equal(git('status','--porcelain'),'','FOCAL_DIRTY_CHECKOUT');
+      git('checkout','--quiet','--detach',head);
+    }
+    return head;
+  }
+  const boot=fresh();exactFocalCommit(boot);exactFocalCommit(plan.mechanismSha);
+  const existing=optional(boot,journalPath);
+  const temp=fs.mkdtempSync(path.join(os.tmpdir(),'gi-focal-operator-'));
+  try{
+    const auth={getRequestHeaders:async()=>({Authorization:'Bearer '+cloud(['auth','print-access-token','--project='+focalPackage.C.projectId])})};
+    const storage=await focalPreview.cloudIo(await auth.getRequestHeaders());
+    const verifyDir=path.join(temp,'preview');
+    let proof;
+    if(existing){
+      assert.equal(existing.generation,n);assert.ok(existing.nativePreview,'FOCAL_NATIVE_JOURNAL_REQUIRED');
+      assert.equal(existing.nativePreview.buildId,previewId);
+      const saved=(await storage.object(existing.nativePreview.receipt)).data;
+      proof=JSON.parse(saved).proof;
+    }else{
+      focalControl(boot,plan);
+      proof=(await focalPreview.verify(plan,previewId,verifyDir)).proof;
+    }
+    const target=focalTarget(plan,proof,previewId,blobAt(pp.sourceSha,P.composition));
+    const previous=pp.baseline;
+    if(existing){
+      assert.deepEqual(existing.request.target,target,'FOCAL_RETAINED_TARGET');
+      assert.deepEqual(existing.request.previous,previous,'FOCAL_RETAINED_PREDECESSOR');
+    }
+    const prefix='i66/source-checkpoints/focal-hosting-package/'+pp.requestDigest+'/runtime/'+previewId+'/';
+    const data=await focalPreview.readPackage(plan,storage,path.join(temp,'package'),process.cwd());
+    assert.equal(data.proof.output.siteManifestSha256,proof.siteManifestSha256);
+    const previousBytes=(await storage.object(pp.request.baselineArchive)).data;
+    const oldBundle=focalComposition.unpackBaseline(previousBytes,pp,path.join(temp,'old'));
+    const newDir=path.join(temp,'new');fs.mkdirSync(newDir);
+    focalPreview.safeUnpack(path.join(temp,'package',focalPackage.F.archive),newDir);
+    const newBundle=focalPreview.loadBundle(newDir,target);
+    const bundles=[{binding:previous,bundle:oldBundle},{binding:target,bundle:newBundle}];
+    const provider=hosting(auth,undefined,{certifiedBundles:bundles});
+    const journal=()=>optional(fresh(),journalPath);
+    const readAt=head=>({readFileSync:(file,encoding)=>execFileSync('git',['cat-file','blob',head+':'+file],{encoding,maxBuffer:40*1024*1024})});
+    async function verifiedUi(head,phase,physicalKey){
+      const file=phase==='preview'?previewUi:liveUi,stored=jsonAt(head,file);
+      const commit=git('log','-1','--format=%H',head,'--',file),signedUi=exactFocalCommit(commit);
+      assert.equal(signedUi.author?.login,account.login,'FOCAL_ATTESTING_OPERATOR');
+      assert.equal(stored.schema,'GI_I66_SIGNED_FOCAL_ROLE_EVIDENCE_V1');
+      const ref=stored.evidence;
+      assert.ok(ref.uri==='gs://'+focalPackage.C.bucket+'/'+prefix+phase+'/'+ref.sha256+'.json','FOCAL_ROLE_EVIDENCE_PATH');
+      const raw=(await storage.object(ref)).data;
+      focalRoleProof(JSON.parse(raw),phase,target,physicalKey);
+      assert.deepEqual(stored,{schema:'GI_I66_SIGNED_FOCAL_ROLE_EVIDENCE_V1',phase,requestDigest:pp.requestDigest,
+        sourceSha:target.sourceSha,buildId:target.buildId,artifactDigest:target.artifactDigest,hostingVersion:target.hostingVersion,
+        physicalPhaseKey:physicalKey,evidence:ref,result:'PASS'});
+      return {result:'PASS',buildId:target.buildId,receiptBlob:blobAt(head,file)};
+    }
+    async function verifyCommitted(j){
+      const head=fresh();assert.deepEqual(optional(head,journalPath),j);
+      assert.equal(j.request.target.focalHosting.requestDigest,pp.requestDigest);
+      physicalGuard(jsonAt(head,P.cp),jsonAt(head,P.state),jsonAt(head,P.transport),readAt(head));
+      exactFocalCommit(j.receipt.commit);await verifiedUi(head,'preview',null);await verifiedUi(head,'live',j.key);
+      assert.deepEqual(await provider.live(target),j.physical);
+    }
+    if(existing?.phase==='COMMITTED'){await verifyCommitted(existing);return existing;}
+    const control=focalControl(boot,plan);
+    const requestBase={schema:'GI_I66_FRONTEND_PROMOTION_V1',gate:'I6.6',scope:'FRONTEND_ONLY',scopeId:'COTIZADOR_COMPARATIVO_DESTINATARIO',
+      generation:n,guardBlob:control.guardBlob,previousReceiptBlob:pp.request.previousReceiptBlob,target,previous};
+    const cas=(head,message,entries,closing=false)=>writeFocalCas({head,message,entries,request:requestBase,account,storage,temp,closing});
+    if(mode.startsWith('attest-')){
+      const phase=mode.slice(7),physicalKey=phase==='live'?existing?.key:null;
+      if(phase==='live')assert.equal(existing?.phase,'VERIFIED','FOCAL_LIVE_UI_REQUIRES_PHYSICAL_VERIFIED');
+      else assert.equal(await provider.current('live'),previous.hostingVersion);
+      const bytes=fs.readFileSync(reportFile),report=JSON.parse(bytes);
+      focalRoleProof(report,phase,target,physicalKey);
+      const state=phase==='preview'?await provider.preview(target):await provider.live(target);
+      assert.equal(state.hostingVersion,target.hostingVersion);
+      const ref=await retainFocal(storage,prefix+phase+'/'+focalPackage.sha(bytes)+'.json',bytes);
+      const value={schema:'GI_I66_SIGNED_FOCAL_ROLE_EVIDENCE_V1',phase,requestDigest:pp.requestDigest,
+        sourceSha:target.sourceSha,buildId:target.buildId,artifactDigest:target.artifactDigest,hostingVersion:target.hostingVersion,
+        physicalPhaseKey:physicalKey,evidence:ref,result:'PASS'};
+      // The observer retains only the role evidence. The promotion process is
+      // the sole canonical writer, including while it awaits LIVE readback.
+      const head=fresh();focalControl(head,plan);assert.deepEqual(optional(head,journalPath),existing);
+      const receipt=await retainFocal(storage,prefix+phase+'/attestation.json',Buffer.from(serial(value)));
+      return {stage:'ROLE_OBSERVATION_RETAINED',buildId:target.buildId,receipt};
+    }
+    async function adoptUi(phase,physicalKey) {
+      const file=phase==='preview'?previewUi:liveUi,head=fresh();
+      if(existsAt(head,file))return verifiedUi(head,phase,physicalKey);
+      const objectName=prefix+phase+'/attestation.json';
+      const url='https://storage.googleapis.com/storage/v1/b/'+focalPackage.C.bucket+'/o/'+encodeURIComponent(objectName);
+      const response=await fetch(url,{headers:await auth.getRequestHeaders(),redirect:'error',signal:AbortSignal.timeout(15000)});
+      if(response.status===404)return null;
+      assert.ok(response.ok,'FOCAL_ROLE_ATTESTATION_READ');
+      const m=await response.json();assert.equal(m.bucket,focalPackage.C.bucket);assert.equal(m.name,objectName);
+      assert.match(String(m.generation),/^[1-9][0-9]*$/);assert.ok(Number(m.size)>0&&Number(m.size)<16384);
+      const bytes=await storage.bytes(objectName,String(m.generation));assert.equal(bytes.length,Number(m.size));
+      const value=JSON.parse(bytes),ref=value.evidence;
+      assert.equal(ref.uri,'gs://'+focalPackage.C.bucket+'/'+prefix+phase+'/'+ref.sha256+'.json');
+      const raw=(await storage.object(ref)).data;
+      focalRoleProof(JSON.parse(raw),phase,target,physicalKey);
+      assert.deepEqual(value,{schema:'GI_I66_SIGNED_FOCAL_ROLE_EVIDENCE_V1',phase,requestDigest:pp.requestDigest,
+        sourceSha:target.sourceSha,buildId:target.buildId,artifactDigest:target.artifactDigest,hostingVersion:target.hostingVersion,
+        physicalPhaseKey:physicalKey,evidence:ref,result:'PASS'});
+      assert.equal(await provider.current(phase==='preview'?plan.channel:'live'),target.hostingVersion);
+      const before=fresh();focalControl(before,plan);
+      if(phase==='live') {
+        const active=optional(before,journalPath);
+        assert.equal(active?.phase,'VERIFIED');assert.equal(active.key,physicalKey);
+      }
+      if(!existsAt(before,file))await cas(before,'release(i66): attest focal '+phase+' UI generation '+n,{[file]:value});
+      return verifiedUi(fresh(),phase,physicalKey);
+    }
+    if(mode==='inspect')return {stage:'PREVIEW_DEPLOYED',previewBuild:previewId,target,previous,roleProof:existsAt(boot,previewUi)?await verifiedUi(boot,'preview',null):'PENDING'};
+    const uiApproval=await adoptUi('preview',null);
+    assert.ok(uiApproval,'FOCAL_AUTHENTICATED_PREVIEW_ROLE_EVIDENCE_PENDING');
+    const request={...requestBase,approvalBlob:uiApproval.receiptBlob};
+    getFocalSigner(account,pp.requestDigest);
+    assert.equal(n,4,'E4_TEMPORARY_SIGNER_SCOPE');
+    const cli=process.env.FIREBASE_CLI_BIN;
+    assert.ok(cli&&fs.existsSync(cli),'FOCAL_PINNED_HOSTING_CLI_REQUIRED');
+    assert.equal(execFileSync(process.execPath,[cli,'--version'],{encoding:'utf8'}).trim(),'14.10.1');
+    const nativePreview=existing?.nativePreview||{buildId:previewId,receipt:await retainFocal(storage,prefix+'certified-preview.json',fs.readFileSync(path.join(verifyDir,'receipt.json')))};
+    if(existing)assert.deepEqual(existing.request,request,'FOCAL_JOURNAL_REQUEST_DRIFT');
+    async function ownership(j){
+      const h=fresh();focalControl(h,plan);assert.deepEqual(optional(h,journalPath),j,'FOCAL_JOURNAL_OWNER_CHANGED');return h;
+    }
+    async function writePhase(old,next){
+      const h=await ownership(old);
+      const value={...next,nativePreview};
+      await cas(h,'release(i66): '+value.phase+' focal Hosting generation '+n,{[journalPath]:value});
+      assert.deepEqual(journal(),value,'FOCAL_PHASE_READBACK');return value;
+    }
+    const io={readJournal:journal,readControl:()=>focalControl(fresh(),plan),
+      validateProofs:()=>verifiedUi(fresh(),'preview',null),cas:writePhase,incident:writePhase,
+      verifyLive:provider.live,verifyPreview:provider.preview,currentVersion:()=>provider.current('live'),
+      clone:provider.clone,assertOwnership:ownership,assertCompensationOwnership:ownership,
+      liveUiProof:async j=>{
+        for(let i=0;i<60;i++){
+          await ownership(j);
+          const ui=await adoptUi('live',j.key);if(ui)return ui;
+          await sleep(10000);
+        }
+        throw Error('FOCAL_LIVE_UI_RECEIPT_TIMEOUT');
+      },
+      signedReceipt:async(j,ui)=>{
+        const h=await ownership(j),release=await provider.currentRelease('live');
+        assert.equal(release.version.name,target.hostingVersion);
+        assert.match(release.name,/^sites\/ays-orbit-360-lab\/(?:channels\/live\/)?releases\/[a-zA-Z0-9_-]+$/);
+        const value={schema:'GI_I66_SIGNED_FRONTEND_RECEIPT_V1',generation:n,scopeId:request.scopeId,
+          authorization:request.approvalBlob,target,previous,preview:j.preview,physical:j.physical,ui,runId:release.name,
+          hostingRelease:release.name,previewBuild:previewId,packageBuild:target.buildRunId};
+        const prior=optional(h,receiptPath);if(prior)assert.deepEqual(prior,value,'FOCAL_SIGNED_RECEIPT_COLLISION');
+        else await cas(h,'release(i66): sign focal Hosting receipt generation '+n,{[receiptPath]:value});
+        const head=fresh(),commit=git('log','-1','--format=%H',head,'--',receiptPath);
+        exactFocalCommit(commit);assert.equal(blobAt(head,receiptPath),blob(serial(value)));
+        return {blob:blobAt(head,receiptPath),commit,verified:true,runId:release.name};
+      },
+      commitAll:async(j,next)=>{
+        const h=await ownership(j),changes=closeFiles(file=>jsonAt(h,file),j,next);
+        const reader={readFileSync:file=>Object.hasOwn(changes,file)?serial(changes[file]):readAt(h).readFileSync(file).toString('utf8')};
+        physicalGuard(changes[P.cp],changes[P.state],changes[P.transport],reader);
+        await verifyProspectiveChanges(h,changes);
+        assert.equal(await provider.current('live'),target.hostingVersion);
+        assert.equal(await ownership(j),h);
+        await cas(h,'release(i66): COMMITTED exact focal Hosting generation '+n,changes,true);
+        await verifyCommitted(next);return next;
+      },verifyCommitted};
+    return await promote(io,request);
+  }finally{fs.rmSync(temp,{recursive:true,force:true});}
+}
+
+function dispatchReleaseAction(action,handlers={verifyCompositeFinancialPreview,runCompositeAcceptance,authorizeCompositeRollback,recordCompositeRollback,run,runFocal}){
+  const operations={'--promote-focal':'runFocal','--verify-composite-financial-preview':'verifyCompositeFinancialPreview','--accept-composite-live':'runCompositeAcceptance',
     '--authorize-composite-rollback':'authorizeCompositeRollback','--record-composite-rollback':'recordCompositeRollback'};
   const name=action===undefined?'run':operations[action];
   if(!name)return Promise.reject(Error('RELEASE_OWNER_UNKNOWN_OPERATION'));
@@ -923,8 +1295,11 @@ function dispatchReleaseAction(action,handlers={verifyCompositeFinancialPreview,
 }
 if(require.main===module){
   const execution=dispatchReleaseAction(process.argv[2]);
+  if(process.argv[2]==='--promote-focal')execution.then(result=>console.log(JSON.stringify({
+    stage:result.stage||result.phase||result.result,buildId:result.target?.buildId||result.request?.target?.buildId||result.buildId,
+    receipt:result.receipt||result.receiptBlob||null})),()=>{});
   execution.catch(e=>{console.error('I66_FRONTEND_PROMOTION_HOLD '+String(e.message).split('\n')[0].slice(0,150)+(transportCode(e)?' TRANSPORT_CODE='+transportCode(e):''));process.exitCode=1;});
 }
-module.exports={releaseProviderIdentity,nextCompositeGeneration,assertCompositeRollbackAllowed,FINANCIAL_SCOPE,financialQaPaths,financialQaOwnerSelection,assertFinancialComposition,financialTarget,
+module.exports={focalRoleProof,focalTarget,focalControl,assertFocalPhasePaths,releaseProviderIdentity,nextCompositeGeneration,assertCompositeRollbackAllowed,FINANCIAL_SCOPE,financialQaPaths,financialQaOwnerSelection,assertFinancialComposition,financialTarget,
   validateFinancialAuthority,resolveFinancialQa,validateFinancialReport,validateFinancialPhasePair,compositeFinancialBinding,
   validateCompositeFinancialParent,dispatchReleaseAction,transportCode,runReleaseChild,commitWithReadback};

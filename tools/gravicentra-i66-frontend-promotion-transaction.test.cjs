@@ -282,3 +282,111 @@ test('long child supervision leaves the parent event loop running and propagates
   clearTimeout(timer);assert.equal(heartbeat,true);
   await assert.rejects(recoveryOwner.runReleaseChild(process.execPath,['-e','process.exit(7)'],{stdio:'ignore',timeout:1000}),/RELEASE_SUBPROCESS_FAILED_7/);
 });
+
+const focalOwner=require('./gravicentra-i66-frontend-promotion-owner.cjs');
+const focalControlOwner=require('./gravicentra-i66-frontend-control.cjs');
+const focalPkg=require('./gravicentra-i6-6-cloud-build-package.cjs');
+const focalPreviewOwner=require('./gravicentra-i6-6-cloud-build-preview.cjs');
+const sourceTree=require('./gravicentra-i6-6-focal-hosting-composition.cjs');
+const nativeCi=require('node:child_process');
+const focalFixtureHead='118e68f2ae8a29628ab137a6cc2fb3d0afe4c0c8';
+let focalPlanCache;
+function nativeFocalFixture(){
+  const cwd=require('node:path').join(__dirname,'..');
+  const pp=focalPlanCache||=sourceTree.plan(cwd,focalFixtureHead);
+  const previewId='00000000-0000-4000-8000-000000000001',build='00000000-0000-4000-8000-000000000002';
+  const channel='gi-i66-e'+pp.requestVersion+'-'+pp.requestDigest.slice(0,12);
+  const archive={uri:'gs://'+focalPkg.C.bucket+'/'+sourceTree.prefix(pp,build)+focalPkg.F.archive,
+    bytes:12345,sha256:'2'.repeat(64),generation:'12345'};
+  const p={schema:focalPreviewOwner.focalPreviewSchema,provider:focalPkg.C.provider,scope:'HOSTING_PREVIEW_ONLY',
+    packagePlan:pp,sourceSha:pp.sourceSha,mechanismSha:focalFixtureHead,packageBuildId:build,requestVersion:pp.requestVersion,
+    packageArtifact:archive,channel};
+  const buildId='gi-i66-'+pp.sourceSha.slice(0,12)+'-'+pp.compositionTree.slice(0,12);
+  const proof={schema:'GI_I66_FOCAL_HOSTING_PREVIEW_PROOF_V1',executionBuildId:previewId,packageBuildId:build,
+    planDigest:focalPkg.digest(p),requestDigest:pp.requestDigest,compositionTree:pp.compositionTree,packageArtifact:archive,
+    buildId,scope:'HOSTING_PREVIEW_ONLY',origin:'https://ays-orbit-360-lab--'+channel+'-fixture.web.app',
+    hostingVersion:'sites/ays-orbit-360-lab/versions/fixture'};
+  const composition=nativeCi.execFileSync('git',['rev-parse',pp.sourceSha+':'+focalControlOwner.P.composition],{cwd,encoding:'utf8'}).trim();
+  return {p,proof,previewId,composition,target:focalOwner.focalTarget(p,proof,previewId,composition)};
+}
+test('native focal admission supplies the canonical request and exact product tree to the existing transaction',async()=>{
+  const f=nativeFocalFixture(),control=focalOwner.focalControl(focalFixtureHead,f.p);
+  assert.equal(control.focalRequestDigest,'55e78a70916bbcd4dffa3dd57a4e60f43c3ee4d2fc214471148047559322b1c6');
+  assert.equal(control.focalCompositionTree,'072013af1a8ae12569611a8828179db9b4a63ed3');
+  const r={schema:'GI_I66_FRONTEND_PROMOTION_V1',gate:'I6.6',scope:'FRONTEND_ONLY',generation:4,guardBlob:control.guardBlob,
+    previousReceiptBlob:control.receiptBlob,previous:control.physical,approvalBlob:'f'.repeat(40),target:f.target};
+  require('./gravicentra-i66-frontend-promotion-transaction.cjs').validateRequest(r,control);
+  assert.deepEqual(r.previous,f.p.packagePlan.baseline);
+  assert.equal(await focalOwner.dispatchReleaseAction('--promote-focal',{runFocal:async()=>'focal',run:()=>assert.fail('Actions')}),'focal');
+  for(const patch of [{compositionTree:'7'.repeat(40)},{origin:f.p.packagePlan.baseline.previewUrl},{scope:'COMPOSITE'},
+    {packageArtifact:{...f.p.packageArtifact,generation:'678'}},{executionBuildId:f.p.packageBuildId}]){
+    assert.throws(()=>focalOwner.focalTarget(f.p,{...f.proof,...patch},f.previewId,f.composition));
+  }
+});
+test('focal role acceptance requires both observed identities, checks after reload, exact artifact and no external effects',()=>{
+  const {target:t}=nativeFocalFixture();
+  const report={schema:'GI_I66_FOCAL_COMPARISON_ROLE_READBACK_V1',phase:'preview',result:'PASS',requestDigest:t.focalHosting.requestDigest,
+    compositionTree:t.compositionTree,artifactDigest:t.artifactDigest,hostingVersion:t.hostingVersion,sourceSha:t.sourceSha,buildId:t.buildId,
+    origin:t.previewUrl,physicalPhaseKey:null,businessWrites:0,externalCommunications:0,backendChanges:0,roles:[]};
+  for(const [i,role] of ['direccion','operativo'].entries()){
+    const actorSha256=String(i+1).repeat(64),s={role,actorSha256,buildId:t.buildId,origin:t.previewUrl,authenticated:true,tenant:'alianzas-soluciones',country:'GT',
+      implicitRecipientBlocked:true,invalidProposalBlocked:true,mixedCurrenciesBlocked:true,exactCentavos:true,changedApprovalBlocked:true,
+      emailComposerRevalidated:true,canonicalComparisonValid:true,independentDraftAvailable:true};
+    report.roles.push({role,actorSha256,beforeReload:s,afterReload:{...s},fixtureKind:'synthetic',externalCommunications:0,businessWrites:0});
+  }
+  assert.equal(focalOwner.focalRoleProof(report,'preview',t,null),report);
+  for(const change of [r=>r.roles.pop(),r=>r.roles[1].actorSha256=r.roles[0].actorSha256,r=>r.roles[1].afterReload.authenticated=false,
+    r=>r.roles[0].afterReload.exactCentavos=false,r=>r.roles[1].beforeReload.emailComposerRevalidated=false,r=>r.externalCommunications++,
+    r=>r.roles[0].businessWrites++,r=>r.roles[1].afterReload.origin='https://example.invalid',r=>r.artifactDigest='sha256:'+'3'.repeat(64)]){
+    const copy=structuredClone(report);change(copy);assert.throws(()=>focalOwner.focalRoleProof(copy,'preview',t,null));
+  }
+  assert.throws(()=>focalOwner.focalRoleProof(report,'live',t,'3'.repeat(64)));
+});
+test('six-path closure excludes request35 owners and the previously rolled back journal',()=>{
+  const {target}=nativeFocalFixture(),f=target.focalHosting,n=f.generation,{P,genName,releaseJournalPath}=focalControlOwner;
+  const paths=[P.cp,P.state,P.transport,P.ledger,genName(n,'FOCAL_PROGRESS'),releaseJournalPath(n,f)];
+  assert.doesNotThrow(()=>focalOwner.assertFocalPhasePaths(n,f,paths,true));
+  for(const file of [genName(n,'JOURNAL'),genName(n,'PREVIEW_UI'),P.authority,'orbit360-platform/index.html']){
+    assert.throws(()=>focalOwner.assertFocalPhasePaths(n,f,[...paths.slice(0,-1),file],true));
+    assert.throws(()=>focalOwner.assertFocalPhasePaths(n,f,[file],false));
+  }
+});
+
+test('synthetic E4 completes the shared transaction and six-document closure on R93 without consuming request35',async()=>{
+  const f=nativeFocalFixture(),ctl=focalOwner.focalControl(focalFixtureHead,f.p),{P,genName,serial,blob,closeFiles,physicalGuard}=focalControlOwner;
+  const readText=file=>nativeCi.execFileSync('git',['cat-file','blob',focalFixtureHead+':'+file],{encoding:'utf8',maxBuffer:32*1024*1024});
+  const request={schema:'GI_I66_FRONTEND_PROMOTION_V1',gate:'I6.6',scope:'FRONTEND_ONLY',scopeId:'COTIZADOR_COMPARATIVO_DESTINATARIO',
+    generation:4,guardBlob:ctl.guardBlob,previousReceiptBlob:ctl.receiptBlob,previous:ctl.physical,approvalBlob:'f'.repeat(40),target:f.target};
+  const original=JSON.parse(readText(P.transport));
+  const {io,state}=fixture();Object.assign(state,{current:request.previous.hostingVersion});
+  let effective={};
+  Object.assign(io,{readControl:()=>ctl,signedReceipt:async(j,ui)=>{
+    const runId='sites/ays-orbit-360-lab/channels/live/releases/fixture';
+    const receipt={schema:'GI_I66_SIGNED_FRONTEND_RECEIPT_V1',generation:4,scopeId:request.scopeId,authorization:request.approvalBlob,
+      target:request.target,previous:request.previous,preview:j.preview,physical:j.physical,ui,runId};
+    effective[genName(4,'RECEIPT')]=receipt;return {runId,commit:'2'.repeat(40),blob:blob(serial(receipt)),verified:true};
+  },liveUiProof:async()=>({result:'PASS',buildId:f.target.buildId,receiptBlob:'2'.repeat(40)}),
+  verifyLive:async r=>{assert.equal(state.current,r.hostingVersion);return {...r,firebase:r.files,custom:r.files,manifestDigest:'sha256:'+'9'.repeat(64)};},
+  commitAll:async(j,next)=>{
+    effective={...effective,...closeFiles(file=>JSON.parse(readText(file)),j,next)};
+    state.j=next;return next;
+  }});
+  const j=await promote(io,request);assert.equal(j.phase,'COMMITTED');assert.equal(state.clones,1);
+  const read={readFileSync:file=>Object.hasOwn(effective,file)?serial(effective[file]):readText(file)};
+  physicalGuard(effective[P.cp],effective[P.state],effective[P.transport],read);
+  for(const key of ['frontendPreviewRequest','operationalReleaseCandidate','scopedBackendPreviewI66','lastConsumedFrontendRelease'])
+    assert.deepEqual(effective[P.transport][key],original[key]);
+  assert.equal(read.readFileSync(genName(4,'JOURNAL')),readText(genName(4,'JOURNAL')));
+  assert.equal(effective[genName(4,'FOCAL_PROGRESS')].releaseExecution.uiReceiptPath,genName(4,'FOCAL_HOSTING_LIVE_UI'));
+});
+test('uncertain focal closure keeps its verified journal for readback before any compensation',async()=>{
+  const f=nativeFocalFixture(),ctl=focalOwner.focalControl(focalFixtureHead,f.p);
+  const req={schema:'GI_I66_FRONTEND_PROMOTION_V1',gate:'I6.6',scope:'FRONTEND_ONLY',generation:4,approvalBlob:'f'.repeat(40),
+    previousReceiptBlob:ctl.receiptBlob,guardBlob:ctl.guardBlob,previous:ctl.physical,target:f.target};
+  const {state,io}=fixture();state.current=req.previous.hostingVersion;
+  Object.assign(io,{readControl:()=>ctl,verifyLive:async r=>({...r,firebase:r.files,custom:r.files,manifestDigest:'sha256:'+'9'.repeat(64)}),
+    liveUiProof:async()=>({result:'PASS',buildId:req.target.buildId,receiptBlob:'2'.repeat(40)}),
+    commitAll:async()=>{throw Object.assign(new Error('unknown ACK'),{code:'FOCAL_CLOSURE_ACK_PENDING'});}});
+  await assert.rejects(promote(io,req),{code:'FOCAL_CLOSURE_ACK_PENDING'});
+  assert.equal(state.j.phase,'VERIFIED');assert.equal(state.clones,1);assert.equal(state.current,req.target.hostingVersion);
+});

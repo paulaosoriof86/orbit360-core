@@ -100,6 +100,9 @@ async function promote(io,request) {
     const actual=await io.readJournal(request.generation);
     if(actual?.phase==='COMMITTED' && actual.key===key){await io.verifyCommitted(actual);return actual;}
     if(actual?.key!==key)throw error;
+    // The exact commit has been handed to the Git server. A possibly late
+    // signed ACK must be reconciled before compensating a VERIFIED release.
+    if(request.target.focalHosting && actual.phase==='VERIFIED' && error.code==='FOCAL_CLOSURE_ACK_PENDING')throw error;
     let state='INCIDENT',rollback;
     try{
       const physical=await io.currentVersion();
